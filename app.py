@@ -1,7 +1,16 @@
 import os
 import io
 
-from flask import Flask, render_template, request, send_file
+from flask import (
+    Flask,
+    render_template,
+    request,
+    send_file,
+    redirect,
+    url_for,
+    session
+)
+
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -10,6 +19,15 @@ from reportlab.lib.units import mm
 
 
 app = Flask(__name__)
+
+# ======================================================
+# LOGIN
+# ======================================================
+
+app.secret_key = "certificados_secret_key"
+
+USUARIO = "admin"
+SENHA = "1234"
 
 # ======================================================
 # CONFIG
@@ -66,10 +84,13 @@ anos = [str(i) for i in range(2026, 2036)]
 FONTE_TITULO = "Helvetica-Bold"
 FONTE_TEXTO = "Helvetica"
 
-
 # ======================================================
 # FUNÇÕES
 # ======================================================
+
+def usuario_logado():
+    return session.get("logado")
+
 
 def nome_valido(nome):
     return len(nome.strip().split()) >= 2
@@ -84,7 +105,11 @@ def tamanho_fonte_dinamico(texto, fonte, tamanho_maximo, largura_maxima):
     tamanho = tamanho_maximo
 
     while tamanho > 10:
-        largura_texto = pdfmetrics.stringWidth(texto, fonte, tamanho)
+        largura_texto = pdfmetrics.stringWidth(
+            texto,
+            fonte,
+            tamanho
+        )
 
         if largura_texto <= largura_maxima:
             return tamanho
@@ -95,7 +120,11 @@ def tamanho_fonte_dinamico(texto, fonte, tamanho_maximo, largura_maxima):
 
 
 def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
-    largura_nome = pdfmetrics.stringWidth(nome, fonte, tamanho)
+    largura_nome = pdfmetrics.stringWidth(
+        nome,
+        fonte,
+        tamanho
+    )
 
     if largura_nome <= largura_quebra:
         return [nome]
@@ -110,8 +139,17 @@ def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
         linha_1 = " ".join(palavras[:i])
         linha_2 = " ".join(palavras[i:])
 
-        largura_1 = pdfmetrics.stringWidth(linha_1, fonte, tamanho)
-        largura_2 = pdfmetrics.stringWidth(linha_2, fonte, tamanho)
+        largura_1 = pdfmetrics.stringWidth(
+            linha_1,
+            fonte,
+            tamanho
+        )
+
+        largura_2 = pdfmetrics.stringWidth(
+            linha_2,
+            fonte,
+            tamanho
+        )
 
         diferenca = abs(largura_1 - largura_2)
 
@@ -148,33 +186,7 @@ def desenhar_nome_dinamico(
     )
 
     if len(nome_linhas) == 2:
-        maior_linha = max(
-            nome_linhas,
-            key=lambda linha: pdfmetrics.stringWidth(
-                linha,
-                fonte,
-                tamanho_nome
-            )
-        )
 
-        tamanho_nome = tamanho_fonte_dinamico(
-            maior_linha,
-            fonte,
-            tamanho_maximo,
-            largura_maxima
-        )
-
-    if len(nome_linhas) == 1:
-        texto_centralizado(
-            pdf,
-            nome_linhas[0],
-            centro_x,
-            y_nome,
-            fonte,
-            tamanho_nome
-        )
-
-    else:
         espacamento_linha = 8 * mm
 
         texto_centralizado(
@@ -195,10 +207,24 @@ def desenhar_nome_dinamico(
             tamanho_nome
         )
 
+    else:
+
+        texto_centralizado(
+            pdf,
+            nome_linhas[0],
+            centro_x,
+            y_nome,
+            fonte,
+            tamanho_nome
+        )
+
 
 def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
+
     nome = nome.strip().upper()
+
     data_certificado = f"{dia} de {mes} de {ano}"
+
     cor_da_faixa = f"FAIXA {faixa.upper()}"
 
     buffer = io.BytesIO()
@@ -209,6 +235,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     )
 
     largura, altura = landscape(A4)
+
     centro_x = largura / 2
 
     # ==================================================
@@ -224,6 +251,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     )
 
     if os.path.exists(caminho_fundo):
+
         fundo = ImageReader(caminho_fundo)
 
         pdf.drawImage(
@@ -238,36 +266,32 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     # MEDIDAS
     # ==================================================
 
-    fonte_titulo = FONTE_TITULO
-    fonte_texto = FONTE_TEXTO
-
     topo_bloco = altura - (30 * mm)
+
     fim_bloco = altura - (120 * mm)
 
     linhas = 8
-    espacamento = (topo_bloco - fim_bloco) / (linhas - 1)
 
-    y_certificado_base = topo_bloco
+    espacamento = (
+        topo_bloco - fim_bloco
+    ) / (linhas - 1)
+
+    y_certificado = topo_bloco
     y_certifico = topo_bloco - (espacamento * 1)
-    y_nome_base = topo_bloco - (espacamento * 1.8)
+    y_nome = topo_bloco - (espacamento * 1.8)
     y_graduou = topo_bloco - (espacamento * 3)
-    y_faixa_base = topo_bloco - (espacamento * 3.8)
+    y_faixa = topo_bloco - (espacamento * 3.8)
     y_exame = topo_bloco - (espacamento * 5)
     y_equipe = topo_bloco - (espacamento * 6)
     y_data = fim_bloco
 
-    ajuste_titulo = -4 * mm
-
-    y_certificado = y_certificado_base + ajuste_titulo
-    y_nome = y_nome_base + ajuste_titulo
-    y_faixa = y_faixa_base + ajuste_titulo
-
     largura_nome_maxima = 185 * mm
+
     largura_quebra_nome = 150 * mm
 
     tamanho_faixa = tamanho_fonte_dinamico(
         cor_da_faixa,
-        fonte_titulo,
+        FONTE_TITULO,
         40,
         largura_nome_maxima
     )
@@ -281,7 +305,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         "CERTIFICADO",
         centro_x,
         y_certificado,
-        fonte_titulo,
+        FONTE_TITULO,
         40
     )
 
@@ -290,7 +314,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         "CERTIFICO QUE O ATLETA",
         centro_x,
         y_certifico,
-        fonte_texto,
+        FONTE_TEXTO,
         18
     )
 
@@ -299,7 +323,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         nome,
         centro_x,
         y_nome,
-        fonte_titulo,
+        FONTE_TITULO,
         25,
         largura_nome_maxima,
         largura_quebra_nome
@@ -310,7 +334,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         "GRADUOU-SE COM MÉRITO A",
         centro_x,
         y_graduou,
-        fonte_texto,
+        FONTE_TEXTO,
         18
     )
 
@@ -319,7 +343,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         cor_da_faixa,
         centro_x,
         y_faixa,
-        fonte_titulo,
+        FONTE_TITULO,
         tamanho_faixa
     )
 
@@ -328,7 +352,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         "COM EXAME DE GRADUAÇÃO CONCEDIDO",
         centro_x,
         y_exame,
-        fonte_texto,
+        FONTE_TEXTO,
         18
     )
 
@@ -337,7 +361,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         "PELA EQUIPE CRIST OSS BJJ.",
         centro_x,
         y_equipe,
-        fonte_texto,
+        FONTE_TEXTO,
         18
     )
 
@@ -346,7 +370,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         data_certificado,
         centro_x,
         y_data,
-        fonte_texto,
+        FONTE_TEXTO,
         18
     )
 
@@ -358,11 +382,49 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
 
 
 # ======================================================
+# LOGIN
+# ======================================================
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+
+        usuario = request.form.get("usuario")
+        senha = request.form.get("senha")
+
+        if usuario == USUARIO and senha == SENHA:
+
+            session["logado"] = True
+
+            return redirect(url_for("index"))
+
+        return render_template(
+            "login.html",
+            erro="Usuário ou senha inválidos."
+        )
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect(url_for("login"))
+
+
+# ======================================================
 # ROTAS
 # ======================================================
 
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
     return render_template(
         "index.html",
         faixas=faixas,
@@ -374,6 +436,10 @@ def index():
 
 @app.route("/gerar", methods=["POST"])
 def gerar():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
     nome = request.form.get("nome", "").strip()
     faixa = request.form.get("faixa", "").strip()
     dia = request.form.get("dia", "").strip()
@@ -381,13 +447,7 @@ def gerar():
     ano = request.form.get("ano", "").strip()
 
     if not nome_valido(nome):
-        return "Erro: digite o nome completo do aluno.", 400
-
-    if faixa not in faixas:
-        return "Erro: faixa inválida.", 400
-
-    if dia not in dias or mes not in meses or ano not in anos:
-        return "Erro: data inválida.", 400
+        return "Erro: digite nome completo.", 400
 
     pdf_buffer = gerar_pdf_certificado(
         nome,
@@ -397,7 +457,11 @@ def gerar():
         ano
     )
 
-    nome_arquivo = nome.upper().replace(" ", "_").replace("/", "_")
+    nome_arquivo = (
+        nome.upper()
+        .replace(" ", "_")
+        .replace("/", "_")
+    )
 
     return send_file(
         pdf_buffer,
