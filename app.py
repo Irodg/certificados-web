@@ -29,6 +29,7 @@ app.secret_key = "certificados_secret_key"
 USUARIO = "admin"
 SENHA = "1234"
 
+
 # ======================================================
 # CONFIG
 # ======================================================
@@ -84,12 +85,13 @@ anos = [str(i) for i in range(2026, 2036)]
 FONTE_TITULO = "Helvetica-Bold"
 FONTE_TEXTO = "Helvetica"
 
+
 # ======================================================
 # FUNÇÕES
 # ======================================================
 
 def usuario_logado():
-    return session.get("logado")
+    return session.get("logado") is True
 
 
 def nome_valido(nome):
@@ -186,6 +188,21 @@ def desenhar_nome_dinamico(
     )
 
     if len(nome_linhas) == 2:
+        maior_linha = max(
+            nome_linhas,
+            key=lambda linha: pdfmetrics.stringWidth(
+                linha,
+                fonte,
+                tamanho_nome
+            )
+        )
+
+        tamanho_nome = tamanho_fonte_dinamico(
+            maior_linha,
+            fonte,
+            tamanho_maximo,
+            largura_maxima
+        )
 
         espacamento_linha = 8 * mm
 
@@ -208,7 +225,6 @@ def desenhar_nome_dinamico(
         )
 
     else:
-
         texto_centralizado(
             pdf,
             nome_linhas[0],
@@ -220,11 +236,9 @@ def desenhar_nome_dinamico(
 
 
 def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
-
     nome = nome.strip().upper()
 
     data_certificado = f"{dia} de {mes} de {ano}"
-
     cor_da_faixa = f"FAIXA {faixa.upper()}"
 
     buffer = io.BytesIO()
@@ -235,58 +249,58 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     )
 
     largura, altura = landscape(A4)
-
     centro_x = largura / 2
 
     # ==================================================
     # FUNDO
     # ==================================================
 
-    nome_fundo = fundos_por_faixa[faixa]
+    nome_fundo = fundos_por_faixa.get(faixa)
 
-    caminho_fundo = os.path.join(
-        app.root_path,
-        "fundos",
-        nome_fundo
-    )
-
-    if os.path.exists(caminho_fundo):
-
-        fundo = ImageReader(caminho_fundo)
-
-        pdf.drawImage(
-            fundo,
-            0,
-            0,
-            width=largura,
-            height=altura
+    if nome_fundo:
+        caminho_fundo = os.path.join(
+            app.root_path,
+            "fundos",
+            nome_fundo
         )
+
+        if os.path.exists(caminho_fundo):
+            fundo = ImageReader(caminho_fundo)
+
+            pdf.drawImage(
+                fundo,
+                0,
+                0,
+                width=largura,
+                height=altura
+            )
 
     # ==================================================
     # MEDIDAS
     # ==================================================
 
     topo_bloco = altura - (30 * mm)
-
     fim_bloco = altura - (120 * mm)
 
     linhas = 8
+    espacamento = (topo_bloco - fim_bloco) / (linhas - 1)
 
-    espacamento = (
-        topo_bloco - fim_bloco
-    ) / (linhas - 1)
-
-    y_certificado = topo_bloco
+    y_certificado_base = topo_bloco
     y_certifico = topo_bloco - (espacamento * 1)
-    y_nome = topo_bloco - (espacamento * 2.2)
+    y_nome_base = topo_bloco - (espacamento * 1.8)
     y_graduou = topo_bloco - (espacamento * 3)
-    y_faixa = topo_bloco - (espacamento * 4.2)
+    y_faixa_base = topo_bloco - (espacamento * 3.8)
     y_exame = topo_bloco - (espacamento * 5)
     y_equipe = topo_bloco - (espacamento * 6)
     y_data = fim_bloco
 
-    largura_nome_maxima = 185 * mm
+    ajuste_titulo = -4 * mm
 
+    y_certificado = y_certificado_base + ajuste_titulo
+    y_nome = y_nome_base + ajuste_titulo
+    y_faixa = y_faixa_base + ajuste_titulo
+
+    largura_nome_maxima = 185 * mm
     largura_quebra_nome = 150 * mm
 
     tamanho_faixa = tamanho_fonte_dinamico(
@@ -375,28 +389,23 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     )
 
     pdf.save()
-
     buffer.seek(0)
 
     return buffer
 
 
 # ======================================================
-# LOGIN
+# ROTAS DE LOGIN
 # ======================================================
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
-
-        usuario = request.form.get("usuario")
-        senha = request.form.get("senha")
+        usuario = request.form.get("usuario", "").strip()
+        senha = request.form.get("senha", "").strip()
 
         if usuario == USUARIO and senha == SENHA:
-
             session["logado"] = True
-
             return redirect(url_for("index"))
 
         return render_template(
@@ -409,19 +418,60 @@ def login():
 
 @app.route("/logout")
 def logout():
-
     session.clear()
-
     return redirect(url_for("login"))
 
 
 # ======================================================
-# ROTAS
+# ROTAS DO SISTEMA
 # ======================================================
 
-@app.route("/pdf")
-def pdf():
+@app.route("/", methods=["GET"])
+def index():
+    if not usuario_logado():
+        return redirect(url_for("login"))
 
+    return render_template(
+        "index.html",
+        faixas=faixas,
+        dias=dias,
+        meses=meses,
+        anos=anos
+    )
+
+
+@app.route("/gerar", methods=["POST"])
+def gerar():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    nome = request.form.get("nome", "").strip()
+    faixa = request.form.get("faixa", "").strip()
+    dia = request.form.get("dia", "").strip()
+    mes = request.form.get("mes", "").strip()
+    ano = request.form.get("ano", "").strip()
+
+    if not nome_valido(nome):
+        return "Erro: digite o nome completo do aluno.", 400
+
+    if faixa not in faixas:
+        return "Erro: faixa inválida.", 400
+
+    if dia not in dias or mes not in meses or ano not in anos:
+        return "Erro: data inválida.", 400
+
+    return render_template(
+        "visualizar.html",
+        nome=nome,
+        faixa=faixa,
+        dia=dia,
+        mes=mes,
+        ano=ano
+    )
+
+
+@app.route("/pdf", methods=["GET"])
+def pdf():
     if not usuario_logado():
         return redirect(url_for("login"))
 
@@ -433,6 +483,12 @@ def pdf():
 
     if not nome_valido(nome):
         return "Erro: nome inválido.", 400
+
+    if faixa not in faixas:
+        return "Erro: faixa inválida.", 400
+
+    if dia not in dias or mes not in meses or ano not in anos:
+        return "Erro: data inválida.", 400
 
     pdf_buffer = gerar_pdf_certificado(
         nome,
@@ -454,6 +510,7 @@ def pdf():
         as_attachment=False,
         download_name=f"certificado_{nome_arquivo}.pdf"
     )
+
 
 # ======================================================
 # START
