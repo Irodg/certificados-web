@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Sistema de Certificados</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eeeeee;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 720px;
+            background: white;
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 32px;
+        }
+
+        label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            font-size: 18px;
+            padding: 14px;
+            margin-bottom: 25px;
+            border: 1px solid #bbbbbb;
+            border-radius: 10px;
+        }
+
+        .data {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            background: #202020;
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #000000;
+        }
+
+        .info {
+            text-align: center;
+            color: #555555;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .card {
+                padding: 25px;
+            }
+
+            .data {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+
+            <h1>Gerador de Certificados</h1>
+
+            <form action="/gerar" method="POST" target="_blank">
+
+                <label>Nome completo do aluno</label>
+                <input
+                    type="text"
+                    name="nome"
+                    placeholder="Ex: João Silva Santos"
+                    required
+                >
+
+                <label>Cor da faixa</label>
+                <select name="faixa" required>
+                    {% for faixa in faixas %}
+                        <option value="{{ faixa }}">{{ faixa }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Data do certificado</label>
+
+                <div class="data">
+                    <select name="dia" required>
+                        {% for dia in dias %}
+                            <option value="{{ dia }}">{{ dia }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="mes" required>
+                        {% for mes in meses %}
+                            <option value="{{ mes }}">{{ mes }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="ano" required>
+                        {% for ano in anos %}
+                            <option value="{{ ano }}">{{ ano }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit">
+                    GERAR CERTIFICADO
+                </button>
+
+            </form>
+
+            <p class="info">
+                O PDF será aberto em uma nova aba. Depois é só imprimir.
+            </p>
+
+        </div>
+    </div>
+
+</body>
+</html>
