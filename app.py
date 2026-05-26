@@ -278,9 +278,9 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
 
     y_certificado = topo_bloco
     y_certifico = topo_bloco - (espacamento * 1)
-    y_nome = topo_bloco - (espacamento * 1.8)
+    y_nome = topo_bloco - (espacamento * 2.2)
     y_graduou = topo_bloco - (espacamento * 3)
-    y_faixa = topo_bloco - (espacamento * 3.8)
+    y_faixa = topo_bloco - (espacamento * 4.2)
     y_exame = topo_bloco - (espacamento * 5)
     y_equipe = topo_bloco - (espacamento * 6)
     y_data = fim_bloco
@@ -419,35 +419,20 @@ def logout():
 # ROTAS
 # ======================================================
 
-@app.route("/")
-def index():
+@app.route("/pdf")
+def pdf():
 
     if not usuario_logado():
         return redirect(url_for("login"))
 
-    return render_template(
-        "index.html",
-        faixas=faixas,
-        dias=dias,
-        meses=meses,
-        anos=anos
-    )
-
-
-@app.route("/gerar", methods=["POST"])
-def gerar():
-
-    if not usuario_logado():
-        return redirect(url_for("login"))
-
-    nome = request.form.get("nome", "").strip()
-    faixa = request.form.get("faixa", "").strip()
-    dia = request.form.get("dia", "").strip()
-    mes = request.form.get("mes", "").strip()
-    ano = request.form.get("ano", "").strip()
+    nome = request.args.get("nome", "").strip()
+    faixa = request.args.get("faixa", "").strip()
+    dia = request.args.get("dia", "").strip()
+    mes = request.args.get("mes", "").strip()
+    ano = request.args.get("ano", "").strip()
 
     if not nome_valido(nome):
-        return "Erro: digite nome completo.", 400
+        return "Erro: nome inválido.", 400
 
     pdf_buffer = gerar_pdf_certificado(
         nome,
@@ -469,7 +454,6 @@ def gerar():
         as_attachment=False,
         download_name=f"certificado_{nome_arquivo}.pdf"
     )
-
 
 # ======================================================
 # START
