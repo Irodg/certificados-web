@@ -7,8 +7,11 @@
 <title>{{ titulo }}</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
 
+html,
 body{
     margin:0;
     font-family:Arial,sans-serif;
@@ -43,6 +46,7 @@ h1{
     text-align:center;
     font-size:26px;
     margin-bottom:28px;
+    text-transform:uppercase;
 }
 
 label{
@@ -50,6 +54,7 @@ label{
     font-size:16px;
     font-weight:bold;
     margin-bottom:6px;
+    text-transform:uppercase;
 }
 
 input,
@@ -79,9 +84,12 @@ button{
     font-weight:bold;
     border-radius:12px;
     cursor:pointer;
+    text-transform:uppercase;
 }
 
-button:hover{background:#000}
+button:hover{
+    background:#000;
+}
 
 .voltar{
     display:block;
@@ -90,10 +98,16 @@ button:hover{background:#000}
     color:#555;
     text-decoration:none;
     font-weight:bold;
+    text-transform:uppercase;
 }
 
 @media(max-width:600px){
-    html,body{height:100%;overflow:hidden}
+
+    html,
+    body{
+        height:100%;
+        overflow:hidden;
+    }
 
     .container{
         height:100vh;
@@ -152,55 +166,149 @@ button:hover{background:#000}
 <div class="container">
     <div class="card">
 
-        <img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+        <img
+            class="logo"
+            src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+        >
 
         <h1>{{ titulo }}</h1>
 
-        <form action="{{ url_for('declaracao_visualizar') }}" method="POST">
+        <form
+            action="{{ url_for('declaracao_visualizar') }}"
+            method="POST"
+        >
 
-            <input type="hidden" name="tipo" value="{{ tipo }}">
+            <input
+                type="hidden"
+                name="tipo"
+                value="{{ tipo }}"
+            >
 
             <label>NOME COMPLETO DO ALUNO</label>
-            <input type="text" name="nome_aluno" required>
+
+            <input
+                type="text"
+                name="nome_aluno"
+                required
+            >
 
             <label>NOME COMPLETO DO RESPONSÁVEL</label>
-            <input type="text" name="nome_responsavel" required>
+
+            <input
+                type="text"
+                name="nome_responsavel"
+                required
+            >
 
             <label>CPF DO RESPONSÁVEL</label>
-            <input type="text" name="cpf_responsavel" placeholder="000.000.000-00" required>
+
+            <input
+                type="text"
+                name="cpf_responsavel"
+                id="cpf_responsavel"
+                placeholder="000.000.000-00"
+                maxlength="14"
+                required
+            >
 
             <label>NÚMERO DE GRAUS DO PROFESSOR</label>
-            <input type="text" name="graus" placeholder="EX: 1" required>
+
+            <input
+                type="text"
+                name="graus"
+                placeholder="EX: 1"
+                required
+            >
 
             <label>DATA</label>
+
             <div class="data">
+
                 <select name="dia" required>
                     {% for dia in dias %}
-                        <option value="{{ dia }}">{{ dia }}</option>
+                        <option value="{{ dia }}">
+                            {{ dia }}
+                        </option>
                     {% endfor %}
                 </select>
 
                 <select name="mes" required>
                     {% for mes in meses %}
-                        <option value="{{ mes }}">{{ mes }}</option>
+                        <option value="{{ mes }}">
+                            {{ mes }}
+                        </option>
                     {% endfor %}
                 </select>
 
                 <select name="ano" required>
                     {% for ano in anos %}
-                        <option value="{{ ano }}">{{ ano }}</option>
+                        <option value="{{ ano }}">
+                            {{ ano }}
+                        </option>
                     {% endfor %}
                 </select>
+
             </div>
 
-            <button type="submit">GERAR DECLARAÇÃO</button>
+            <button type="submit">
+                GERAR DECLARAÇÃO
+            </button>
 
         </form>
 
-        <a class="voltar" href="{{ url_for('declaracao_menu') }}">VOLTAR</a>
+        <a
+            class="voltar"
+            href="{{ url_for('declaracao_menu') }}"
+        >
+            VOLTAR
+        </a>
 
     </div>
 </div>
+
+<script>
+const cpfInput =
+    document.getElementById("cpf_responsavel");
+
+cpfInput.addEventListener(
+    "input",
+    function(e){
+
+        let valor = e.target.value;
+
+        valor = valor.replace(/\D/g, "");
+
+        valor = valor.substring(0, 11);
+
+        if(valor.length > 9){
+
+            valor = valor.replace(
+                /^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/,
+                "$1.$2.$3-$4"
+            );
+
+        }
+        else if(valor.length > 6){
+
+            valor = valor.replace(
+                /^(\d{3})(\d{3})(\d{0,3}).*/,
+                "$1.$2.$3"
+            );
+
+        }
+        else if(valor.length > 3){
+
+            valor = valor.replace(
+                /^(\d{3})(\d{0,3}).*/,
+                "$1.$2"
+            );
+
+        }
+
+        e.target.value = valor;
+    }
+);
+</script>
 
 </body>
 </html>
