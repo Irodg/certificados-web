@@ -11,6 +11,7 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -211,48 +212,103 @@ button:hover {
 }
 
 /* ==================================================
-   MOBILE / FRAME VERTICAL 1080x1920
+   MOBILE SEM ROLAGEM DESNECESSÁRIA
 ================================================== */
 
 @media (max-width: 600px) {
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
     .container {
-        min-height: 1920px;
-        padding: 20px 14px;
-        align-items: flex-start;
+        width: 100%;
+        height: 100vh;
+        min-height: 100vh;
+        padding: 10px;
+        align-items: center;
     }
 
     .card {
-        max-width: 92%;
-        margin-top: 20px;
-        padding: 35px 25px;
+        width: 100%;
+        max-width: 430px;
+        max-height: 96vh;
+        margin: 0;
+        padding: 18px;
+        overflow: visible;
+        border-radius: 14px;
     }
 
     .logo {
-        width: 220px;
-        max-width: 55%;
-        margin-top: 20px;
-        margin-bottom: 45px;
+        width: 120px;
+        max-width: 38%;
+        margin-top: 0;
+        margin-bottom: 14px;
     }
 
     h1 {
-        font-size: 26px;
+        font-size: 20px;
+        margin-bottom: 18px;
+    }
+
+    label {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    input,
+    select {
+        font-size: 15px;
+        padding: 10px;
+        margin-bottom: 14px;
+        border-radius: 8px;
     }
 
     .data {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1.5fr 1fr;
+        gap: 8px;
     }
 
-    .faixa-opcoes {
-        max-height: 600px;
-    }
-
-    .faixa-opcao {
-        height: 68px;
-        margin-bottom: 12px;
+    .faixa-select {
+        margin-bottom: 14px;
     }
 
     .faixa-atual {
-        height: 68px;
+        height: 44px;
+    }
+
+    .faixa-seta {
+        width: 42px;
+        font-size: 18px;
+    }
+
+    .faixa-opcoes {
+        max-height: 260px;
+        padding: 6px;
+        margin-top: 6px;
+    }
+
+    .faixa-opcao {
+        height: 44px;
+        margin-bottom: 6px;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+
+    .info {
+        font-size: 11px;
+        margin-top: 12px;
+    }
+
+    .sair {
+        margin-top: 12px;
+        font-size: 13px;
     }
 }
 </style>
