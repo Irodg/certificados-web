@@ -1,168 +1,443 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <title>Sistema de Certificados</title>
+<title>GRADUAÇÃO CRIST OSS BJJ</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #eeeeee;
-        }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eeeeee;
+}
 
-        .container {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-        }
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
 
-        .card {
-            width: 100%;
-            max-width: 720px;
-            background: white;
-            border-radius: 18px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-        }
+.card {
+    width: 100%;
+    max-width: 720px;
+    background: white;
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
 
-        h1 {
-            text-align: center;
-            margin-bottom: 35px;
-            font-size: 32px;
-        }
+h1 {
+    text-align: center;
+    margin-bottom: 35px;
+    font-size: 32px;
+    text-transform: uppercase;
+}
 
-        label {
-            display: block;
-            font-size: 18px;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
+label {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
 
-        input,
-        select {
-            width: 100%;
-            font-size: 18px;
-            padding: 14px;
-            margin-bottom: 25px;
-            border: 1px solid #bbbbbb;
-            border-radius: 10px;
-        }
+input,
+select {
+    width: 100%;
+    font-size: 18px;
+    padding: 14px;
+    margin-bottom: 25px;
+    border: 1px solid #bbbbbb;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
 
-        .data {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            gap: 15px;
-        }
+/* ==================================================
+   SELECT CUSTOMIZADO DA FAIXA
+================================================== */
 
-        button {
-            width: 100%;
-            background: #202020;
-            color: white;
-            border: none;
-            padding: 18px;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-        }
+.faixa-select {
+    position: relative;
+    width: 100%;
+    margin-bottom: 25px;
+}
 
-        button:hover {
-            background: #000000;
-        }
+.faixa-atual {
+    width: 100%;
+    height: 58px;
+    border: 1px solid #bbbbbb;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background: white;
+}
 
-        .info {
-            text-align: center;
-            color: #555555;
-            margin-top: 20px;
-            font-size: 14px;
-        }
+.faixa-cor {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
 
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
+.faixa-detalhe {
+    width: 15%;
+    height: 100%;
+}
 
-            .card {
-                padding: 25px;
-            }
+.faixa-seta {
+    width: 50px;
+    height: 100%;
+    text-align: center;
+    font-size: 22px;
+    background: white;
+    color: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-            .data {
-                grid-template-columns: 1fr;
-            }
+.faixa-opcoes {
+    display: none;
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+    background: white;
+    border: 1px solid #bbbbbb;
+    border-radius: 10px;
+    margin-top: 8px;
+    padding: 8px;
+    max-height: 420px;
+    overflow-y: auto;
+}
 
-            h1 {
-                font-size: 26px;
-            }
-        }
-    </style>
+.faixa-opcao {
+    height: 58px;
+    display: flex;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 1px solid #cccccc;
+}
+
+.faixa-opcao:last-child {
+    margin-bottom: 0;
+}
+
+.faixa-opcao:hover {
+    filter: brightness(0.92);
+    transform: scale(1.01);
+}
+
+.faixa-opcao-cor {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.faixa-opcao-detalhe {
+    width: 15%;
+    height: 100%;
+}
+
+.linha-horizontal {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 40%;
+    height: 20%;
+}
+
+.data {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 15px;
+}
+
+button {
+    width: 100%;
+    background: #202020;
+    color: white;
+    border: none;
+    padding: 18px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background: #000000;
+}
+
+.info {
+    text-align: center;
+    color: #555555;
+    margin-top: 20px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.sair {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #555;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.sair:hover {
+    color: black;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+
+    .card {
+        padding: 25px;
+    }
+
+    .data {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <div class="container">
-        <div class="card">
+<div class="container">
+    <div class="card">
 
-            <h1>Gerador de Certificados</h1>
+        <h1>GRADUAÇÃO CRIST OSS BJJ</h1>
 
-            <form action="/gerar" method="POST" target="_blank">
+        <form action="/gerar" method="POST">
 
-                <label>Nome completo do aluno</label>
-                <input
-                    type="text"
-                    name="nome"
-                    placeholder="Ex: João Silva Santos"
-                    required
-                >
+            <label>NOME COMPLETO DO ALUNO</label>
+            <input
+                type="text"
+                name="nome"
+                placeholder="EX: JOÃO SILVA SANTOS"
+                required
+            >
 
-                <label>Cor da faixa</label>
-                <select name="faixa" required>
-                    {% for faixa in faixas %}
-                        <option value="{{ faixa }}">{{ faixa }}</option>
+            <label>COR DA FAIXA</label>
+
+            <input
+                type="hidden"
+                name="faixa"
+                id="faixaInput"
+                value="cinza/branca"
+            >
+
+            <div class="faixa-select">
+
+                <div class="faixa-atual" onclick="abrirFaixas()">
+                    <div id="faixaAtualCor" class="faixa-cor"></div>
+
+                    <div id="faixaAtualDetalhe" class="faixa-detalhe"></div>
+
+                    <div class="faixa-seta">
+                        ▼
+                    </div>
+                </div>
+
+                <div id="faixaOpcoes" class="faixa-opcoes"></div>
+
+            </div>
+
+            <label>DATA DA GRADUAÇÃO</label>
+
+            <div class="data">
+                <select name="dia" required>
+                    {% for dia in dias %}
+                        <option value="{{ dia }}">{{ dia }}</option>
                     {% endfor %}
                 </select>
 
-                <label>Data do certificado</label>
+                <select name="mes" required>
+                    {% for mes in meses %}
+                        <option value="{{ mes }}">{{ mes }}</option>
+                    {% endfor %}
+                </select>
 
-                <div class="data">
-                    <select name="dia" required>
-                        {% for dia in dias %}
-                            <option value="{{ dia }}">{{ dia }}</option>
-                        {% endfor %}
-                    </select>
+                <select name="ano" required>
+                    {% for ano in anos %}
+                        <option value="{{ ano }}">{{ ano }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                    <select name="mes" required>
-                        {% for mes in meses %}
-                            <option value="{{ mes }}">{{ mes }}</option>
-                        {% endfor %}
-                    </select>
+            <button type="submit">
+                GERAR CERTIFICADO
+            </button>
 
-                    <select name="ano" required>
-                        {% for ano in anos %}
-                            <option value="{{ ano }}">{{ ano }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+        </form>
 
-                <button type="submit">
-                    GERAR CERTIFICADO
-                </button>
+        <p class="info">
+            O PDF SERÁ ABERTO COM OPÇÃO DE IMPRIMIR, BAIXAR E COMPARTILHAR.
+        </p>
 
-            </form>
+        <a class="sair" href="/logout">
+            SAIR
+        </a>
 
-            <p class="info">
-                O PDF será aberto em uma nova aba. Depois é só imprimir.
-            </p>
-
-        </div>
     </div>
+</div>
+
+<script>
+const faixas = [
+    "cinza/branca",
+    "cinza",
+    "cinza/preta",
+    "amarela/branca",
+    "amarela",
+    "amarela/preta",
+    "laranja/branca",
+    "laranja",
+    "laranja/preta",
+    "verde/branca",
+    "verde",
+    "verde/preta",
+    "azul",
+    "roxa",
+    "marrom",
+    "preta"
+];
+
+const coresFaixa = {
+    "cinza/branca": "#8f8f8f",
+    "cinza": "#8f8f8f",
+    "cinza/preta": "#8f8f8f",
+
+    "amarela/branca": "#f1c40f",
+    "amarela": "#f1c40f",
+    "amarela/preta": "#f1c40f",
+
+    "laranja/branca": "#e67e22",
+    "laranja": "#e67e22",
+    "laranja/preta": "#e67e22",
+
+    "verde/branca": "#27ae60",
+    "verde": "#27ae60",
+    "verde/preta": "#27ae60",
+
+    "azul": "#1f5fbf",
+    "roxa": "#6c3483",
+    "marrom": "#7b4a24",
+    "preta": "#111111"
+};
+
+function corTarjaFinal(faixa) {
+    if (faixa === "preta") {
+        return "#c0392b";
+    }
+
+    return "#111111";
+}
+
+function corLinhaHorizontal(faixa) {
+    if (faixa.includes("/branca")) {
+        return "#ffffff";
+    }
+
+    if (faixa.includes("/preta")) {
+        return "#111111";
+    }
+
+    return null;
+}
+
+function aplicarFaixa(elementoCor, elementoDetalhe, faixa) {
+    elementoCor.style.background = coresFaixa[faixa];
+    elementoDetalhe.style.background = corTarjaFinal(faixa);
+
+    elementoCor.innerHTML = "";
+
+    const linhaCor = corLinhaHorizontal(faixa);
+
+    if (linhaCor) {
+        const linha = document.createElement("div");
+        linha.className = "linha-horizontal";
+        linha.style.background = linhaCor;
+        elementoCor.appendChild(linha);
+    }
+}
+
+function montarOpcoes() {
+    const opcoes = document.getElementById("faixaOpcoes");
+    opcoes.innerHTML = "";
+
+    faixas.forEach(faixa => {
+        const item = document.createElement("div");
+        item.className = "faixa-opcao";
+        item.onclick = () => selecionarFaixa(faixa);
+
+        const cor = document.createElement("div");
+        cor.className = "faixa-opcao-cor";
+
+        const detalhe = document.createElement("div");
+        detalhe.className = "faixa-opcao-detalhe";
+
+        aplicarFaixa(cor, detalhe, faixa);
+
+        item.appendChild(cor);
+        item.appendChild(detalhe);
+
+        opcoes.appendChild(item);
+    });
+}
+
+function selecionarFaixa(faixa) {
+    document.getElementById("faixaInput").value = faixa;
+
+    const faixaAtualCor = document.getElementById("faixaAtualCor");
+    const faixaAtualDetalhe = document.getElementById("faixaAtualDetalhe");
+
+    aplicarFaixa(faixaAtualCor, faixaAtualDetalhe, faixa);
+
+    document.getElementById("faixaOpcoes").style.display = "none";
+}
+
+function abrirFaixas() {
+    const opcoes = document.getElementById("faixaOpcoes");
+
+    if (opcoes.style.display === "block") {
+        opcoes.style.display = "none";
+    } else {
+        opcoes.style.display = "block";
+    }
+}
+
+document.addEventListener("click", function(event) {
+    const select = document.querySelector(".faixa-select");
+
+    if (!select.contains(event.target)) {
+        document.getElementById("faixaOpcoes").style.display = "none";
+    }
+});
+
+montarOpcoes();
+selecionarFaixa("cinza/branca");
+</script>
 
 </body>
 </html>
