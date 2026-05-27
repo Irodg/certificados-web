@@ -1,108 +1,163 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Login</title>
+<title>LOGIN</title>
 
 <style>
-
-body{
-    margin:0;
-    font-family:Arial;
-    background:#f0f0f0;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    height:100vh;
+* {
+    box-sizing: border-box;
 }
 
-.card{
-    width:350px;
-    background:white;
-    padding:40px;
-    border-radius:16px;
-    box-shadow:0 10px 30px rgba(0,0,0,.15);
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eeeeee;
 }
 
-h1{
-    text-align:center;
-    margin-bottom:30px;
+.page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
 }
 
-input{
-    width:100%;
-    padding:14px;
-    margin-bottom:20px;
-    font-size:16px;
-    border-radius:10px;
-    border:1px solid #ccc;
-    box-sizing:border-box;
+.mobile-frame {
+    width: 100%;
+    max-width: 1080px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    background:#202020;
-    color:white;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
+.logo {
+    width: 180px;
+    max-width: 45%;
+    margin: 30px 0 35px 0;
 }
 
-button:hover{
-    background:black;
+.card {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-.erro{
-    color:red;
-    text-align:center;
-    margin-bottom:15px;
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 30px;
 }
 
+input {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    text-transform: uppercase;
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    background: #202020;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.erro {
+    color: red;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    .page {
+        padding: 20px 14px;
+    }
+
+    .mobile-frame {
+        max-width: 1080px;
+        min-height: 1920px;
+    }
+
+    .logo {
+        width: 220px;
+        margin-top: 40px;
+        margin-bottom: 45px;
+    }
+
+    .card {
+        max-width: 92%;
+        padding: 35px 25px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+}
 </style>
-
 </head>
 
 <body>
 
-<div class="card">
+<div class="page">
+    <div class="mobile-frame">
 
-<h1>LOGIN</h1>
+        <img
+            class="logo"
+            src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+            alt="Logo Crist Oss"
+        >
 
-{% if erro %}
-<div class="erro">
-    {{ erro }}
-</div>
-{% endif %}
+        <div class="card">
 
-<form method="POST">
+            <h1>LOGIN</h1>
 
-<input
-    type="text"
-    name="usuario"
-    placeholder="Usuário"
-    required
->
+            {% if erro %}
+            <div class="erro">
+                {{ erro }}
+            </div>
+            {% endif %}
 
-<input
-    type="password"
-    name="senha"
-    placeholder="Senha"
-    required
->
+            <form method="POST">
 
-<button type="submit">
-    ENTRAR
-</button>
+                <input
+                    type="text"
+                    name="usuario"
+                    placeholder="USUÁRIO"
+                    required
+                >
 
-</form>
+                <input
+                    type="password"
+                    name="senha"
+                    placeholder="SENHA"
+                    required
+                >
 
+                <button type="submit">
+                    ENTRAR
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
 </div>
 
 </body>
