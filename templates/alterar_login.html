@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+
 <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -14,6 +15,7 @@
     box-sizing:border-box;
 }
 
+html,
 body{
     margin:0;
     font-family:Arial,sans-serif;
@@ -46,6 +48,7 @@ body{
 h1{
     text-align:center;
     margin-bottom:25px;
+    text-transform:uppercase;
 }
 
 label{
@@ -74,6 +77,7 @@ button{
     font-size:18px;
     font-weight:bold;
     cursor:pointer;
+    text-transform:uppercase;
 }
 
 button:hover{
@@ -85,6 +89,7 @@ button:hover{
     text-align:center;
     margin-bottom:15px;
     font-weight:bold;
+    text-transform:uppercase;
 }
 
 .sucesso{
@@ -92,6 +97,7 @@ button:hover{
     text-align:center;
     margin-bottom:15px;
     font-weight:bold;
+    text-transform:uppercase;
 }
 
 .voltar{
@@ -101,6 +107,7 @@ button:hover{
     color:#555;
     text-decoration:none;
     font-weight:bold;
+    text-transform:uppercase;
 }
 
 @media(max-width:600px){
@@ -181,14 +188,6 @@ button:hover{
             <input
                 type="password"
                 name="nova_senha"
-                required
-            >
-
-            <label>CHAVE MESTRA</label>
-
-            <input
-                type="password"
-                name="chave_mestra"
                 required
             >
 
