@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MENU</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eeeeee;
+}
+
+.container{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.card{
+    width:100%;
+    max-width:520px;
+    background:white;
+    border-radius:18px;
+    padding:35px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+    text-align:center;
+}
+
+.logo{
+    width:160px;
+    max-width:45%;
+    margin-bottom:25px;
+}
+
+h1{
+    font-size:28px;
+    margin-bottom:30px;
+}
+
+a{
+    display:block;
+    width:100%;
+    padding:18px;
+    margin-bottom:16px;
+    background:#202020;
+    color:white;
+    text-decoration:none;
+    border-radius:12px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+a:hover{background:#000}
+
+.sair{
+    background:#777;
+    font-size:15px;
+}
+
+@media(max-width:600px){
+    html,body{height:100%;overflow:hidden}
+
+    .container{
+        height:100vh;
+        padding:12px;
+    }
+
+    .card{
+        max-width:430px;
+        padding:24px;
+    }
+
+    .logo{
+        width:130px;
+        margin-bottom:20px;
+    }
+
+    h1{
+        font-size:22px;
+    }
+
+    a{
+        font-size:17px;
+        padding:15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+
+        <h1>GRADUAÇÃO CRIST OSS BJJ</h1>
+
+        <a href="{{ url_for('certificado') }}">CERTIFICADO</a>
+
+        <a href="{{ url_for('declaracao_menu') }}">DECLARAÇÃO</a>
+
+        <a class="sair" href="{{ url_for('logout') }}">SAIR</a>
+
+    </div>
+</div>
+
+</body>
+</html>
