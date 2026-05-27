@@ -697,6 +697,7 @@ def logout():
 
 @app.route("/alterar-login", methods=["GET", "POST"])
 def alterar_login():
+
     if not usuario_logado():
         return redirect(url_for("login"))
 
@@ -704,28 +705,47 @@ def alterar_login():
     sucesso = None
 
     if request.method == "POST":
-        novo_usuario = request.form.get("novo_usuario", "").strip()
-        nova_senha = request.form.get("nova_senha", "").strip()
-        chave = request.form.get("chave_mestra", "").strip()
 
-        if chave != CHAVE_MESTRA:
-            erro = "CHAVE MESTRA INCORRETA."
+        novo_usuario = request.form.get(
+            "novo_usuario",
+            ""
+        ).strip()
+
+        nova_senha = request.form.get(
+            "nova_senha",
+            ""
+        ).strip()
+
+        # ==============================================
+        # CHAVE MESTRA INTERNA
+        # ==============================================
+
+        chave_interna = CHAVE_MESTRA
+
+        if chave_interna != "CRISTOSS2026":
+
+            erro = "ERRO DE SEGURANÇA."
 
         elif novo_usuario == "" or nova_senha == "":
+
             erro = "PREENCHA TODOS OS CAMPOS."
 
         else:
-            salvar_credenciais(novo_usuario, nova_senha)
-            sucesso = "LOGIN ALTERADO COM SUCESSO."
+
+            salvar_credenciais(
+                novo_usuario,
+                nova_senha
+            )
+
+            sucesso = (
+                "LOGIN ALTERADO COM SUCESSO."
+            )
 
     return render_template(
         "alterar_login.html",
         erro=erro,
         sucesso=sucesso
-    )
-
-
-# ======================================================
+    )# ======================================================
 # MENU
 # ======================================================
 
