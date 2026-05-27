@@ -220,18 +220,110 @@ def quebrar_texto(texto, fonte, tamanho, largura_maxima):
     return linhas
 
 
-def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, tamanho, entrelinha):
+def desenhar_paragrafo(
+    pdf,
+    texto,
+    x,
+    y,
+    largura_maxima,
+    fonte,
+    tamanho,
+    entrelinha
+):
     pdf.setFont(fonte, tamanho)
 
-    linhas = quebrar_texto(
-        texto,
-        fonte,
-        tamanho,
-        largura_maxima
-    )
+    palavras = texto.split()
 
-    for linha in linhas:
-        pdf.drawString(x, y, linha)
+    linhas = []
+    linha_atual = ""
+
+    for palavra in palavras:
+
+        teste = (
+            palavra
+            if linha_atual == ""
+            else linha_atual + " " + palavra
+        )
+
+        largura_teste = pdfmetrics.stringWidth(
+            teste,
+            fonte,
+            tamanho
+        )
+
+        if largura_teste <= largura_maxima:
+            linha_atual = teste
+
+        else:
+            linhas.append(linha_atual)
+            linha_atual = palavra
+
+    if linha_atual:
+        linhas.append(linha_atual)
+
+    # ==================================================
+    # DESENHO JUSTIFICADO
+    # ==================================================
+
+    for i, linha in enumerate(linhas):
+
+        # última linha NÃO justifica
+        if i == len(linhas) - 1:
+
+            pdf.drawString(x, y, linha)
+
+        else:
+
+            palavras_linha = linha.split()
+
+            # se tiver só 1 palavra
+            if len(palavras_linha) == 1:
+
+                pdf.drawString(x, y, linha)
+
+            else:
+
+                largura_sem_espacos = sum(
+                    pdfmetrics.stringWidth(
+                        palavra,
+                        fonte,
+                        tamanho
+                    )
+                    for palavra in palavras_linha
+                )
+
+                espacos = len(palavras_linha) - 1
+
+                largura_total_espacos = (
+                    largura_maxima
+                    - largura_sem_espacos
+                )
+
+                espaco_extra = (
+                    largura_total_espacos / espacos
+                )
+
+                x_atual = x
+
+                for palavra in palavras_linha:
+
+                    pdf.drawString(
+                        x_atual,
+                        y,
+                        palavra
+                    )
+
+                    largura_palavra = pdfmetrics.stringWidth(
+                        palavra,
+                        fonte,
+                        tamanho
+                    )
+
+                    x_atual += (
+                        largura_palavra
+                        + espaco_extra
+                    )
+
         y -= entrelinha
 
     return y
