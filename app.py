@@ -11,6 +11,8 @@ from flask import (
     session
 )
 
+from PIL import Image
+
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
@@ -31,26 +33,15 @@ SENHA = "1234"
 
 
 # ======================================================
-# CONFIG
+# CONFIG CERTIFICADO
 # ======================================================
 
 faixas = [
-    "cinza/branca",
-    "cinza",
-    "cinza/preta",
-    "amarela/branca",
-    "amarela",
-    "amarela/preta",
-    "laranja/branca",
-    "laranja",
-    "laranja/preta",
-    "verde/branca",
-    "verde",
-    "verde/preta",
-    "azul",
-    "roxa",
-    "marrom",
-    "preta"
+    "cinza/branca", "cinza", "cinza/preta",
+    "amarela/branca", "amarela", "amarela/preta",
+    "laranja/branca", "laranja", "laranja/preta",
+    "verde/branca", "verde", "verde/preta",
+    "azul", "roxa", "marrom", "preta"
 ]
 
 fundos_por_faixa = {
@@ -87,7 +78,7 @@ FONTE_TEXTO = "Helvetica"
 
 
 # ======================================================
-# FUNÇÕES
+# FUNÇÕES GERAIS
 # ======================================================
 
 def usuario_logado():
@@ -107,13 +98,7 @@ def tamanho_fonte_dinamico(texto, fonte, tamanho_maximo, largura_maxima):
     tamanho = tamanho_maximo
 
     while tamanho > 10:
-        largura_texto = pdfmetrics.stringWidth(
-            texto,
-            fonte,
-            tamanho
-        )
-
-        if largura_texto <= largura_maxima:
+        if pdfmetrics.stringWidth(texto, fonte, tamanho) <= largura_maxima:
             return tamanho
 
         tamanho -= 1
@@ -122,17 +107,10 @@ def tamanho_fonte_dinamico(texto, fonte, tamanho_maximo, largura_maxima):
 
 
 def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
-    largura_nome = pdfmetrics.stringWidth(
-        nome,
-        fonte,
-        tamanho
-    )
-
-    if largura_nome <= largura_quebra:
+    if pdfmetrics.stringWidth(nome, fonte, tamanho) <= largura_quebra:
         return [nome]
 
     palavras = nome.split()
-
     melhor_linha_1 = ""
     melhor_linha_2 = ""
     menor_diferenca = None
@@ -141,17 +119,8 @@ def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
         linha_1 = " ".join(palavras[:i])
         linha_2 = " ".join(palavras[i:])
 
-        largura_1 = pdfmetrics.stringWidth(
-            linha_1,
-            fonte,
-            tamanho
-        )
-
-        largura_2 = pdfmetrics.stringWidth(
-            linha_2,
-            fonte,
-            tamanho
-        )
+        largura_1 = pdfmetrics.stringWidth(linha_1, fonte, tamanho)
+        largura_2 = pdfmetrics.stringWidth(linha_2, fonte, tamanho)
 
         diferenca = abs(largura_1 - largura_2)
 
@@ -190,11 +159,7 @@ def desenhar_nome_dinamico(
     if len(nome_linhas) == 2:
         maior_linha = max(
             nome_linhas,
-            key=lambda linha: pdfmetrics.stringWidth(
-                linha,
-                fonte,
-                tamanho_nome
-            )
+            key=lambda linha: pdfmetrics.stringWidth(linha, fonte, tamanho_nome)
         )
 
         tamanho_nome = tamanho_fonte_dinamico(
@@ -235,6 +200,61 @@ def desenhar_nome_dinamico(
         )
 
 
+def quebrar_texto(texto, fonte, tamanho, largura_maxima):
+    palavras = texto.split()
+    linhas = []
+    linha_atual = ""
+
+    for palavra in palavras:
+        teste = palavra if linha_atual == "" else linha_atual + " " + palavra
+
+        if pdfmetrics.stringWidth(teste, fonte, tamanho) <= largura_maxima:
+            linha_atual = teste
+        else:
+            linhas.append(linha_atual)
+            linha_atual = palavra
+
+    if linha_atual:
+        linhas.append(linha_atual)
+
+    return linhas
+
+
+def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, tamanho, entrelinha):
+    pdf.setFont(fonte, tamanho)
+
+    linhas = quebrar_texto(
+        texto,
+        fonte,
+        tamanho,
+        largura_maxima
+    )
+
+    for linha in linhas:
+        pdf.drawString(x, y, linha)
+        y -= entrelinha
+
+    return y
+
+
+def criar_logo_transparente(caminho_logo, opacidade=0.10):
+    imagem = Image.open(caminho_logo).convert("RGBA")
+
+    alpha = imagem.getchannel("A")
+    alpha = alpha.point(lambda p: int(p * opacidade))
+    imagem.putalpha(alpha)
+
+    buffer = io.BytesIO()
+    imagem.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    return ImageReader(buffer)
+
+
+# ======================================================
+# PDF CERTIFICADO
+# ======================================================
+
 def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     nome = nome.strip().upper()
 
@@ -251,18 +271,10 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     largura, altura = landscape(A4)
     centro_x = largura / 2
 
-    # ==================================================
-    # FUNDO
-    # ==================================================
-
     nome_fundo = fundos_por_faixa.get(faixa)
 
     if nome_fundo:
-        caminho_fundo = os.path.join(
-            app.root_path,
-            "fundos",
-            nome_fundo
-        )
+        caminho_fundo = os.path.join(app.root_path, "fundos", nome_fundo)
 
         if os.path.exists(caminho_fundo):
             fundo = ImageReader(caminho_fundo)
@@ -274,10 +286,6 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
                 width=largura,
                 height=altura
             )
-
-    # ==================================================
-    # MEDIDAS
-    # ==================================================
 
     topo_bloco = altura - (30 * mm)
     fim_bloco = altura - (120 * mm)
@@ -310,27 +318,8 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_nome_maxima
     )
 
-    # ==================================================
-    # TEXTOS
-    # ==================================================
-
-    texto_centralizado(
-        pdf,
-        "CERTIFICADO",
-        centro_x,
-        y_certificado,
-        FONTE_TITULO,
-        40
-    )
-
-    texto_centralizado(
-        pdf,
-        "CERTIFICO QUE O ATLETA",
-        centro_x,
-        y_certifico,
-        FONTE_TEXTO,
-        18
-    )
+    texto_centralizado(pdf, "CERTIFICADO", centro_x, y_certificado, FONTE_TITULO, 40)
+    texto_centralizado(pdf, "CERTIFICO QUE O ATLETA", centro_x, y_certifico, FONTE_TEXTO, 18)
 
     desenhar_nome_dinamico(
         pdf,
@@ -343,49 +332,170 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_quebra_nome
     )
 
-    texto_centralizado(
-        pdf,
-        "GRADUOU-SE COM MÉRITO A",
+    texto_centralizado(pdf, "GRADUOU-SE COM MÉRITO A", centro_x, y_graduou, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, cor_da_faixa, centro_x, y_faixa, FONTE_TITULO, tamanho_faixa)
+    texto_centralizado(pdf, "COM EXAME DE GRADUAÇÃO CONCEDIDO", centro_x, y_exame, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, "PELA EQUIPE CRIST OSS BJJ.", centro_x, y_equipe, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, data_certificado, centro_x, y_data, FONTE_TEXTO, 18)
+
+    pdf.save()
+    buffer.seek(0)
+
+    return buffer
+
+
+# ======================================================
+# PDF DECLARAÇÃO
+# ======================================================
+
+def gerar_pdf_declaracao(tipo, nome_aluno, nome_responsavel, cpf_responsavel, graus, dia, mes, ano):
+    nome_aluno = nome_aluno.strip().upper()
+    nome_responsavel = nome_responsavel.strip().upper()
+    cpf_responsavel = cpf_responsavel.strip()
+    graus = graus.strip()
+
+    data = f"{dia} de {mes} de {ano}"
+
+    buffer = io.BytesIO()
+
+    pdf = canvas.Canvas(buffer, pagesize=A4)
+
+    largura, altura = A4
+    centro_x = largura / 2
+
+    margem_x = 25 * mm
+    largura_texto = largura - (50 * mm)
+
+    logo_path = os.path.join(app.root_path, "static", "logo_crist_oss.png")
+    ibjjf_path = os.path.join(app.root_path, "static", "IBJJF.png")
+
+    # ==================================================
+    # MARCA D'ÁGUA
+    # ==================================================
+
+    if os.path.exists(logo_path):
+        marca = criar_logo_transparente(logo_path, 0.08)
+        tamanho_marca = 130 * mm
+
+        pdf.drawImage(
+            marca,
+            centro_x - (tamanho_marca / 2),
+            (altura / 2) - (tamanho_marca / 2),
+            width=tamanho_marca,
+            height=tamanho_marca,
+            mask="auto"
+        )
+
+    # ==================================================
+    # CABEÇALHO
+    # ==================================================
+
+    if tipo == "frequencia":
+        titulo = "DECLARAÇÃO DE FREQUÊNCIA E PARTICIPAÇÃO"
+    else:
+        titulo = "DECLARAÇÃO DE AUSÊNCIA PARA EVENTO"
+
+    pdf.setFont("Helvetica-Bold", 15)
+    pdf.drawCentredString(centro_x, altura - (30 * mm), titulo)
+
+    y = altura - (50 * mm)
+
+    pdf.setFont("Helvetica", 12)
+
+    if tipo == "frequencia":
+        paragrafo_1 = (
+            f"A ESCOLA CRIST OSS BJJ, inscrita no CNPJ sob o nº 44.227.964/0001-42, "
+            f"localizada no bairro Conjunto Ceará, nº 348, Fortaleza/CE, declara, "
+            f"para os devidos fins, que o(a) aluno(a) {nome_aluno} realiza regularmente "
+            f"o curso de Jiu-Jitsu, com frequência assídua às segundas, quartas e "
+            f"sextas-feiras, sob orientação do Professor Leandro Marques, faixa preta "
+            f"{graus} graus, portador do CPF nº 725.598.963-20."
+        )
+
+        paragrafo_2 = (
+            f"Declaramos, ainda, que a participação do(a) aluno(a) ocorre mediante "
+            f"autorização de seu/sua responsável legal, {nome_responsavel}, "
+            f"portador(a) do CPF nº {cpf_responsavel}."
+        )
+
+    else:
+        paragrafo_1 = (
+            f"A ESCOLA CRIST OSS BJJ, inscrita no CNPJ sob o nº 44.227.964/0001-42, "
+            f"declara, para os devidos fins, que o(a) aluno(a) {nome_aluno} precisou "
+            f"ausentar-se de suas atividades regulares no dia {data}, em razão de "
+            f"participação em evento promovido pela ESCOLA CRIST OSS BJJ, sob supervisão "
+            f"do Professor Leandro Marques, faixa preta {graus} graus, portador do CPF "
+            f"nº 725.598.963-20."
+        )
+
+        paragrafo_2 = (
+            f"Declaramos, ainda, que a participação do(a) aluno(a) no referido evento "
+            f"ocorreu mediante autorização de seu/sua responsável legal, {nome_responsavel}, "
+            f"portador(a) do CPF nº {cpf_responsavel}."
+        )
+
+    y = desenhar_paragrafo(pdf, paragrafo_1, margem_x, y, largura_texto, "Helvetica", 12, 7 * mm)
+    y -= 8 * mm
+    y = desenhar_paragrafo(pdf, paragrafo_2, margem_x, y, largura_texto, "Helvetica", 12, 7 * mm)
+
+    if tipo == "evento":
+        y -= 10 * mm
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawCentredString(
+            centro_x,
+            y,
+            "DESDE JÁ, AGRADECEMOS A COMPREENSÃO."
+        )
+
+    # ==================================================
+    # RODAPÉ / DATA / ASSINATURA
+    # ==================================================
+
+    pdf.setFont("Helvetica", 12)
+
+    pdf.drawCentredString(
         centro_x,
-        y_graduou,
-        FONTE_TEXTO,
-        18
+        78 * mm,
+        "Fortaleza/CE, ____/____/________."
     )
 
-    texto_centralizado(
-        pdf,
-        cor_da_faixa,
+    pdf.drawCentredString(
         centro_x,
-        y_faixa,
-        FONTE_TITULO,
-        tamanho_faixa
+        65 * mm,
+        "________________________________________________________________"
     )
 
-    texto_centralizado(
-        pdf,
-        "COM EXAME DE GRADUAÇÃO CONCEDIDO",
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawCentredString(
         centro_x,
-        y_exame,
-        FONTE_TEXTO,
-        18
+        56 * mm,
+        "PROFESSOR LEANDRO MARQUES"
     )
 
-    texto_centralizado(
-        pdf,
-        "PELA EQUIPE CRIST OSS BJJ.",
+    if os.path.exists(ibjjf_path):
+        ibjjf = ImageReader(ibjjf_path)
+
+        pdf.drawImage(
+            ibjjf,
+            centro_x - (12 * mm),
+            35 * mm,
+            width=24 * mm,
+            height=16 * mm,
+            preserveAspectRatio=True,
+            mask="auto"
+        )
+
+    pdf.setFont("Helvetica", 11)
+    pdf.drawCentredString(
         centro_x,
-        y_equipe,
-        FONTE_TEXTO,
-        18
+        28 * mm,
+        "IBJJF: 348820"
     )
 
-    texto_centralizado(
-        pdf,
-        data_certificado,
+    pdf.drawCentredString(
         centro_x,
-        y_data,
-        FONTE_TEXTO,
-        18
+        18 * mm,
+        "CNPJ: 44.227.964/0001-42"
     )
 
     pdf.save()
@@ -395,7 +505,7 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
 
 
 # ======================================================
-# ROTAS DE LOGIN
+# LOGIN
 # ======================================================
 
 @app.route("/login", methods=["GET", "POST"])
@@ -406,12 +516,9 @@ def login():
 
         if usuario == USUARIO and senha == SENHA:
             session["logado"] = True
-            return redirect(url_for("index"))
+            return redirect(url_for("menu"))
 
-        return render_template(
-            "login.html",
-            erro="Usuário ou senha inválidos."
-        )
+        return render_template("login.html", erro="Usuário ou senha inválidos.")
 
     return render_template("login.html")
 
@@ -423,11 +530,31 @@ def logout():
 
 
 # ======================================================
-# ROTAS DO SISTEMA
+# MENU
 # ======================================================
 
-@app.route("/", methods=["GET"])
-def index():
+@app.route("/")
+def raiz():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return redirect(url_for("menu"))
+
+
+@app.route("/menu")
+def menu():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template("menu.html")
+
+
+# ======================================================
+# CERTIFICADO
+# ======================================================
+
+@app.route("/certificado", methods=["GET"])
+def certificado():
     if not usuario_logado():
         return redirect(url_for("login"))
 
@@ -490,25 +617,134 @@ def pdf():
     if dia not in dias or mes not in meses or ano not in anos:
         return "Erro: data inválida.", 400
 
-    pdf_buffer = gerar_pdf_certificado(
-        nome,
-        faixa,
-        dia,
-        mes,
-        ano
-    )
+    pdf_buffer = gerar_pdf_certificado(nome, faixa, dia, mes, ano)
 
-    nome_arquivo = (
-        nome.upper()
-        .replace(" ", "_")
-        .replace("/", "_")
-    )
+    nome_arquivo = nome.upper().replace(" ", "_").replace("/", "_")
 
     return send_file(
         pdf_buffer,
         mimetype="application/pdf",
         as_attachment=False,
         download_name=f"certificado_{nome_arquivo}.pdf"
+    )
+
+
+# ======================================================
+# DECLARAÇÕES
+# ======================================================
+
+@app.route("/declaracao")
+def declaracao_menu():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template("declaracao_menu.html")
+
+
+@app.route("/declaracao/frequencia")
+def declaracao_frequencia():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template(
+        "declaracao_form.html",
+        tipo="frequencia",
+        titulo="DECLARAÇÃO DE FREQUÊNCIA E PARTICIPAÇÃO",
+        dias=dias,
+        meses=meses,
+        anos=anos
+    )
+
+
+@app.route("/declaracao/evento")
+def declaracao_evento():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template(
+        "declaracao_form.html",
+        tipo="evento",
+        titulo="DECLARAÇÃO DE AUSÊNCIA PARA EVENTO",
+        dias=dias,
+        meses=meses,
+        anos=anos
+    )
+
+
+@app.route("/declaracao/visualizar", methods=["POST"])
+def declaracao_visualizar():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    tipo = request.form.get("tipo", "").strip()
+    nome_aluno = request.form.get("nome_aluno", "").strip()
+    nome_responsavel = request.form.get("nome_responsavel", "").strip()
+    cpf_responsavel = request.form.get("cpf_responsavel", "").strip()
+    graus = request.form.get("graus", "").strip()
+    dia = request.form.get("dia", "").strip()
+    mes = request.form.get("mes", "").strip()
+    ano = request.form.get("ano", "").strip()
+
+    if tipo not in ["frequencia", "evento"]:
+        return "Erro: tipo de declaração inválido.", 400
+
+    if not nome_valido(nome_aluno):
+        return "Erro: informe o nome completo do aluno.", 400
+
+    if not nome_valido(nome_responsavel):
+        return "Erro: informe o nome completo do responsável.", 400
+
+    if cpf_responsavel == "":
+        return "Erro: informe o CPF do responsável.", 400
+
+    if graus == "":
+        return "Erro: informe o número de graus do professor.", 400
+
+    return render_template(
+        "visualizar_declaracao.html",
+        tipo=tipo,
+        nome_aluno=nome_aluno,
+        nome_responsavel=nome_responsavel,
+        cpf_responsavel=cpf_responsavel,
+        graus=graus,
+        dia=dia,
+        mes=mes,
+        ano=ano
+    )
+
+
+@app.route("/declaracao/pdf")
+def declaracao_pdf():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    tipo = request.args.get("tipo", "").strip()
+    nome_aluno = request.args.get("nome_aluno", "").strip()
+    nome_responsavel = request.args.get("nome_responsavel", "").strip()
+    cpf_responsavel = request.args.get("cpf_responsavel", "").strip()
+    graus = request.args.get("graus", "").strip()
+    dia = request.args.get("dia", "").strip()
+    mes = request.args.get("mes", "").strip()
+    ano = request.args.get("ano", "").strip()
+
+    pdf_buffer = gerar_pdf_declaracao(
+        tipo,
+        nome_aluno,
+        nome_responsavel,
+        cpf_responsavel,
+        graus,
+        dia,
+        mes,
+        ano
+    )
+
+    nome_arquivo = nome_aluno.upper().replace(" ", "_").replace("/", "_")
+
+    return send_file(
+        pdf_buffer,
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=f"declaracao_{nome_arquivo}.pdf"
     )
 
 
