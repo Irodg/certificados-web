@@ -3,11 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>MENU</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
 
+html,
 body{
     margin:0;
     font-family:Arial,sans-serif;
@@ -41,6 +45,7 @@ body{
 h1{
     font-size:28px;
     margin-bottom:30px;
+    text-transform:uppercase;
 }
 
 a{
@@ -54,17 +59,30 @@ a{
     border-radius:12px;
     font-size:20px;
     font-weight:bold;
+    text-transform:uppercase;
 }
 
-a:hover{background:#000}
+a:hover{
+    background:#000;
+}
+
+.alterar{
+    background:#444444;
+    font-size:16px;
+}
 
 .sair{
-    background:#777;
+    background:#777777;
     font-size:15px;
 }
 
 @media(max-width:600px){
-    html,body{height:100%;overflow:hidden}
+
+    html,
+    body{
+        height:100%;
+        overflow:hidden;
+    }
 
     .container{
         height:100vh;
@@ -89,6 +107,14 @@ a:hover{background:#000}
         font-size:17px;
         padding:15px;
     }
+
+    .alterar{
+        font-size:14px;
+    }
+
+    .sair{
+        font-size:14px;
+    }
 }
 </style>
 </head>
@@ -98,15 +124,35 @@ a:hover{background:#000}
 <div class="container">
     <div class="card">
 
-        <img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+        <img
+            class="logo"
+            src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+            alt="Logo Crist Oss"
+        >
 
         <h1>GRADUAÇÃO CRIST OSS BJJ</h1>
 
-        <a href="{{ url_for('certificado') }}">CERTIFICADO</a>
+        <a href="{{ url_for('certificado') }}">
+            CERTIFICADO
+        </a>
 
-        <a href="{{ url_for('declaracao_menu') }}">DECLARAÇÃO</a>
+        <a href="{{ url_for('declaracao_menu') }}">
+            DECLARAÇÃO
+        </a>
 
-        <a class="sair" href="{{ url_for('logout') }}">SAIR</a>
+        <a
+            class="alterar"
+            href="{{ url_for('alterar_login') }}"
+        >
+            ALTERAR LOGIN
+        </a>
+
+        <a
+            class="sair"
+            href="{{ url_for('logout') }}"
+        >
+            SAIR
+        </a>
 
     </div>
 </div>
