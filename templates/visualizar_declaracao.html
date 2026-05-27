@@ -1,3 +1,135 @@
-3 tubos 2" R$95x3
-4 chapas 20 R$150x4
-2 cantoneiras 1" 1/8 2xR$65 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DECLARAÇÃO GERADA</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eeeeee;
+}
+
+.topo{
+    background:#202020;
+    color:white;
+    padding:15px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+button,
+a{
+    border:none;
+    padding:13px 20px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    text-decoration:none;
+    color:white;
+    background:#444;
+}
+
+button:hover,
+a:hover{
+    background:#000;
+}
+
+.voltar{
+    background:#777;
+}
+
+.pdf-area{
+    width:100%;
+    height:calc(100vh - 75px);
+}
+
+iframe{
+    width:100%;
+    height:100%;
+    border:none;
+    background:white;
+}
+
+@media(max-width:600px){
+    .topo{
+        padding:8px;
+        gap:6px;
+    }
+
+    button,
+    a{
+        padding:10px 12px;
+        font-size:12px;
+    }
+
+    .pdf-area{
+        height:calc(100vh - 95px);
+    }
+}
+</style>
+</head>
+
+<body>
+
+{% set pdf_url = url_for(
+    'declaracao_pdf',
+    tipo=tipo,
+    nome_aluno=nome_aluno,
+    nome_responsavel=nome_responsavel,
+    cpf_responsavel=cpf_responsavel,
+    graus=graus,
+    dia=dia,
+    mes=mes,
+    ano=ano
+) %}
+
+<div class="topo">
+
+    <button onclick="imprimirPDF()">IMPRIMIR</button>
+
+    <a href="{{ pdf_url }}" target="_blank">ABRIR / BAIXAR PDF</a>
+
+    <button onclick="compartilharPDF()">COMPARTILHAR</button>
+
+    <a class="voltar" href="{{ url_for('declaracao_menu') }}">VOLTAR</a>
+
+</div>
+
+<div class="pdf-area">
+    <iframe id="pdfFrame" src="{{ pdf_url }}"></iframe>
+</div>
+
+<script>
+const pdfUrl = window.location.origin + "{{ pdf_url }}";
+
+function imprimirPDF(){
+    const frame = document.getElementById("pdfFrame");
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+}
+
+async function compartilharPDF(){
+    if(navigator.share){
+        await navigator.share({
+            title:"Declaração",
+            text:"Segue a declaração em PDF.",
+            url:pdfUrl
+        });
+    }else{
+        navigator.clipboard.writeText(pdfUrl);
+        alert("LINK DO PDF COPIADO.");
+    }
+}
+</script>
+
+</body>
+</html>
