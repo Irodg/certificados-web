@@ -1,6 +1,7 @@
 import os
 import io
 import json
+import uuid
 
 from flask import (
     Flask,
@@ -12,6 +13,7 @@ from flask import (
     session
 )
 
+from werkzeug.utils import secure_filename
 from PIL import Image
 
 from reportlab.lib.pagesizes import A4, landscape
@@ -22,49 +24,63 @@ from reportlab.lib.units import mm
 
 
 app = Flask(__name__)
-
-# ======================================================
-# LOGIN / SESSÃO
-# ======================================================
-
 app.secret_key = "certificados_secret_key"
 app.config["SESSION_PERMANENT"] = False
 
-ARQUIVO_CREDENCIAIS = "credenciais.json"
-CHAVE_MESTRA = "CRISTOSS2026"
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+ARQUIVO_USUARIOS = "usuarios.json"
 
 
-def criar_credenciais_padrao():
-    if not os.path.exists(ARQUIVO_CREDENCIAIS):
+def carregar_usuarios():
+    if not os.path.exists(ARQUIVO_USUARIOS):
         dados = {
-            "usuario": "admin",
-            "senha": "1234"
+            "usuarios": [
+                {
+                    "id": 1,
+                    "usuario": "admin",
+                    "senha": "1234",
+                    "tipo": "admin",
+                    "foto": "default.png"
+                }
+            ]
         }
 
-        with open(ARQUIVO_CREDENCIAIS, "w", encoding="utf-8") as arquivo:
+        with open(ARQUIVO_USUARIOS, "w", encoding="utf-8") as arquivo:
             json.dump(dados, arquivo, indent=4)
 
-
-def carregar_credenciais():
-    criar_credenciais_padrao()
-
-    with open(ARQUIVO_CREDENCIAIS, "r", encoding="utf-8") as arquivo:
+    with open(ARQUIVO_USUARIOS, "r", encoding="utf-8") as arquivo:
         return json.load(arquivo)
 
 
-def salvar_credenciais(usuario, senha):
-    dados = {
-        "usuario": usuario,
-        "senha": senha
-    }
-
-    with open(ARQUIVO_CREDENCIAIS, "w", encoding="utf-8") as arquivo:
+def salvar_usuarios(dados):
+    with open(ARQUIVO_USUARIOS, "w", encoding="utf-8") as arquivo:
         json.dump(dados, arquivo, indent=4)
 
 
-# ======================================================
-# CONFIG CERTIFICADO
-# ======================================================
+def buscar_usuario(usuario):
+    dados = carregar_usuarios()
+
+    for u in dados["usuarios"]:
+        if u["usuario"] == usuario:
+            return u
+
+    return None
+
+
+def usuario_logado():
+    return session.get("logado") is True
+
+
+def usuario_admin():
+    return session.get("tipo") == "admin"
+
+
+def nome_valido(nome):
+    return len(nome.strip().split()) >= 2
+
 
 faixas = [
     "cinza/branca", "cinza", "cinza/preta",
@@ -107,18 +123,6 @@ FONTE_TITULO = "Helvetica-Bold"
 FONTE_TEXTO = "Helvetica"
 
 
-# ======================================================
-# FUNÇÕES GERAIS
-# ======================================================
-
-def usuario_logado():
-    return session.get("logado") is True
-
-
-def nome_valido(nome):
-    return len(nome.strip().split()) >= 2
-
-
 def texto_centralizado(pdf, texto, x, y, fonte, tamanho):
     pdf.setFont(fonte, tamanho)
     pdf.drawCentredString(x, y, texto)
@@ -130,7 +134,6 @@ def tamanho_fonte_dinamico(texto, fonte, tamanho_maximo, largura_maxima):
     while tamanho > 10:
         if pdfmetrics.stringWidth(texto, fonte, tamanho) <= largura_maxima:
             return tamanho
-
         tamanho -= 1
 
     return tamanho
@@ -151,7 +154,6 @@ def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
 
         largura_1 = pdfmetrics.stringWidth(linha_1, fonte, tamanho)
         largura_2 = pdfmetrics.stringWidth(linha_2, fonte, tamanho)
-
         diferenca = abs(largura_1 - largura_2)
 
         if menor_diferenca is None or diferenca < menor_diferenca:
@@ -189,7 +191,11 @@ def desenhar_nome_dinamico(
     if len(nome_linhas) == 2:
         maior_linha = max(
             nome_linhas,
-            key=lambda linha: pdfmetrics.stringWidth(linha, fonte, tamanho_nome)
+            key=lambda linha: pdfmetrics.stringWidth(
+                linha,
+                fonte,
+                tamanho_nome
+            )
         )
 
         tamanho_nome = tamanho_fonte_dinamico(
@@ -262,12 +268,7 @@ def desenhar_paragrafo(
 ):
     pdf.setFont(fonte, tamanho)
 
-    linhas = quebrar_texto(
-        texto,
-        fonte,
-        tamanho,
-        largura_maxima
-    )
+    linhas = quebrar_texto(texto, fonte, tamanho, largura_maxima)
 
     for i, linha in enumerate(linhas):
         if i == len(linhas) - 1:
@@ -307,7 +308,6 @@ def desenhar_paragrafo(
 
 def criar_logo_transparente(caminho_logo, opacidade=0.10):
     imagem = Image.open(caminho_logo).convert("RGBA")
-
     alpha = imagem.getchannel("A")
     alpha = alpha.point(lambda p: int(p * opacidade))
     imagem.putalpha(alpha)
@@ -319,22 +319,13 @@ def criar_logo_transparente(caminho_logo, opacidade=0.10):
     return ImageReader(buffer)
 
 
-# ======================================================
-# PDF CERTIFICADO
-# ======================================================
-
 def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     nome = nome.strip().upper()
-
     data_certificado = f"{dia} de {mes} de {ano}"
     cor_da_faixa = f"FAIXA {faixa.upper()}"
 
     buffer = io.BytesIO()
-
-    pdf = canvas.Canvas(
-        buffer,
-        pagesize=landscape(A4)
-    )
+    pdf = canvas.Canvas(buffer, pagesize=landscape(A4))
 
     largura, altura = landscape(A4)
     centro_x = largura / 2
@@ -386,23 +377,8 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_nome_maxima
     )
 
-    texto_centralizado(
-        pdf,
-        "CERTIFICADO",
-        centro_x,
-        y_certificado,
-        FONTE_TITULO,
-        40
-    )
-
-    texto_centralizado(
-        pdf,
-        "CERTIFICO QUE O ATLETA",
-        centro_x,
-        y_certifico,
-        FONTE_TEXTO,
-        18
-    )
+    texto_centralizado(pdf, "CERTIFICADO", centro_x, y_certificado, FONTE_TITULO, 40)
+    texto_centralizado(pdf, "CERTIFICO QUE O ATLETA", centro_x, y_certifico, FONTE_TEXTO, 18)
 
     desenhar_nome_dinamico(
         pdf,
@@ -415,60 +391,17 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_quebra_nome
     )
 
-    texto_centralizado(
-        pdf,
-        "GRADUOU-SE COM MÉRITO A",
-        centro_x,
-        y_graduou,
-        FONTE_TEXTO,
-        18
-    )
-
-    texto_centralizado(
-        pdf,
-        cor_da_faixa,
-        centro_x,
-        y_faixa,
-        FONTE_TITULO,
-        tamanho_faixa
-    )
-
-    texto_centralizado(
-        pdf,
-        "COM EXAME DE GRADUAÇÃO CONCEDIDO",
-        centro_x,
-        y_exame,
-        FONTE_TEXTO,
-        18
-    )
-
-    texto_centralizado(
-        pdf,
-        "PELA EQUIPE CRIST OSS BJJ.",
-        centro_x,
-        y_equipe,
-        FONTE_TEXTO,
-        18
-    )
-
-    texto_centralizado(
-        pdf,
-        data_certificado,
-        centro_x,
-        y_data,
-        FONTE_TEXTO,
-        18
-    )
+    texto_centralizado(pdf, "GRADUOU-SE COM MÉRITO A", centro_x, y_graduou, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, cor_da_faixa, centro_x, y_faixa, FONTE_TITULO, tamanho_faixa)
+    texto_centralizado(pdf, "COM EXAME DE GRADUAÇÃO CONCEDIDO", centro_x, y_exame, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, "PELA EQUIPE CRIST OSS BJJ.", centro_x, y_equipe, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, data_certificado, centro_x, y_data, FONTE_TEXTO, 18)
 
     pdf.save()
     buffer.seek(0)
 
     return buffer
 
-
-# ======================================================
-# PDF DECLARAÇÃO
-# ======================================================
 
 def gerar_pdf_declaracao(
     tipo,
@@ -499,10 +432,6 @@ def gerar_pdf_declaracao(
     logo_path = os.path.join(app.root_path, "static", "logo_crist_oss.png")
     ibjjf_path = os.path.join(app.root_path, "static", "IBJJF.png")
 
-    # ==================================================
-    # MARCA D'ÁGUA
-    # ==================================================
-
     if os.path.exists(logo_path):
         marca = criar_logo_transparente(logo_path, 0.08)
         tamanho_marca = 130 * mm
@@ -515,10 +444,6 @@ def gerar_pdf_declaracao(
             height=tamanho_marca,
             mask="auto"
         )
-
-    # ==================================================
-    # TÍTULO
-    # ==================================================
 
     if tipo == "frequencia":
         titulo = "DECLARAÇÃO DE FREQUÊNCIA E PARTICIPAÇÃO"
@@ -591,16 +516,11 @@ def gerar_pdf_declaracao(
     if tipo == "evento":
         y -= 10 * mm
         pdf.setFont("Helvetica-Bold", 12)
-
         pdf.drawCentredString(
             centro_x,
             y,
             "DESDE JÁ, AGRADECEMOS A COMPREENSÃO."
         )
-
-    # ==================================================
-    # RODAPÉ / DATA / ASSINATURA
-    # ==================================================
 
     pdf.setFont("Helvetica", 12)
 
@@ -657,29 +577,26 @@ def gerar_pdf_declaracao(
     return buffer
 
 
-# ======================================================
-# LOGIN
-# ======================================================
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         usuario = request.form.get("usuario", "").strip()
         senha = request.form.get("senha", "").strip()
 
-        credenciais = carregar_credenciais()
+        user = buscar_usuario(usuario)
 
-        if (
-            usuario == credenciais["usuario"]
-            and
-            senha == credenciais["senha"]
-        ):
+        if user and user["senha"] == senha:
             session["logado"] = True
+            session["usuario"] = user["usuario"]
+            session["tipo"] = user["tipo"]
+            session["foto"] = user["foto"]
+            session["id"] = user["id"]
+
             return redirect(url_for("menu"))
 
         return render_template(
             "login.html",
-            erro="Usuário ou senha inválidos."
+            erro="USUÁRIO OU SENHA INVÁLIDOS."
         )
 
     return render_template("login.html")
@@ -690,64 +607,6 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-
-# ======================================================
-# ALTERAR LOGIN
-# ======================================================
-
-@app.route("/alterar-login", methods=["GET", "POST"])
-def alterar_login():
-
-    if not usuario_logado():
-        return redirect(url_for("login"))
-
-    erro = None
-    sucesso = None
-
-    if request.method == "POST":
-
-        novo_usuario = request.form.get(
-            "novo_usuario",
-            ""
-        ).strip()
-
-        nova_senha = request.form.get(
-            "nova_senha",
-            ""
-        ).strip()
-
-        # ==============================================
-        # CHAVE MESTRA INTERNA
-        # ==============================================
-
-        chave_interna = CHAVE_MESTRA
-
-        if chave_interna != "CRISTOSS2026":
-
-            erro = "ERRO DE SEGURANÇA."
-
-        elif novo_usuario == "" or nova_senha == "":
-
-            erro = "PREENCHA TODOS OS CAMPOS."
-
-        else:
-
-            salvar_credenciais(
-                novo_usuario,
-                nova_senha
-            )
-
-            sucesso = (
-                "LOGIN ALTERADO COM SUCESSO."
-            )
-
-    return render_template(
-        "alterar_login.html",
-        erro=erro,
-        sucesso=sucesso
-    )# ======================================================
-# MENU
-# ======================================================
 
 @app.route("/")
 def raiz():
@@ -762,12 +621,160 @@ def menu():
     if not usuario_logado():
         return redirect(url_for("login"))
 
-    return render_template("menu.html")
+    return render_template(
+        "menu.html",
+        usuario=session.get("usuario"),
+        foto=session.get("foto"),
+        tipo=session.get("tipo")
+    )
 
 
-# ======================================================
-# CERTIFICADO
-# ======================================================
+@app.route("/minha-conta", methods=["GET", "POST"])
+def minha_conta():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    dados = carregar_usuarios()
+    usuario_atual = None
+
+    for u in dados["usuarios"]:
+        if u["id"] == session["id"]:
+            usuario_atual = u
+            break
+
+    mensagem = None
+    erro = None
+
+    if request.method == "POST":
+        novo_usuario = request.form.get("novo_usuario", "").strip()
+        nova_senha = request.form.get("nova_senha", "").strip()
+        foto = request.files.get("foto")
+
+        if novo_usuario != "":
+            existente = buscar_usuario(novo_usuario)
+
+            if existente and existente["id"] != usuario_atual["id"]:
+                erro = "ESSE USUÁRIO JÁ EXISTE."
+            else:
+                usuario_atual["usuario"] = novo_usuario
+                session["usuario"] = novo_usuario
+
+        if not erro and nova_senha != "":
+            usuario_atual["senha"] = nova_senha
+
+        if not erro and foto and foto.filename != "":
+            extensao = foto.filename.split(".")[-1].lower()
+
+            if extensao not in ["png", "jpg", "jpeg", "webp"]:
+                erro = "FORMATO DE IMAGEM INVÁLIDO."
+            else:
+                nome_arquivo = str(uuid.uuid4()) + "." + extensao
+
+                caminho = os.path.join(
+                    app.config["UPLOAD_FOLDER"],
+                    secure_filename(nome_arquivo)
+                )
+
+                foto.save(caminho)
+
+                usuario_atual["foto"] = nome_arquivo
+                session["foto"] = nome_arquivo
+
+        if not erro:
+            salvar_usuarios(dados)
+            mensagem = "CONTA ATUALIZADA COM SUCESSO."
+
+    return render_template(
+        "minha_conta.html",
+        usuario=usuario_atual,
+        mensagem=mensagem,
+        erro=erro
+    )
+
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    if not usuario_admin():
+        return redirect(url_for("menu"))
+
+    dados = carregar_usuarios()
+    mensagem = None
+    erro = None
+
+    if request.method == "POST":
+        acao = request.form.get("acao")
+
+        if acao == "criar":
+            novo_usuario = request.form.get("novo_usuario", "").strip()
+            nova_senha = request.form.get("nova_senha", "").strip()
+            tipo = request.form.get("tipo", "comum").strip()
+
+            if novo_usuario == "" or nova_senha == "":
+                erro = "PREENCHA USUÁRIO E SENHA."
+
+            elif buscar_usuario(novo_usuario):
+                erro = "ESSE USUÁRIO JÁ EXISTE."
+
+            else:
+                novo_id = max(
+                    [u["id"] for u in dados["usuarios"]],
+                    default=0
+                ) + 1
+
+                dados["usuarios"].append(
+                    {
+                        "id": novo_id,
+                        "usuario": novo_usuario,
+                        "senha": nova_senha,
+                        "tipo": tipo,
+                        "foto": "default.png"
+                    }
+                )
+
+                salvar_usuarios(dados)
+                mensagem = "USUÁRIO CRIADO COM SUCESSO."
+
+        elif acao == "alterar_senha":
+            usuario_id = int(request.form.get("usuario_id"))
+            nova_senha = request.form.get("nova_senha", "").strip()
+
+            if nova_senha == "":
+                erro = "DIGITE A NOVA SENHA."
+            else:
+                for u in dados["usuarios"]:
+                    if u["id"] == usuario_id:
+                        u["senha"] = nova_senha
+                        break
+
+                salvar_usuarios(dados)
+                mensagem = "SENHA ALTERADA COM SUCESSO."
+
+        elif acao == "excluir":
+            usuario_id = int(request.form.get("usuario_id"))
+
+            if usuario_id == session["id"]:
+                erro = "VOCÊ NÃO PODE EXCLUIR SUA PRÓPRIA CONTA."
+            else:
+                dados["usuarios"] = [
+                    u for u in dados["usuarios"]
+                    if u["id"] != usuario_id
+                ]
+
+                salvar_usuarios(dados)
+                mensagem = "USUÁRIO EXCLUÍDO COM SUCESSO."
+
+    dados = carregar_usuarios()
+
+    return render_template(
+        "admin.html",
+        usuarios=dados["usuarios"],
+        mensagem=mensagem,
+        erro=erro
+    )
+
 
 @app.route("/certificado", methods=["GET"])
 def certificado():
@@ -834,7 +841,6 @@ def pdf():
         return "Erro: data inválida.", 400
 
     pdf_buffer = gerar_pdf_certificado(nome, faixa, dia, mes, ano)
-
     nome_arquivo = nome.upper().replace(" ", "_").replace("/", "_")
 
     return send_file(
@@ -844,10 +850,6 @@ def pdf():
         download_name=f"certificado_{nome_arquivo}.pdf"
     )
 
-
-# ======================================================
-# DECLARAÇÕES
-# ======================================================
 
 @app.route("/declaracao")
 def declaracao_menu():
@@ -978,10 +980,6 @@ def declaracao_pdf():
         download_name=f"declaracao_{nome_arquivo}.pdf"
     )
 
-
-# ======================================================
-# START
-# ======================================================
 
 if __name__ == "__main__":
     app.run(debug=True)
