@@ -1,0 +1,11 @@
+{
+    "usuarios": [
+        {
+            "id": 1,
+            "usuario": "admin",
+            "senha": "1234",
+            "tipo": "admin",
+            "foto": "default.png"
+        }
+    ]
+}
