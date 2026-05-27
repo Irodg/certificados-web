@@ -1,5 +1,6 @@
 import os
 import io
+import json
 
 from flask import (
     Flask,
@@ -23,13 +24,42 @@ from reportlab.lib.units import mm
 app = Flask(__name__)
 
 # ======================================================
-# LOGIN
+# LOGIN / SESSÃO
 # ======================================================
 
 app.secret_key = "certificados_secret_key"
+app.config["SESSION_PERMANENT"] = False
 
-USUARIO = "admin"
-SENHA = "1234"
+ARQUIVO_CREDENCIAIS = "credenciais.json"
+CHAVE_MESTRA = "CRISTOSS2026"
+
+
+def criar_credenciais_padrao():
+    if not os.path.exists(ARQUIVO_CREDENCIAIS):
+        dados = {
+            "usuario": "admin",
+            "senha": "1234"
+        }
+
+        with open(ARQUIVO_CREDENCIAIS, "w", encoding="utf-8") as arquivo:
+            json.dump(dados, arquivo, indent=4)
+
+
+def carregar_credenciais():
+    criar_credenciais_padrao()
+
+    with open(ARQUIVO_CREDENCIAIS, "r", encoding="utf-8") as arquivo:
+        return json.load(arquivo)
+
+
+def salvar_credenciais(usuario, senha):
+    dados = {
+        "usuario": usuario,
+        "senha": senha
+    }
+
+    with open(ARQUIVO_CREDENCIAIS, "w", encoding="utf-8") as arquivo:
+        json.dump(dados, arquivo, indent=4)
 
 
 # ======================================================
@@ -232,86 +262,35 @@ def desenhar_paragrafo(
 ):
     pdf.setFont(fonte, tamanho)
 
-    palavras = texto.split()
-
-    linhas = []
-    linha_atual = ""
-
-    for palavra in palavras:
-
-        teste = (
-            palavra
-            if linha_atual == ""
-            else linha_atual + " " + palavra
-        )
-
-        largura_teste = pdfmetrics.stringWidth(
-            teste,
-            fonte,
-            tamanho
-        )
-
-        if largura_teste <= largura_maxima:
-            linha_atual = teste
-
-        else:
-            linhas.append(linha_atual)
-            linha_atual = palavra
-
-    if linha_atual:
-        linhas.append(linha_atual)
-
-    # ==================================================
-    # DESENHO JUSTIFICADO
-    # ==================================================
+    linhas = quebrar_texto(
+        texto,
+        fonte,
+        tamanho,
+        largura_maxima
+    )
 
     for i, linha in enumerate(linhas):
-
-        # última linha NÃO justifica
         if i == len(linhas) - 1:
-
             pdf.drawString(x, y, linha)
-
         else:
-
             palavras_linha = linha.split()
 
-            # se tiver só 1 palavra
             if len(palavras_linha) == 1:
-
                 pdf.drawString(x, y, linha)
-
             else:
-
                 largura_sem_espacos = sum(
-                    pdfmetrics.stringWidth(
-                        palavra,
-                        fonte,
-                        tamanho
-                    )
+                    pdfmetrics.stringWidth(palavra, fonte, tamanho)
                     for palavra in palavras_linha
                 )
 
-                espacos = len(palavras_linha) - 1
-
-                largura_total_espacos = (
-                    largura_maxima
-                    - largura_sem_espacos
-                )
-
-                espaco_extra = (
-                    largura_total_espacos / espacos
-                )
+                quantidade_espacos = len(palavras_linha) - 1
+                largura_total_espacos = largura_maxima - largura_sem_espacos
+                espaco_extra = largura_total_espacos / quantidade_espacos
 
                 x_atual = x
 
                 for palavra in palavras_linha:
-
-                    pdf.drawString(
-                        x_atual,
-                        y,
-                        palavra
-                    )
+                    pdf.drawString(x_atual, y, palavra)
 
                     largura_palavra = pdfmetrics.stringWidth(
                         palavra,
@@ -319,10 +298,7 @@ def desenhar_paragrafo(
                         tamanho
                     )
 
-                    x_atual += (
-                        largura_palavra
-                        + espaco_extra
-                    )
+                    x_atual += largura_palavra + espaco_extra
 
         y -= entrelinha
 
@@ -410,8 +386,23 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_nome_maxima
     )
 
-    texto_centralizado(pdf, "CERTIFICADO", centro_x, y_certificado, FONTE_TITULO, 40)
-    texto_centralizado(pdf, "CERTIFICO QUE O ATLETA", centro_x, y_certifico, FONTE_TEXTO, 18)
+    texto_centralizado(
+        pdf,
+        "CERTIFICADO",
+        centro_x,
+        y_certificado,
+        FONTE_TITULO,
+        40
+    )
+
+    texto_centralizado(
+        pdf,
+        "CERTIFICO QUE O ATLETA",
+        centro_x,
+        y_certifico,
+        FONTE_TEXTO,
+        18
+    )
 
     desenhar_nome_dinamico(
         pdf,
@@ -424,11 +415,50 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_quebra_nome
     )
 
-    texto_centralizado(pdf, "GRADUOU-SE COM MÉRITO A", centro_x, y_graduou, FONTE_TEXTO, 18)
-    texto_centralizado(pdf, cor_da_faixa, centro_x, y_faixa, FONTE_TITULO, tamanho_faixa)
-    texto_centralizado(pdf, "COM EXAME DE GRADUAÇÃO CONCEDIDO", centro_x, y_exame, FONTE_TEXTO, 18)
-    texto_centralizado(pdf, "PELA EQUIPE CRIST OSS BJJ.", centro_x, y_equipe, FONTE_TEXTO, 18)
-    texto_centralizado(pdf, data_certificado, centro_x, y_data, FONTE_TEXTO, 18)
+    texto_centralizado(
+        pdf,
+        "GRADUOU-SE COM MÉRITO A",
+        centro_x,
+        y_graduou,
+        FONTE_TEXTO,
+        18
+    )
+
+    texto_centralizado(
+        pdf,
+        cor_da_faixa,
+        centro_x,
+        y_faixa,
+        FONTE_TITULO,
+        tamanho_faixa
+    )
+
+    texto_centralizado(
+        pdf,
+        "COM EXAME DE GRADUAÇÃO CONCEDIDO",
+        centro_x,
+        y_exame,
+        FONTE_TEXTO,
+        18
+    )
+
+    texto_centralizado(
+        pdf,
+        "PELA EQUIPE CRIST OSS BJJ.",
+        centro_x,
+        y_equipe,
+        FONTE_TEXTO,
+        18
+    )
+
+    texto_centralizado(
+        pdf,
+        data_certificado,
+        centro_x,
+        y_data,
+        FONTE_TEXTO,
+        18
+    )
 
     pdf.save()
     buffer.seek(0)
@@ -440,7 +470,16 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
 # PDF DECLARAÇÃO
 # ======================================================
 
-def gerar_pdf_declaracao(tipo, nome_aluno, nome_responsavel, cpf_responsavel, graus, dia, mes, ano):
+def gerar_pdf_declaracao(
+    tipo,
+    nome_aluno,
+    nome_responsavel,
+    cpf_responsavel,
+    graus,
+    dia,
+    mes,
+    ano
+):
     nome_aluno = nome_aluno.strip().upper()
     nome_responsavel = nome_responsavel.strip().upper()
     cpf_responsavel = cpf_responsavel.strip()
@@ -449,7 +488,6 @@ def gerar_pdf_declaracao(tipo, nome_aluno, nome_responsavel, cpf_responsavel, gr
     data = f"{dia} de {mes} de {ano}"
 
     buffer = io.BytesIO()
-
     pdf = canvas.Canvas(buffer, pagesize=A4)
 
     largura, altura = A4
@@ -479,7 +517,7 @@ def gerar_pdf_declaracao(tipo, nome_aluno, nome_responsavel, cpf_responsavel, gr
         )
 
     # ==================================================
-    # CABEÇALHO
+    # TÍTULO
     # ==================================================
 
     if tipo == "frequencia":
@@ -492,47 +530,68 @@ def gerar_pdf_declaracao(tipo, nome_aluno, nome_responsavel, cpf_responsavel, gr
 
     y = altura - (50 * mm)
 
-    pdf.setFont("Helvetica", 12)
-
     if tipo == "frequencia":
         paragrafo_1 = (
-            f"A ESCOLA CRIST OSS BJJ, inscrita no CNPJ sob o nº 44.227.964/0001-42, "
-            f"localizada no bairro Conjunto Ceará, nº 348, Fortaleza/CE, declara, "
-            f"para os devidos fins, que o(a) aluno(a) {nome_aluno} realiza regularmente "
-            f"o curso de Jiu-Jitsu, com frequência assídua às segundas, quartas e "
-            f"sextas-feiras, sob orientação do Professor Leandro Marques, faixa preta "
-            f"{graus} graus, portador do CPF nº 725.598.963-20."
+            f"A ESCOLA CRIST OSS BJJ, inscrita no CNPJ sob o nº "
+            f"44.227.964/0001-42, localizada no bairro Conjunto Ceará, "
+            f"nº 348, Fortaleza/CE, declara, para os devidos fins, "
+            f"que o(a) aluno(a) {nome_aluno} realiza regularmente o curso "
+            f"de Jiu-Jitsu, com frequência assídua às segundas, quartas "
+            f"e sextas-feiras, sob orientação do Professor Leandro Marques, "
+            f"faixa preta {graus} graus, portador do CPF nº 725.598.963-20."
         )
 
         paragrafo_2 = (
-            f"Declaramos, ainda, que a participação do(a) aluno(a) ocorre mediante "
-            f"autorização de seu/sua responsável legal, {nome_responsavel}, "
-            f"portador(a) do CPF nº {cpf_responsavel}."
+            f"Declaramos, ainda, que a participação do(a) aluno(a) ocorre "
+            f"mediante autorização de seu/sua responsável legal, "
+            f"{nome_responsavel}, portador(a) do CPF nº {cpf_responsavel}."
         )
 
     else:
         paragrafo_1 = (
-            f"A ESCOLA CRIST OSS BJJ, inscrita no CNPJ sob o nº 44.227.964/0001-42, "
-            f"declara, para os devidos fins, que o(a) aluno(a) {nome_aluno} precisou "
-            f"ausentar-se de suas atividades regulares no dia {data}, em razão de "
-            f"participação em evento promovido pela ESCOLA CRIST OSS BJJ, sob supervisão "
-            f"do Professor Leandro Marques, faixa preta {graus} graus, portador do CPF "
-            f"nº 725.598.963-20."
+            f"A ESCOLA CRIST OSS BJJ, inscrita no CNPJ sob o nº "
+            f"44.227.964/0001-42, declara, para os devidos fins, "
+            f"que o(a) aluno(a) {nome_aluno} precisou ausentar-se de suas "
+            f"atividades regulares no dia {data}, em razão de participação "
+            f"em evento promovido pela ESCOLA CRIST OSS BJJ, sob supervisão "
+            f"do Professor Leandro Marques, faixa preta {graus} graus, "
+            f"portador do CPF nº 725.598.963-20."
         )
 
         paragrafo_2 = (
-            f"Declaramos, ainda, que a participação do(a) aluno(a) no referido evento "
-            f"ocorreu mediante autorização de seu/sua responsável legal, {nome_responsavel}, "
-            f"portador(a) do CPF nº {cpf_responsavel}."
+            f"Declaramos, ainda, que a participação do(a) aluno(a) no referido "
+            f"evento ocorreu mediante autorização de seu/sua responsável legal, "
+            f"{nome_responsavel}, portador(a) do CPF nº {cpf_responsavel}."
         )
 
-    y = desenhar_paragrafo(pdf, paragrafo_1, margem_x, y, largura_texto, "Helvetica", 12, 7 * mm)
+    y = desenhar_paragrafo(
+        pdf,
+        paragrafo_1,
+        margem_x,
+        y,
+        largura_texto,
+        "Helvetica",
+        12,
+        7 * mm
+    )
+
     y -= 8 * mm
-    y = desenhar_paragrafo(pdf, paragrafo_2, margem_x, y, largura_texto, "Helvetica", 12, 7 * mm)
+
+    y = desenhar_paragrafo(
+        pdf,
+        paragrafo_2,
+        margem_x,
+        y,
+        largura_texto,
+        "Helvetica",
+        12,
+        7 * mm
+    )
 
     if tipo == "evento":
         y -= 10 * mm
         pdf.setFont("Helvetica-Bold", 12)
+
         pdf.drawCentredString(
             centro_x,
             y,
@@ -558,6 +617,7 @@ def gerar_pdf_declaracao(tipo, nome_aluno, nome_responsavel, cpf_responsavel, gr
     )
 
     pdf.setFont("Helvetica-Bold", 12)
+
     pdf.drawCentredString(
         centro_x,
         56 * mm,
@@ -578,6 +638,7 @@ def gerar_pdf_declaracao(tipo, nome_aluno, nome_responsavel, cpf_responsavel, gr
         )
 
     pdf.setFont("Helvetica", 11)
+
     pdf.drawCentredString(
         centro_x,
         28 * mm,
@@ -606,11 +667,20 @@ def login():
         usuario = request.form.get("usuario", "").strip()
         senha = request.form.get("senha", "").strip()
 
-        if usuario == USUARIO and senha == SENHA:
+        credenciais = carregar_credenciais()
+
+        if (
+            usuario == credenciais["usuario"]
+            and
+            senha == credenciais["senha"]
+        ):
             session["logado"] = True
             return redirect(url_for("menu"))
 
-        return render_template("login.html", erro="Usuário ou senha inválidos.")
+        return render_template(
+            "login.html",
+            erro="Usuário ou senha inválidos."
+        )
 
     return render_template("login.html")
 
@@ -619,6 +689,40 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+
+# ======================================================
+# ALTERAR LOGIN
+# ======================================================
+
+@app.route("/alterar-login", methods=["GET", "POST"])
+def alterar_login():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    erro = None
+    sucesso = None
+
+    if request.method == "POST":
+        novo_usuario = request.form.get("novo_usuario", "").strip()
+        nova_senha = request.form.get("nova_senha", "").strip()
+        chave = request.form.get("chave_mestra", "").strip()
+
+        if chave != CHAVE_MESTRA:
+            erro = "CHAVE MESTRA INCORRETA."
+
+        elif novo_usuario == "" or nova_senha == "":
+            erro = "PREENCHA TODOS OS CAMPOS."
+
+        else:
+            salvar_credenciais(novo_usuario, nova_senha)
+            sucesso = "LOGIN ALTERADO COM SUCESSO."
+
+    return render_template(
+        "alterar_login.html",
+        erro=erro,
+        sucesso=sucesso
+    )
 
 
 # ======================================================
@@ -818,6 +922,21 @@ def declaracao_pdf():
     dia = request.args.get("dia", "").strip()
     mes = request.args.get("mes", "").strip()
     ano = request.args.get("ano", "").strip()
+
+    if tipo not in ["frequencia", "evento"]:
+        return "Erro: tipo de declaração inválido.", 400
+
+    if not nome_valido(nome_aluno):
+        return "Erro: nome do aluno inválido.", 400
+
+    if not nome_valido(nome_responsavel):
+        return "Erro: nome do responsável inválido.", 400
+
+    if cpf_responsavel == "":
+        return "Erro: CPF inválido.", 400
+
+    if graus == "":
+        return "Erro: grau inválido.", 400
 
     pdf_buffer = gerar_pdf_declaracao(
         tipo,
