@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
 <title>MINHA CONTA</title>
 
@@ -190,23 +194,33 @@ button:hover{
         <h1>MINHA CONTA</h1>
 
         {% if erro %}
-            <div class="erro">{{ erro }}</div>
+            <div class="erro">
+                {{ erro }}
+            </div>
         {% endif %}
 
         {% if mensagem %}
-            <div class="sucesso">{{ mensagem }}</div>
+            <div class="sucesso">
+                {{ mensagem }}
+            </div>
         {% endif %}
 
-        <form method="POST" enctype="multipart/form-data">
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
 
             <label>FOTO DO USUÁRIO</label>
+
             <input
                 type="file"
                 name="foto"
-                accept="image/png, image/jpeg, image/webp"
+                accept="image/*"
+                capture="user"
             >
 
             <label>NOVO USUÁRIO</label>
+
             <input
                 type="text"
                 name="novo_usuario"
@@ -214,6 +228,7 @@ button:hover{
             >
 
             <label>NOVA SENHA</label>
+
             <input
                 type="password"
                 name="nova_senha"
@@ -226,7 +241,10 @@ button:hover{
 
         </form>
 
-        <a class="voltar" href="{{ url_for('menu') }}">
+        <a
+            class="voltar"
+            href="{{ url_for('menu') }}"
+        >
             VOLTAR
         </a>
 
