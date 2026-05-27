@@ -2,63 +2,82 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Certificado Gerado</title>
+<title>CERTIFICADO GERADO</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #eeeeee;
-    }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eeeeee;
+}
 
+.topo {
+    background: #202020;
+    color: white;
+    padding: 18px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+button,
+a {
+    border: none;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    background: #444444;
+    text-transform: uppercase;
+}
+
+button:hover,
+a:hover {
+    background: #000000;
+}
+
+.voltar {
+    background: #777777;
+}
+
+.pdf-area {
+    width: 100%;
+    height: calc(100vh - 80px);
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+}
+
+@media (max-width: 600px) {
     .topo {
-        background: #202020;
-        color: white;
-        padding: 18px;
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        flex-wrap: wrap;
+        padding: 8px;
+        gap: 6px;
     }
 
     button,
     a {
-        border: none;
-        padding: 14px 22px;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        color: white;
-        background: #444444;
-    }
-
-    button:hover,
-    a:hover {
-        background: #000000;
-    }
-
-    .voltar {
-        background: #777777;
+        padding: 10px 12px;
+        font-size: 12px;
     }
 
     .pdf-area {
-        width: 100%;
-        height: calc(100vh - 80px);
+        height: calc(100vh - 95px);
     }
-
-    iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        background: white;
-    }
+}
 </style>
 </head>
 
@@ -69,19 +88,19 @@
 <div class="topo">
 
     <button onclick="imprimirPDF()">
-        Imprimir
+        IMPRIMIR
     </button>
 
-    <a href="{{ pdf_url }}" download>
-        Baixar PDF
+    <a href="{{ pdf_url }}" target="_blank">
+        ABRIR / BAIXAR PDF
     </a>
 
     <button onclick="compartilharPDF()">
-        Compartilhar PDF
+        COMPARTILHAR
     </button>
 
-    <a class="voltar" href="{{ url_for('index') }}">
-        Voltar
+    <a class="voltar" href="{{ url_for('certificado') }}">
+        VOLTAR
     </a>
 
 </div>
@@ -91,26 +110,26 @@
 </div>
 
 <script>
-    const pdfUrl = window.location.origin + "{{ pdf_url }}";
+const pdfUrl = window.location.origin + "{{ pdf_url }}";
 
-    function imprimirPDF() {
-        const frame = document.getElementById("pdfFrame");
-        frame.contentWindow.focus();
-        frame.contentWindow.print();
-    }
+function imprimirPDF() {
+    const frame = document.getElementById("pdfFrame");
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+}
 
-    async function compartilharPDF() {
-        if (navigator.share) {
-            await navigator.share({
-                title: "Certificado",
-                text: "Segue o certificado em PDF.",
-                url: pdfUrl
-            });
-        } else {
-            navigator.clipboard.writeText(pdfUrl);
-            alert("Link do PDF copiado para a área de transferência.");
-        }
+async function compartilharPDF() {
+    if (navigator.share) {
+        await navigator.share({
+            title: "Certificado",
+            text: "Segue o certificado em PDF.",
+            url: pdfUrl
+        });
+    } else {
+        navigator.clipboard.writeText(pdfUrl);
+        alert("LINK DO PDF COPIADO.");
     }
+}
 </script>
 
 </body>
