@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>GRADUAÇÃO CRIST OSS BJJ</title>
 
@@ -20,7 +21,7 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     padding: 40px;
 }
 
@@ -31,6 +32,13 @@ body {
     border-radius: 18px;
     padding: 40px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.logo {
+    display: block;
+    width: 180px;
+    max-width: 45%;
+    margin: 30px auto 35px auto;
 }
 
 h1 {
@@ -202,21 +210,49 @@ button:hover {
     color: black;
 }
 
+/* ==================================================
+   MOBILE / FRAME VERTICAL 1080x1920
+================================================== */
+
 @media (max-width: 600px) {
     .container {
-        padding: 20px;
+        min-height: 1920px;
+        padding: 20px 14px;
+        align-items: flex-start;
     }
 
     .card {
-        padding: 25px;
+        max-width: 92%;
+        margin-top: 20px;
+        padding: 35px 25px;
+    }
+
+    .logo {
+        width: 220px;
+        max-width: 55%;
+        margin-top: 20px;
+        margin-bottom: 45px;
+    }
+
+    h1 {
+        font-size: 26px;
     }
 
     .data {
         grid-template-columns: 1fr;
     }
 
-    h1 {
-        font-size: 26px;
+    .faixa-opcoes {
+        max-height: 600px;
+    }
+
+    .faixa-opcao {
+        height: 68px;
+        margin-bottom: 12px;
+    }
+
+    .faixa-atual {
+        height: 68px;
     }
 }
 </style>
@@ -226,6 +262,12 @@ button:hover {
 
 <div class="container">
     <div class="card">
+
+        <img
+            class="logo"
+            src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+            alt="Logo Crist Oss"
+        >
 
         <h1>GRADUAÇÃO CRIST OSS BJJ</h1>
 
