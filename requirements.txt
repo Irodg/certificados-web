@@ -3,3 +3,4 @@ reportlab
 gunicorn
 pillow
 werkzeug
+psycopg2-binary
