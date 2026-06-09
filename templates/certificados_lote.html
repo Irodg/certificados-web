@@ -1,1 +1,288 @@
-certificados_lote.html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CERTIFICADOS EM LOTE</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eeeeee;
+}
+
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.card {
+    width: 100%;
+    max-width: 760px;
+    background: white;
+    border-radius: 18px;
+    padding: 35px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+.logo {
+    display: block;
+    width: 150px;
+    max-width: 45%;
+    margin: 0 auto 25px auto;
+}
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 22px;
+    text-transform: uppercase;
+}
+
+.info {
+    background: #f4f4f4;
+    border-left: 5px solid #202020;
+    padding: 14px;
+    margin-bottom: 22px;
+    font-size: 14px;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+textarea {
+    width: 100%;
+    height: 220px;
+    font-size: 16px;
+    padding: 14px;
+    margin-bottom: 18px;
+    border: 1px solid #bbbbbb;
+    border-radius: 10px;
+    resize: vertical;
+    text-transform: uppercase;
+    font-family: Arial, sans-serif;
+}
+
+select {
+    width: 100%;
+    font-size: 17px;
+    padding: 13px;
+    margin-bottom: 18px;
+    border: 1px solid #bbbbbb;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+.data {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 12px;
+}
+
+button {
+    width: 100%;
+    background: #202020;
+    color: white;
+    border: none;
+    padding: 17px;
+    font-size: 19px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+button:hover {
+    background: #000;
+}
+
+.voltar {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    color: #555;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.voltar:hover {
+    color: black;
+}
+
+@media(max-width:600px) {
+    html,
+    body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .container {
+        height: 100vh;
+        padding: 10px;
+    }
+
+    .card {
+        max-width: 430px;
+        max-height: 96vh;
+        padding: 18px;
+        overflow: visible;
+    }
+
+    .logo {
+        width: 110px;
+        margin-bottom: 12px;
+    }
+
+    h1 {
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+
+    .info {
+        font-size: 11px;
+        padding: 10px;
+        margin-bottom: 12px;
+        line-height: 1.35;
+    }
+
+    label {
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    textarea {
+        height: 170px;
+        font-size: 14px;
+        padding: 10px;
+        margin-bottom: 11px;
+    }
+
+    select {
+        font-size: 14px;
+        padding: 9px;
+        margin-bottom: 11px;
+    }
+
+    .data {
+        grid-template-columns: 1fr 1.5fr 1fr;
+        gap: 7px;
+    }
+
+    button {
+        font-size: 15px;
+        padding: 11px;
+    }
+
+    .voltar {
+        font-size: 13px;
+        margin-top: 11px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <img
+            class="logo"
+            src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+            alt="Logo Crist Oss"
+        >
+
+        <h1>CERTIFICADOS EM LOTE</h1>
+
+        <div class="info">
+            DIGITE OU COLE OS NOMES SEGUIDOS DA FAIXA. A FAIXA É O QUE SEPARA CADA CERTIFICADO.
+            <br><br>
+            EXEMPLO:
+            <br>
+            RAFAEL AMARELA<br>
+            ANDREA AZUL<br>
+            JOÃO SILVA VERDE/PRETA<br>
+            MARIA CLARA<br>
+            ROXA
+        </div>
+
+        <form
+            action="{{ url_for('gerar_lote') }}"
+            method="POST"
+            target="_blank"
+        >
+
+            <label>NOMES E FAIXAS</label>
+
+            <textarea
+                name="texto_lote"
+                placeholder="EX: RAFAEL AMARELA&#10;ANDREA AZUL&#10;JOÃO SILVA VERDE/PRETA&#10;MARIA CLARA&#10;ROXA"
+                required
+            ></textarea>
+
+            <label>DATA DA GRADUAÇÃO</label>
+
+            <div class="data">
+
+                <select name="dia" required>
+                    {% for dia in dias %}
+                        <option value="{{ dia }}">
+                            {{ dia }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="mes" required>
+                    {% for mes in meses %}
+                        <option value="{{ mes }}">
+                            {{ mes }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="ano" required>
+                    {% for ano in anos %}
+                        <option value="{{ ano }}">
+                            {{ ano }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+            </div>
+
+            <button type="submit">
+                GERAR PDF EM LOTE
+            </button>
+
+        </form>
+
+        <a
+            class="voltar"
+            href="{{ url_for('certificado') }}"
+        >
+            VOLTAR
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>
