@@ -1,18 +1,10 @@
 import os
 import io
+import re
 import uuid
 import psycopg2
 
-from flask import (
-    Flask,
-    render_template,
-    request,
-    send_file,
-    redirect,
-    url_for,
-    session
-)
-
+from flask import Flask, render_template, request, send_file, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from PIL import Image
 
@@ -22,10 +14,6 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.units import mm
 
-
-# ======================================================
-# APP
-# ======================================================
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
@@ -174,7 +162,6 @@ def criar_usuario(usuario, senha, tipo):
     """, (usuario, senha, tipo))
 
     conn.commit()
-
     cur.close()
     conn.close()
 
@@ -190,7 +177,6 @@ def alterar_usuario(user_id, novo_usuario):
     """, (novo_usuario, user_id))
 
     conn.commit()
-
     cur.close()
     conn.close()
 
@@ -206,7 +192,6 @@ def alterar_senha(user_id, nova_senha):
     """, (nova_senha, user_id))
 
     conn.commit()
-
     cur.close()
     conn.close()
 
@@ -222,7 +207,6 @@ def alterar_foto(user_id, foto):
     """, (foto, user_id))
 
     conn.commit()
-
     cur.close()
     conn.close()
 
@@ -237,7 +221,6 @@ def excluir_usuario(user_id):
     """, (user_id,))
 
     conn.commit()
-
     cur.close()
     conn.close()
 
@@ -246,7 +229,7 @@ criar_tabela_usuarios()
 
 
 # ======================================================
-# CONFIG CERTIFICADO
+# CONFIG
 # ======================================================
 
 faixas = [
@@ -441,31 +424,19 @@ def quebrar_texto(texto, fonte, tamanho, largura_maxima):
     return linhas
 
 
-def desenhar_paragrafo(
-    pdf,
-    texto,
-    x,
-    y,
-    largura_maxima,
-    fonte,
-    tamanho,
-    entrelinha
-):
+def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, tamanho, entrelinha):
     pdf.setFont(fonte, tamanho)
 
     linhas = quebrar_texto(texto, fonte, tamanho, largura_maxima)
 
     for i, linha in enumerate(linhas):
-
         if i == len(linhas) - 1:
             pdf.drawString(x, y, linha)
-
         else:
             palavras_linha = linha.split()
 
             if len(palavras_linha) == 1:
                 pdf.drawString(x, y, linha)
-
             else:
                 largura_sem_espacos = sum(
                     pdfmetrics.stringWidth(palavra, fonte, tamanho)
@@ -507,16 +478,13 @@ def criar_logo_transparente(caminho_logo, opacidade=0.10):
 
 
 # ======================================================
-# PDF CERTIFICADO
+# CERTIFICADO
 # ======================================================
 
-def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
+def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano):
     nome = nome.strip().upper()
     data_certificado = f"{dia} de {mes} de {ano}"
     cor_da_faixa = f"FAIXA {faixa.upper()}"
-
-    buffer = io.BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=landscape(A4))
 
     largura, altura = landscape(A4)
     centro_x = largura / 2
@@ -567,8 +535,23 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_nome_maxima
     )
 
-    texto_centralizado(pdf, "CERTIFICADO", centro_x, y_certificado, FONTE_TITULO, 40)
-    texto_centralizado(pdf, "CERTIFICO QUE O ATLETA", centro_x, y_certifico, FONTE_TEXTO, 18)
+    texto_centralizado(
+        pdf,
+        "CERTIFICADO",
+        centro_x,
+        y_certificado,
+        FONTE_TITULO,
+        40
+    )
+
+    texto_centralizado(
+        pdf,
+        "CERTIFICO QUE O ATLETA",
+        centro_x,
+        y_certifico,
+        FONTE_TEXTO,
+        18
+    )
 
     desenhar_nome_dinamico(
         pdf,
@@ -581,11 +564,68 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         largura_quebra_nome
     )
 
-    texto_centralizado(pdf, "GRADUOU-SE COM MÉRITO A", centro_x, y_graduou, FONTE_TEXTO, 18)
-    texto_centralizado(pdf, cor_da_faixa, centro_x, y_faixa, FONTE_TITULO, tamanho_faixa)
-    texto_centralizado(pdf, "COM EXAME DE GRADUAÇÃO CONCEDIDO", centro_x, y_exame, FONTE_TEXTO, 18)
-    texto_centralizado(pdf, "PELA EQUIPE CRIST OSS BJJ.", centro_x, y_equipe, FONTE_TEXTO, 18)
-    texto_centralizado(pdf, data_certificado, centro_x, y_data, FONTE_TEXTO, 18)
+    texto_centralizado(
+        pdf,
+        "GRADUOU-SE COM MÉRITO A",
+        centro_x,
+        y_graduou,
+        FONTE_TEXTO,
+        18
+    )
+
+    texto_centralizado(
+        pdf,
+        cor_da_faixa,
+        centro_x,
+        y_faixa,
+        FONTE_TITULO,
+        tamanho_faixa
+    )
+
+    texto_centralizado(
+        pdf,
+        "COM EXAME DE GRADUAÇÃO CONCEDIDO",
+        centro_x,
+        y_exame,
+        FONTE_TEXTO,
+        18
+    )
+
+    texto_centralizado(
+        pdf,
+        "PELA EQUIPE CRIST OSS BJJ.",
+        centro_x,
+        y_equipe,
+        FONTE_TEXTO,
+        18
+    )
+
+    texto_centralizado(
+        pdf,
+        data_certificado,
+        centro_x,
+        y_data,
+        FONTE_TEXTO,
+        18
+    )
+
+
+def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
+    buffer = io.BytesIO()
+
+    pdf = canvas.Canvas(
+        buffer,
+        pagesize=landscape(A4)
+    )
+
+    desenhar_certificado_na_pagina(
+        pdf,
+        nome,
+        faixa,
+        dia,
+        mes,
+        ano
+    )
 
     pdf.save()
     buffer.seek(0)
@@ -593,8 +633,118 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
     return buffer
 
 
+def aliases_faixas():
+    return {
+        "cinza/branca": "cinza/branca",
+        "cinza branca": "cinza/branca",
+        "cinza": "cinza",
+        "cinza/preta": "cinza/preta",
+        "cinza preta": "cinza/preta",
+
+        "amarela/branca": "amarela/branca",
+        "amarela branca": "amarela/branca",
+        "amarelo/branco": "amarela/branca",
+        "amarelo branco": "amarela/branca",
+        "amarela": "amarela",
+        "amarelo": "amarela",
+        "amarela/preta": "amarela/preta",
+        "amarela preta": "amarela/preta",
+        "amarelo/preto": "amarela/preta",
+        "amarelo preto": "amarela/preta",
+
+        "laranja/branca": "laranja/branca",
+        "laranja branca": "laranja/branca",
+        "laranja": "laranja",
+        "laranja/preta": "laranja/preta",
+        "laranja preta": "laranja/preta",
+
+        "verde/branca": "verde/branca",
+        "verde branca": "verde/branca",
+        "verde": "verde",
+        "verde/preta": "verde/preta",
+        "verde preta": "verde/preta",
+
+        "azul": "azul",
+        "roxa": "roxa",
+        "roxo": "roxa",
+        "marrom": "marrom",
+        "marron": "marrom",
+        "preta": "preta",
+        "preto": "preta"
+    }
+
+
+def extrair_certificados_em_lote(texto):
+    texto = texto.replace("\r", "\n")
+
+    aliases = aliases_faixas()
+
+    padrao = "|".join(
+        re.escape(k)
+        for k in sorted(aliases.keys(), key=len, reverse=True)
+    )
+
+    regex = re.compile(
+        rf"\b({padrao})\b",
+        re.IGNORECASE
+    )
+
+    certificados = []
+    inicio = 0
+
+    for match in regex.finditer(texto):
+        nome = texto[inicio:match.start()]
+        faixa_detectada = match.group(1).lower()
+        faixa = aliases[faixa_detectada]
+
+        nome = re.sub(r"[\n,;:-]+", " ", nome)
+        nome = re.sub(r"\s+", " ", nome).strip()
+
+        if nome and nome_valido(nome):
+            certificados.append({
+                "nome": nome.upper(),
+                "faixa": faixa
+            })
+
+        inicio = match.end()
+
+    return certificados
+
+
+def gerar_pdf_certificados_lote(texto_lote, dia, mes, ano):
+    certificados = extrair_certificados_em_lote(texto_lote)
+
+    if not certificados:
+        return None, []
+
+    buffer = io.BytesIO()
+
+    pdf = canvas.Canvas(
+        buffer,
+        pagesize=landscape(A4)
+    )
+
+    for index, item in enumerate(certificados):
+        desenhar_certificado_na_pagina(
+            pdf,
+            item["nome"],
+            item["faixa"],
+            dia,
+            mes,
+            ano
+        )
+
+        if index < len(certificados) - 1:
+            pdf.showPage()
+
+    pdf.save()
+    buffer.seek(0)
+
+    return buffer, certificados
+
+
 # ======================================================
-# PDF DECLARAÇÃO
+# DECLARAÇÃO
 # ======================================================
 
 def gerar_pdf_declaracao(
@@ -965,6 +1115,19 @@ def certificado():
     )
 
 
+@app.route("/certificados-lote", methods=["GET"])
+def certificados_lote():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template(
+        "certificados_lote.html",
+        dias=dias,
+        meses=meses,
+        anos=anos
+    )
+
+
 @app.route("/gerar", methods=["POST"])
 def gerar():
     if not usuario_logado():
@@ -992,6 +1155,37 @@ def gerar():
         dia=dia,
         mes=mes,
         ano=ano
+    )
+
+
+@app.route("/gerar-lote", methods=["POST"])
+def gerar_lote():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    texto_lote = request.form.get("texto_lote", "").strip()
+    dia = request.form.get("dia", "").strip()
+    mes = request.form.get("mes", "").strip()
+    ano = request.form.get("ano", "").strip()
+
+    if dia not in dias or mes not in meses or ano not in anos:
+        return "Erro: data inválida.", 400
+
+    pdf_buffer, certificados = gerar_pdf_certificados_lote(
+        texto_lote,
+        dia,
+        mes,
+        ano
+    )
+
+    if not pdf_buffer:
+        return "Erro: nenhum certificado encontrado. Verifique se cada nome tem uma faixa depois.", 400
+
+    return send_file(
+        pdf_buffer,
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name="certificados_em_lote.pdf"
     )
 
 
