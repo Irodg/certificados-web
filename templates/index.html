@@ -68,10 +68,6 @@ select {
     text-transform: uppercase;
 }
 
-/* ==================================================
-   SELECT CUSTOMIZADO DA FAIXA
-================================================== */
-
 .faixa-select {
     position: relative;
     width: 100%;
@@ -173,7 +169,8 @@ select {
     gap: 15px;
 }
 
-button {
+button,
+.botao-link {
     width: 100%;
     background: #202020;
     color: white;
@@ -184,10 +181,19 @@ button {
     border-radius: 12px;
     cursor: pointer;
     text-transform: uppercase;
+    display: block;
+    text-align: center;
+    text-decoration: none;
 }
 
-button:hover {
+button:hover,
+.botao-link:hover {
     background: #000000;
+}
+
+.botao-lote {
+    margin-top: 14px;
+    background: #444444;
 }
 
 .info {
@@ -210,10 +216,6 @@ button:hover {
 .sair:hover {
     color: black;
 }
-
-/* ==================================================
-   MOBILE SEM ROLAGEM DESNECESSÁRIA
-================================================== */
 
 @media (max-width: 600px) {
     html,
@@ -295,7 +297,8 @@ button:hover {
         margin-bottom: 6px;
     }
 
-    button {
+    button,
+    .botao-link {
         padding: 12px;
         font-size: 16px;
         border-radius: 10px;
@@ -390,12 +393,19 @@ button:hover {
 
         </form>
 
+        <a
+            class="botao-link botao-lote"
+            href="{{ url_for('certificados_lote') }}"
+        >
+            CERTIFICADOS EM LOTE
+        </a>
+
         <p class="info">
             O PDF SERÁ ABERTO COM OPÇÃO DE IMPRIMIR, BAIXAR E COMPARTILHAR.
         </p>
 
-        <a class="sair" href="/logout">
-            SAIR
+        <a class="sair" href="{{ url_for('menu') }}">
+            VOLTAR AO MENU
         </a>
 
     </div>
