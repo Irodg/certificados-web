@@ -25,6 +25,8 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+FUNDOS_OTIMIZADOS = {}
+
 
 # ======================================================
 # DATABASE
@@ -478,6 +480,35 @@ def criar_logo_transparente(caminho_logo, opacidade=0.10):
 
 
 # ======================================================
+# FUNDO OTIMIZADO
+# ======================================================
+
+def obter_fundo_otimizado(caminho_fundo):
+    if caminho_fundo in FUNDOS_OTIMIZADOS:
+        return FUNDOS_OTIMIZADOS[caminho_fundo]
+
+    imagem = Image.open(caminho_fundo).convert("RGB")
+    imagem.thumbnail((1800, 1300))
+
+    buffer = io.BytesIO()
+
+    imagem.save(
+        buffer,
+        format="JPEG",
+        quality=78,
+        optimize=True
+    )
+
+    buffer.seek(0)
+
+    fundo = ImageReader(buffer)
+
+    FUNDOS_OTIMIZADOS[caminho_fundo] = fundo
+
+    return fundo
+
+
+# ======================================================
 # CERTIFICADO
 # ======================================================
 
@@ -495,7 +526,8 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano):
         caminho_fundo = os.path.join(app.root_path, "fundos", nome_fundo)
 
         if os.path.exists(caminho_fundo):
-            fundo = ImageReader(caminho_fundo)
+            fundo = obter_fundo_otimizado(caminho_fundo)
+
             pdf.drawImage(
                 fundo,
                 0,
@@ -535,23 +567,8 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano):
         largura_nome_maxima
     )
 
-    texto_centralizado(
-        pdf,
-        "CERTIFICADO",
-        centro_x,
-        y_certificado,
-        FONTE_TITULO,
-        40
-    )
-
-    texto_centralizado(
-        pdf,
-        "CERTIFICO QUE O ATLETA",
-        centro_x,
-        y_certifico,
-        FONTE_TEXTO,
-        18
-    )
+    texto_centralizado(pdf, "CERTIFICADO", centro_x, y_certificado, FONTE_TITULO, 40)
+    texto_centralizado(pdf, "CERTIFICO QUE O ATLETA", centro_x, y_certifico, FONTE_TEXTO, 18)
 
     desenhar_nome_dinamico(
         pdf,
@@ -564,50 +581,11 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano):
         largura_quebra_nome
     )
 
-    texto_centralizado(
-        pdf,
-        "GRADUOU-SE COM MÉRITO A",
-        centro_x,
-        y_graduou,
-        FONTE_TEXTO,
-        18
-    )
-
-    texto_centralizado(
-        pdf,
-        cor_da_faixa,
-        centro_x,
-        y_faixa,
-        FONTE_TITULO,
-        tamanho_faixa
-    )
-
-    texto_centralizado(
-        pdf,
-        "COM EXAME DE GRADUAÇÃO CONCEDIDO",
-        centro_x,
-        y_exame,
-        FONTE_TEXTO,
-        18
-    )
-
-    texto_centralizado(
-        pdf,
-        "PELA EQUIPE CRIST OSS BJJ.",
-        centro_x,
-        y_equipe,
-        FONTE_TEXTO,
-        18
-    )
-
-    texto_centralizado(
-        pdf,
-        data_certificado,
-        centro_x,
-        y_data,
-        FONTE_TEXTO,
-        18
-    )
+    texto_centralizado(pdf, "GRADUOU-SE COM MÉRITO A", centro_x, y_graduou, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, cor_da_faixa, centro_x, y_faixa, FONTE_TITULO, tamanho_faixa)
+    texto_centralizado(pdf, "COM EXAME DE GRADUAÇÃO CONCEDIDO", centro_x, y_exame, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, "PELA EQUIPE CRIST OSS BJJ.", centro_x, y_equipe, FONTE_TEXTO, 18)
+    texto_centralizado(pdf, data_certificado, centro_x, y_data, FONTE_TEXTO, 18)
 
 
 def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
@@ -716,6 +694,9 @@ def gerar_pdf_certificados_lote(texto_lote, dia, mes, ano):
 
     if not certificados:
         return None, []
+
+    if len(certificados) > 25:
+        return "LIMITE", certificados
 
     buffer = io.BytesIO()
 
@@ -1178,6 +1159,9 @@ def gerar_lote():
         ano
     )
 
+    if pdf_buffer == "LIMITE":
+        return "Erro: gere no máximo 25 certificados por vez.", 400
+
     if not pdf_buffer:
         return "Erro: nenhum certificado encontrado. Verifique se cada nome tem uma faixa depois.", 400
 
@@ -1354,10 +1338,6 @@ def declaracao_pdf():
         download_name=f"declaracao_{nome_arquivo}.pdf"
     )
 
-
-# ======================================================
-# START
-# ======================================================
 
 if __name__ == "__main__":
     app.run(debug=True)
