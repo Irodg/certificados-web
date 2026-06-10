@@ -488,14 +488,14 @@ def obter_fundo_otimizado(caminho_fundo):
         return FUNDOS_OTIMIZADOS[caminho_fundo]
 
     imagem = Image.open(caminho_fundo).convert("RGB")
-    imagem.thumbnail((1800, 1300))
+    imagem.thumbnail((2200, 1600))
 
     buffer = io.BytesIO()
 
     imagem.save(
         buffer,
         format="JPEG",
-        quality=78,
+        quality=86,
         optimize=True
     )
 
@@ -695,7 +695,7 @@ def gerar_pdf_certificados_lote(texto_lote, dia, mes, ano):
     if not certificados:
         return None, []
 
-    if len(certificados) > 25:
+    if len(certificados) > 50:
         return "LIMITE", certificados
 
     buffer = io.BytesIO()
@@ -1160,7 +1160,7 @@ def gerar_lote():
     )
 
     if pdf_buffer == "LIMITE":
-        return "Erro: gere no máximo 25 certificados por vez.", 400
+        return "Erro: gere no máximo 50 certificados por vez.", 400
 
     if not pdf_buffer:
         return "Erro: nenhum certificado encontrado. Verifique se cada nome tem uma faixa depois.", 400
