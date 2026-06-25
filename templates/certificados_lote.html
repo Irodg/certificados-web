@@ -7,12 +7,9 @@
 <title>CERTIFICADOS EM LOTE</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
+html, body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #eeeeee;
@@ -67,27 +64,22 @@ label {
     text-transform: uppercase;
 }
 
+input,
+select,
 textarea {
     width: 100%;
-    height: 220px;
     font-size: 16px;
     padding: 14px;
     margin-bottom: 18px;
     border: 1px solid #bbbbbb;
     border-radius: 10px;
-    resize: vertical;
     text-transform: uppercase;
     font-family: Arial, sans-serif;
 }
 
-select {
-    width: 100%;
-    font-size: 17px;
-    padding: 13px;
-    margin-bottom: 18px;
-    border: 1px solid #bbbbbb;
-    border-radius: 10px;
-    text-transform: uppercase;
+textarea {
+    height: 220px;
+    resize: vertical;
 }
 
 .data {
@@ -128,8 +120,7 @@ button:hover {
 }
 
 @media(max-width:600px) {
-    html,
-    body {
+    html, body {
         height: 100%;
         overflow: hidden;
     }
@@ -168,17 +159,16 @@ button:hover {
         margin-bottom: 4px;
     }
 
+    input,
+    select,
     textarea {
-        height: 170px;
-        font-size: 14px;
-        padding: 10px;
-        margin-bottom: 11px;
-    }
-
-    select {
         font-size: 14px;
         padding: 9px;
         margin-bottom: 11px;
+    }
+
+    textarea {
+        height: 145px;
     }
 
     .data {
@@ -222,6 +212,8 @@ button:hover {
             JOÃO SILVA VERDE/PRETA<br>
             MARIA CLARA<br>
             ROXA
+            <br><br>
+            SE INFORMAR A SEDE BATURITÉ, O SISTEMA USARÁ OS FUNDOS BTRT.
         </div>
 
         <form
@@ -229,6 +221,13 @@ button:hover {
             method="POST"
             target="_blank"
         >
+
+            <label>SEDE</label>
+            <input
+                type="text"
+                name="sede"
+                placeholder="EX: BATURITÉ. DEIXE EM BRANCO PARA USAR O FUNDO PADRÃO"
+            >
 
             <label>NOMES E FAIXAS</label>
 
