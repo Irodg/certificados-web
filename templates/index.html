@@ -7,12 +7,9 @@
 <title>GRADUAÇÃO CRIST OSS BJJ</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
+html, body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #eeeeee;
@@ -134,9 +131,7 @@ select {
     border: 1px solid #cccccc;
 }
 
-.faixa-opcao:last-child {
-    margin-bottom: 0;
-}
+.faixa-opcao:last-child { margin-bottom: 0; }
 
 .faixa-opcao:hover {
     filter: brightness(0.92);
@@ -213,13 +208,10 @@ button:hover,
     text-transform: uppercase;
 }
 
-.sair:hover {
-    color: black;
-}
+.sair:hover { color: black; }
 
 @media (max-width: 600px) {
-    html,
-    body {
+    html, body {
         width: 100%;
         height: 100%;
         overflow: hidden;
@@ -273,13 +265,9 @@ button:hover,
         gap: 8px;
     }
 
-    .faixa-select {
-        margin-bottom: 14px;
-    }
+    .faixa-select { margin-bottom: 14px; }
 
-    .faixa-atual {
-        height: 44px;
-    }
+    .faixa-atual { height: 44px; }
 
     .faixa-seta {
         width: 42px;
@@ -340,6 +328,13 @@ button:hover,
                 required
             >
 
+            <label>SEDE</label>
+            <input
+                type="text"
+                name="sede"
+                placeholder="DEIXE EM BRANCO PARA USAR O FUNDO PADRÃO"
+            >
+
             <label>COR DA FAIXA</label>
 
             <input
@@ -353,12 +348,8 @@ button:hover,
 
                 <div class="faixa-atual" onclick="abrirFaixas()">
                     <div id="faixaAtualCor" class="faixa-cor"></div>
-
                     <div id="faixaAtualDetalhe" class="faixa-detalhe"></div>
-
-                    <div class="faixa-seta">
-                        ▼
-                    </div>
+                    <div class="faixa-seta">▼</div>
                 </div>
 
                 <div id="faixaOpcoes" class="faixa-opcoes"></div>
