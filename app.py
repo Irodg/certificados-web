@@ -64,7 +64,6 @@ def criar_tabela_usuarios():
             INSERT INTO usuarios (usuario, senha, tipo, foto)
             VALUES ('admin', '1234', 'admin', 'default.png')
         """)
-
         conn.commit()
 
     cur.close()
@@ -140,18 +139,16 @@ def listar_usuarios():
     cur.close()
     conn.close()
 
-    usuarios = []
-
-    for r in resultados:
-        usuarios.append({
+    return [
+        {
             "id": r[0],
             "usuario": r[1],
             "senha": r[2],
             "tipo": r[3],
             "foto": r[4]
-        })
-
-    return usuarios
+        }
+        for r in resultados
+    ]
 
 
 def criar_usuario(usuario, senha, tipo):
@@ -323,7 +320,6 @@ def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
 
         largura_1 = pdfmetrics.stringWidth(linha_1, fonte, tamanho)
         largura_2 = pdfmetrics.stringWidth(linha_2, fonte, tamanho)
-
         diferenca = abs(largura_1 - largura_2)
 
         if menor_diferenca is None or diferenca < menor_diferenca:
@@ -334,22 +330,8 @@ def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
     return [melhor_linha_1, melhor_linha_2]
 
 
-def desenhar_nome_dinamico(
-    pdf,
-    nome,
-    centro_x,
-    y_nome,
-    fonte,
-    tamanho_maximo,
-    largura_maxima,
-    largura_quebra
-):
-    tamanho_nome = tamanho_fonte_dinamico(
-        nome,
-        fonte,
-        tamanho_maximo,
-        largura_maxima
-    )
+def desenhar_nome_dinamico(pdf, nome, centro_x, y_nome, fonte, tamanho_maximo, largura_maxima, largura_quebra):
+    tamanho_nome = tamanho_fonte_dinamico(nome, fonte, tamanho_maximo, largura_maxima)
 
     nome_linhas = quebrar_nome_por_largura(
         nome,
@@ -361,11 +343,7 @@ def desenhar_nome_dinamico(
     if len(nome_linhas) == 2:
         maior_linha = max(
             nome_linhas,
-            key=lambda linha: pdfmetrics.stringWidth(
-                linha,
-                fonte,
-                tamanho_nome
-            )
+            key=lambda linha: pdfmetrics.stringWidth(linha, fonte, tamanho_nome)
         )
 
         tamanho_nome = tamanho_fonte_dinamico(
@@ -453,11 +431,13 @@ def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, tamanho, entreli
 
                 for palavra in palavras_linha:
                     pdf.drawString(x_atual, y, palavra)
+
                     largura_palavra = pdfmetrics.stringWidth(
                         palavra,
                         fonte,
                         tamanho
                     )
+
                     x_atual += largura_palavra + espaco_extra
 
         y -= entrelinha
@@ -480,6 +460,78 @@ def criar_logo_transparente(caminho_logo, opacidade=0.10):
 
 
 # ======================================================
+# SEDE / FUNDO
+# ======================================================
+
+def normalizar_texto(texto):
+    texto = texto.strip().lower()
+
+    trocas = {
+        "á": "a", "à": "a", "ã": "a", "â": "a",
+        "é": "e", "ê": "e",
+        "í": "i",
+        "ó": "o", "ô": "o", "õ": "o",
+        "ú": "u",
+        "ç": "c"
+    }
+
+    for original, novo in trocas.items():
+        texto = texto.replace(original, novo)
+
+    texto = re.sub(r"[^a-z0-9\s]", " ", texto)
+    texto = re.sub(r"\s+", " ", texto)
+
+    return texto.strip()
+
+
+def identificar_sede(sede_digitada):
+    sede_normalizada = normalizar_texto(sede_digitada)
+
+    if sede_normalizada == "":
+        return None
+
+    aliases_baturite = [
+        "baturite",
+        "baturit",
+        "batturtite",
+        "batturite",
+        "baturrite",
+        "baturyte",
+        "btrt"
+    ]
+
+    for alias in aliases_baturite:
+        if alias in sede_normalizada:
+            return "baturite"
+
+    return None
+
+
+def prefixo_sede(sede_digitada):
+    sede = identificar_sede(sede_digitada)
+
+    prefixos = {
+        "baturite": "btrt"
+    }
+
+    return prefixos.get(sede)
+
+
+def obter_fundo_por_faixa_e_sede(faixa, sede=""):
+    prefixo = prefixo_sede(sede)
+    nome_faixa = faixa.replace("/", "_")
+
+    if prefixo:
+        arquivo_sede = f"{prefixo}_{nome_faixa}.png"
+        caminho_sede = os.path.join(app.root_path, "fundos", arquivo_sede)
+
+        if os.path.exists(caminho_sede):
+            return arquivo_sede
+
+    return fundos_por_faixa.get(faixa)
+
+
+# ======================================================
 # FUNDO OTIMIZADO
 # ======================================================
 
@@ -488,7 +540,11 @@ def obter_fundo_otimizado(caminho_fundo):
         return FUNDOS_OTIMIZADOS[caminho_fundo]
 
     imagem = Image.open(caminho_fundo).convert("RGB")
-    imagem.thumbnail((2200, 1600))
+
+    imagem.thumbnail(
+        (2200, 1600),
+        Image.Resampling.LANCZOS
+    )
 
     buffer = io.BytesIO()
 
@@ -512,7 +568,7 @@ def obter_fundo_otimizado(caminho_fundo):
 # CERTIFICADO
 # ======================================================
 
-def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano):
+def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano, sede=""):
     nome = nome.strip().upper()
     data_certificado = f"{dia} de {mes} de {ano}"
     cor_da_faixa = f"FAIXA {faixa.upper()}"
@@ -520,7 +576,7 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano):
     largura, altura = landscape(A4)
     centro_x = largura / 2
 
-    nome_fundo = fundos_por_faixa.get(faixa)
+    nome_fundo = obter_fundo_por_faixa_e_sede(faixa, sede)
 
     if nome_fundo:
         caminho_fundo = os.path.join(app.root_path, "fundos", nome_fundo)
@@ -588,7 +644,7 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano):
     texto_centralizado(pdf, data_certificado, centro_x, y_data, FONTE_TEXTO, 18)
 
 
-def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
+def gerar_pdf_certificado(nome, faixa, dia, mes, ano, sede=""):
     buffer = io.BytesIO()
 
     pdf = canvas.Canvas(
@@ -602,7 +658,8 @@ def gerar_pdf_certificado(nome, faixa, dia, mes, ano):
         faixa,
         dia,
         mes,
-        ano
+        ano,
+        sede
     )
 
     pdf.save()
@@ -689,7 +746,7 @@ def extrair_certificados_em_lote(texto):
     return certificados
 
 
-def gerar_pdf_certificados_lote(texto_lote, dia, mes, ano):
+def gerar_pdf_certificados_lote(texto_lote, dia, mes, ano, sede=""):
     certificados = extrair_certificados_em_lote(texto_lote)
 
     if not certificados:
@@ -712,7 +769,8 @@ def gerar_pdf_certificados_lote(texto_lote, dia, mes, ano):
             item["faixa"],
             dia,
             mes,
-            ano
+            ano,
+            sede
         )
 
         if index < len(certificados) - 1:
@@ -722,8 +780,6 @@ def gerar_pdf_certificados_lote(texto_lote, dia, mes, ano):
     buffer.seek(0)
 
     return buffer, certificados
-
-
 # ======================================================
 # DECLARAÇÃO
 # ======================================================
@@ -1116,6 +1172,7 @@ def gerar():
 
     nome = request.form.get("nome", "").strip()
     faixa = request.form.get("faixa", "").strip()
+    sede = request.form.get("sede", "").strip()
     dia = request.form.get("dia", "").strip()
     mes = request.form.get("mes", "").strip()
     ano = request.form.get("ano", "").strip()
@@ -1133,6 +1190,7 @@ def gerar():
         "visualizar.html",
         nome=nome,
         faixa=faixa,
+        sede=sede,
         dia=dia,
         mes=mes,
         ano=ano
@@ -1145,6 +1203,7 @@ def gerar_lote():
         return redirect(url_for("login"))
 
     texto_lote = request.form.get("texto_lote", "").strip()
+    sede = request.form.get("sede", "").strip()
     dia = request.form.get("dia", "").strip()
     mes = request.form.get("mes", "").strip()
     ano = request.form.get("ano", "").strip()
@@ -1156,7 +1215,8 @@ def gerar_lote():
         texto_lote,
         dia,
         mes,
-        ano
+        ano,
+        sede
     )
 
     if pdf_buffer == "LIMITE":
@@ -1180,6 +1240,7 @@ def pdf():
 
     nome = request.args.get("nome", "").strip()
     faixa = request.args.get("faixa", "").strip()
+    sede = request.args.get("sede", "").strip()
     dia = request.args.get("dia", "").strip()
     mes = request.args.get("mes", "").strip()
     ano = request.args.get("ano", "").strip()
@@ -1193,7 +1254,14 @@ def pdf():
     if dia not in dias or mes not in meses or ano not in anos:
         return "Erro: data inválida.", 400
 
-    pdf_buffer = gerar_pdf_certificado(nome, faixa, dia, mes, ano)
+    pdf_buffer = gerar_pdf_certificado(
+        nome,
+        faixa,
+        dia,
+        mes,
+        ano,
+        sede
+    )
 
     nome_arquivo = nome.upper().replace(" ", "_").replace("/", "_")
 
@@ -1338,6 +1406,10 @@ def declaracao_pdf():
         download_name=f"declaracao_{nome_arquivo}.pdf"
     )
 
+
+# ======================================================
+# START
+# ======================================================
 
 if __name__ == "__main__":
     app.run(debug=True)
