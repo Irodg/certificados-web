@@ -622,7 +622,7 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano, sede=""):
     tamanho_faixa = tamanho_fonte_dinamico(
         cor_da_faixa,
         FONTE_TITULO,
-        35,
+        40,
         largura_nome_maxima
     )
 
@@ -641,7 +641,7 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano, sede=""):
     )
 
     texto_centralizado(pdf, "GRADUOU-SE COM MÉRITO A", centro_x, y_graduou, FONTE_TEXTO, 18)
-    texto_centralizado(pdf, cor_da_faixa, centro_x, y_faixa, FONTE_TITULO, tamanho_faixa)
+    texto_centralizado(pdf, cor_da_faixa, centro_x, y_faixa, FONTE_TITULO, tamanho_faixa, 35)
     texto_centralizado(pdf, "COM EXAME DE GRADUAÇÃO CONCEDIDO", centro_x, y_exame, FONTE_TEXTO, 18)
     texto_centralizado(pdf, "PELA EQUIPE CRIST OSS BJJ.", centro_x, y_equipe, FONTE_TEXTO, 18)
     texto_centralizado(pdf, data_certificado, centro_x, y_data, FONTE_TEXTO, 18)
