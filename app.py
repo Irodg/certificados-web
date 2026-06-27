@@ -321,8 +321,8 @@ def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
         linha_1 = " ".join(palavras[:i])
         linha_2 = " ".join(palavras[i:])
 
-        largura_1 = pdfmetrics.stringWidth(linha_1, fonte, tamanho)
-        largura_2 = pdfmetrics.stringWidth(linha_2, fonte, tamanho)
+        largura_1 = pdfmetrics.stringWidth(linha_1, fonte, )
+        largura_2 = pdfmetrics.stringWidth(linha_2, fonte, )
         diferenca = abs(largura_1 - largura_2)
 
         if menor_diferenca is None or diferenca < menor_diferenca:
@@ -333,26 +333,26 @@ def quebrar_nome_por_largura(nome, fonte, tamanho, largura_quebra):
     return [melhor_linha_1, melhor_linha_2]
 
 
-def desenhar_nome_dinamico(pdf, nome, centro_x, y_nome, fonte, tamanho_maximo, largura_maxima, largura_quebra):
-    tamanho_nome = tamanho_fonte_dinamico(nome, fonte, tamanho_maximo, largura_maxima)
+def desenhar_nome_dinamico(pdf, nome, centro_x, y_nome, fonte, _maximo, largura_maxima, largura_quebra):
+    _nome = _fonte_dinamico(nome, fonte, _maximo, largura_maxima)
 
     nome_linhas = quebrar_nome_por_largura(
         nome,
         fonte,
-        tamanho_nome,
+        _nome,
         largura_quebra
     )
 
     if len(nome_linhas) == 2:
         maior_linha = max(
             nome_linhas,
-            key=lambda linha: pdfmetrics.stringWidth(linha, fonte, tamanho_nome)
+            key=lambda linha: pdfmetrics.stringWidth(linha, fonte, _nome)
         )
 
-        tamanho_nome = tamanho_fonte_dinamico(
+        _nome = _fonte_dinamico(
             maior_linha,
             fonte,
-            tamanho_maximo,
+            _maximo,
             largura_maxima
         )
 
@@ -364,7 +364,7 @@ def desenhar_nome_dinamico(pdf, nome, centro_x, y_nome, fonte, tamanho_maximo, l
             centro_x,
             y_nome + (espacamento_linha / 2),
             fonte,
-            tamanho_nome
+            _nome
         )
 
         texto_centralizado(
@@ -373,7 +373,7 @@ def desenhar_nome_dinamico(pdf, nome, centro_x, y_nome, fonte, tamanho_maximo, l
             centro_x,
             y_nome - (espacamento_linha / 2),
             fonte,
-            tamanho_nome
+            _nome
         )
 
     else:
@@ -383,11 +383,11 @@ def desenhar_nome_dinamico(pdf, nome, centro_x, y_nome, fonte, tamanho_maximo, l
             centro_x,
             y_nome,
             fonte,
-            tamanho_nome
+            _nome
         )
 
 
-def quebrar_texto(texto, fonte, tamanho, largura_maxima):
+def quebrar_texto(texto, fonte, , largura_maxima):
     palavras = texto.split()
     linhas = []
     linha_atual = ""
@@ -395,7 +395,7 @@ def quebrar_texto(texto, fonte, tamanho, largura_maxima):
     for palavra in palavras:
         teste = palavra if linha_atual == "" else linha_atual + " " + palavra
 
-        if pdfmetrics.stringWidth(teste, fonte, tamanho) <= largura_maxima:
+        if pdfmetrics.stringWidth(teste, fonte, ) <= largura_maxima:
             linha_atual = teste
         else:
             linhas.append(linha_atual)
@@ -407,10 +407,10 @@ def quebrar_texto(texto, fonte, tamanho, largura_maxima):
     return linhas
 
 
-def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, tamanho, entrelinha):
-    pdf.setFont(fonte, tamanho)
+def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, , entrelinha):
+    pdf.setFont(fonte, )
 
-    linhas = quebrar_texto(texto, fonte, tamanho, largura_maxima)
+    linhas = quebrar_texto(texto, fonte, , largura_maxima)
 
     for i, linha in enumerate(linhas):
         if i == len(linhas) - 1:
@@ -422,7 +422,7 @@ def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, tamanho, entreli
                 pdf.drawString(x, y, linha)
             else:
                 largura_sem_espacos = sum(
-                    pdfmetrics.stringWidth(palavra, fonte, tamanho)
+                    pdfmetrics.stringWidth(palavra, fonte, )
                     for palavra in palavras_linha
                 )
 
@@ -438,7 +438,7 @@ def desenhar_paragrafo(pdf, texto, x, y, largura_maxima, fonte, tamanho, entreli
                     largura_palavra = pdfmetrics.stringWidth(
                         palavra,
                         fonte,
-                        tamanho
+                        
                     )
 
                     x_atual += largura_palavra + espaco_extra
@@ -622,7 +622,7 @@ def desenhar_certificado_na_pagina(pdf, nome, faixa, dia, mes, ano, sede=""):
     tamanho_faixa = tamanho_fonte_dinamico(
         cor_da_faixa,
         FONTE_TITULO,
-        40,
+        35,
         largura_nome_maxima
     )
 
