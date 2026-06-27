@@ -1190,14 +1190,7 @@ def menu():
         tipo=session.get("tipo")
     )
 
-@app.route("/alunos")
-def alunos():
 
-    if not usuario_logado():
-        return redirect(url_for("login"))
-
-    return render_template("alunos.html")
-    
 # ======================================================
 # ROTAS CONTA / ADMIN
 # ======================================================
