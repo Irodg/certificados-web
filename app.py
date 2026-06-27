@@ -202,7 +202,32 @@ def criar_aluno(
     cur.close()
     conn.close()
 
+def obter_alunos():
+
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            id,
+            nome,
+            faixa,
+            graus,
+            sede,
+            status
+        FROM alunos
+        ORDER BY nome
+    """)
+
+    alunos = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return alunos
+
 #REFENTE A USUARIOS
+
 
 def buscar_usuario(usuario):
     conn = conectar_db()
@@ -1441,8 +1466,12 @@ def listar_alunos():
     if not usuario_logado():
         return redirect(url_for("login"))
 
-    return "<h2>Lista de alunos em construção</h2>"
+    alunos = obter_alunos()
 
+    return render_template(
+        "listar_alunos.html",
+        alunos=alunos
+    )
 
 @app.route("/alunos/buscar")
 def buscar_aluno():
