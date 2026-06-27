@@ -196,6 +196,10 @@ h1{
             DECLARAÇÃO
         </a>
 
+        <a href="{{ url_for('alunos') }}" class="botao-menu">
+           👨‍🎓 ALUNOS
+        </a>
+
         {% if tipo == "admin" %}
         <a class="btn admin" href="{{ url_for('admin') }}">
             GERENCIAR USUÁRIOS
