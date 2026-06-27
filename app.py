@@ -3,6 +3,8 @@ import io
 import re
 import uuid
 import psycopg2
+import cloudinary
+import cloudinary.uploader
 
 from flask import Flask, render_template, request, send_file, redirect, url_for, session
 from werkzeug.utils import secure_filename
@@ -26,6 +28,13 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 FUNDOS_OTIMIZADOS = {}
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+    secure=True
+)
 
 
 # ======================================================
