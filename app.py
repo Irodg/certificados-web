@@ -140,7 +140,69 @@ def atualizar_tabela_alunos():
     conn.commit()
     cur.close()
     conn.close()
+    
+def criar_aluno(
+    nome,
+    data_nascimento,
+    cpf,
+    responsavel,
+    cpf_responsavel,
+    telefone,
+    endereco,
+    faixa,
+    graus,
+    sede,
+    status,
+    motivo_desligamento,
+    data_desligamento,
+    observacoes,
+    foto_url
+):
+    conn = conectar_db()
+    cur = conn.cursor()
 
+    cur.execute("""
+        INSERT INTO alunos (
+            nome,
+            data_nascimento,
+            cpf,
+            responsavel,
+            cpf_responsavel,
+            telefone,
+            endereco,
+            faixa,
+            graus,
+            sede,
+            status,
+            motivo_desligamento,
+            data_desligamento,
+            observacoes,
+            foto_url
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (
+        nome,
+        data_nascimento or None,
+        cpf,
+        responsavel,
+        cpf_responsavel,
+        telefone,
+        endereco,
+        faixa,
+        graus,
+        sede,
+        status,
+        motivo_desligamento,
+        data_desligamento or None,
+        observacoes,
+        foto_url
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+#REFENTE A USUARIOS
 
 def buscar_usuario(usuario):
     conn = conectar_db()
@@ -1332,15 +1394,47 @@ def alunos():
     return render_template("alunos.html")
 
 
-@app.route("/alunos/novo")
+@app.route("/alunos/novo", methods=["GET", "POST"])
 def novo_aluno():
-
     if not usuario_logado():
         return redirect(url_for("login"))
 
-    return "<h2>Cadastro de aluno em construção</h2>"
+    if request.method == "POST":
+        foto = request.files.get("foto")
 
+        foto_url = ""
 
+        if foto and foto.filename != "":
+            upload = cloudinary.uploader.upload(
+                foto,
+                folder="alunos_crist_oss"
+            )
+            foto_url = upload.get("secure_url", "")
+
+        criar_aluno(
+            request.form.get("nome", "").strip().upper(),
+            request.form.get("data_nascimento", "").strip(),
+            request.form.get("cpf", "").strip(),
+            request.form.get("responsavel", "").strip().upper(),
+            request.form.get("cpf_responsavel", "").strip(),
+            request.form.get("telefone", "").strip(),
+            request.form.get("endereco", "").strip().upper(),
+            request.form.get("faixa", "").strip(),
+            request.form.get("graus", "").strip(),
+            request.form.get("sede", "").strip().upper(),
+            request.form.get("status", "ativo").strip(),
+            request.form.get("motivo_desligamento", "").strip().upper(),
+            request.form.get("data_desligamento", "").strip(),
+            request.form.get("observacoes", "").strip().upper(),
+            foto_url
+        )
+
+        return redirect(url_for("listar_alunos"))
+
+    return render_template(
+        "aluno_form.html",
+        faixas=faixas
+    )
 @app.route("/alunos/listar")
 def listar_alunos():
 
