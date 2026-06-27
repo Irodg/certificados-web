@@ -1190,7 +1190,14 @@ def menu():
         tipo=session.get("tipo")
     )
 
+@app.route("/alunos")
+def alunos():
 
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template("alunos.html")
+    
 # ======================================================
 # ROTAS CONTA / ADMIN
 # ======================================================
@@ -1310,7 +1317,45 @@ def admin():
         erro=erro
     )
 
+# ======================================================
+# ROTAS ALUNOS
+# ======================================================
 
+@app.route("/alunos")
+def alunos():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template("alunos.html")
+
+
+@app.route("/alunos/novo")
+def novo_aluno():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return "<h2>Cadastro de aluno em construção</h2>"
+
+
+@app.route("/alunos/listar")
+def listar_alunos():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return "<h2>Lista de alunos em construção</h2>"
+
+
+@app.route("/alunos/buscar")
+def buscar_aluno():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return "<h2>Busca de alunos em construção</h2>"
+    
 # ======================================================
 # ROTAS CERTIFICADO
 # ======================================================
