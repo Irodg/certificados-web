@@ -33,7 +33,10 @@ FUNDOS_OTIMIZADOS = {}
 # ======================================================
 
 def conectar_db():
-    return psycopg2.connect(DATABASE_URL)
+    return psycopg2.connect(
+        DATABASE_URL,
+        sslmode="require"
+    )
 
 
 def criar_tabela_usuarios():
