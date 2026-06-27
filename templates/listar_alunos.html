@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LISTAR ALUNOS</title>
+
+<style>
+*{ box-sizing:border-box; }
+
+html, body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eeeeee;
+}
+
+.container{
+    min-height:100vh;
+    padding:25px 15px;
+}
+
+.card{
+    width:100%;
+    max-width:900px;
+    margin:auto;
+    background:white;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.logo{
+    display:block;
+    width:140px;
+    max-width:45%;
+    margin:0 auto 20px;
+}
+
+h1{
+    text-align:center;
+    font-size:26px;
+    margin-bottom:22px;
+}
+
+.aluno{
+    border:1px solid #ddd;
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:16px;
+    background:#fafafa;
+}
+
+.nome{
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+.info{
+    font-size:15px;
+    line-height:1.6;
+}
+
+.status{
+    font-weight:bold;
+}
+
+.ativo{
+    color:green;
+}
+
+.desligado{
+    color:red;
+}
+
+.btn{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:56px;
+    margin-top:14px;
+    background:#000;
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    font-size:17px;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.btn:hover{
+    background:#1b1b1b;
+}
+
+.vazio{
+    text-align:center;
+    padding:30px;
+    font-size:18px;
+    color:#555;
+}
+
+@media(max-width:600px){
+    .card{
+        padding:18px;
+    }
+
+    h1{
+        font-size:22px;
+    }
+
+    .nome{
+        font-size:18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<img
+    class="logo"
+    src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+    alt="Logo Crist Oss"
+>
+
+<h1>ALUNOS CADASTRADOS</h1>
+
+<a class="btn" href="{{ url_for('novo_aluno') }}">
+    CADASTRAR NOVO ALUNO
+</a>
+
+{% if alunos %}
+
+    {% for aluno in alunos %}
+    <div class="aluno">
+
+        <div class="nome">
+            {{ aluno[1] }}
+        </div>
+
+        <div class="info">
+            <strong>Faixa:</strong> {{ aluno[2] or 'NÃO INFORMADA' }}<br>
+            <strong>Graus:</strong> {{ aluno[3] or '0' }}<br>
+            <strong>Sede:</strong> {{ aluno[4] or 'NÃO INFORMADA' }}<br>
+
+            <strong>Status:</strong>
+            {% if aluno[5] == 'desligado' %}
+                <span class="status desligado">DESLIGADO</span>
+            {% else %}
+                <span class="status ativo">ATIVO</span>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endfor %}
+
+{% else %}
+
+    <div class="vazio">
+        NENHUM ALUNO CADASTRADO.
+    </div>
+
+{% endif %}
+
+<a class="btn" href="{{ url_for('alunos') }}">
+    VOLTAR
+</a>
+
+</div>
+</div>
+
+</body>
+</html>
