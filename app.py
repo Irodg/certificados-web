@@ -387,7 +387,7 @@ def desenhar_nome_dinamico(pdf, nome, centro_x, y_nome, fonte, _maximo, largura_
         )
 
 
-def quebrar_texto(texto, fonte, , largura_maxima):
+def quebrar_texto(texto, fonte, tamanho, largura_maxima):
     palavras = texto.split()
     linhas = []
     linha_atual = ""
