@@ -83,31 +83,43 @@ h1{
 }
 
 .btn{
-    display:block;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
     width:100%;
-    padding:18px;
+    height:60px;
+
     margin-bottom:16px;
-    background:#202020;
-    color:white;
+
+    background:#000000;
+
+    color:#FFFFFF;
+
     text-decoration:none;
-    border-radius:12px;
+
+    border-radius:14px;
+
     font-size:20px;
     font-weight:bold;
+
     text-transform:uppercase;
+
+    transition:.2s;
 }
 
 .btn:hover{
-    background:#000;
+    background:#1b1b1b;
 }
 
 .admin{
-    background:#444444;
-    font-size:16px;
+    background:#000000;
+    font-size:20px;
 }
 
 .sair{
-    background:#777777;
-    font-size:15px;
+    background:#000000;
+    font-size:20px;
 }
 
 @media(max-width:600px){
@@ -196,9 +208,9 @@ h1{
             DECLARAÇÃO
         </a>
 
-        <a href="{{ url_for('alunos') }}" class="botao-menu">
-           👨‍🎓 ALUNOS
-        </a>
+       <a class="btn" href="{{ url_for('alunos') }}">
+            👨‍🎓 ALUNOS
+       </a>
 
         {% if tipo == "admin" %}
         <a class="btn admin" href="{{ url_for('admin') }}">
