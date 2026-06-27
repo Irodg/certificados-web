@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+
+<title>ALUNOS</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#ececec;
+    margin:0;
+}
+
+.container{
+
+    max-width:900px;
+    margin:auto;
+    padding:40px;
+
+}
+
+h1{
+
+    text-align:center;
+
+}
+
+.botao{
+
+    display:block;
+
+    background:#1f1f1f;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:18px;
+
+    margin:20px 0;
+
+    text-align:center;
+
+    border-radius:10px;
+
+    font-size:22px;
+
+}
+
+.botao:hover{
+
+    background:#333;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>ALUNOS</h1>
+
+<a class="botao"
+href="{{ url_for('novo_aluno') }}">
+
+➕ CADASTRAR ALUNO
+
+</a>
+
+<a class="botao"
+href="{{ url_for('listar_alunos') }}">
+
+📋 LISTAR ALUNOS
+
+</a>
+
+<a class="botao"
+href="{{ url_for('buscar_aluno') }}">
+
+🔍 PESQUISAR ALUNO
+
+</a>
+
+<a class="botao"
+href="{{ url_for('menu') }}">
+
+⬅ VOLTAR
+
+</a>
+
+</div>
+
+</body>
+</html>
