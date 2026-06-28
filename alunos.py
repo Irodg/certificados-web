@@ -121,7 +121,12 @@ def salvar_aluno_do_formulario(form, files):
     if foto and foto.filename != "":
         upload = cloudinary.uploader.upload(
             foto,
-            folder="alunos_crist_oss"
+            folder="alunos_crist_oss",
+            resource_type="image",
+            transformation=[
+                {"width": 600, "height": 600, "crop": "fill", "gravity": "face"},
+                {"quality": "auto", "fetch_format": "auto"}
+            ]
         )
         foto_url = upload.get("secure_url", "")
 
