@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>MATRÍCULA</title>
+</head>
+<body>
+
+<h1>MATRÍCULA CRIST OSS BJJ</h1>
+
+{% if erro %}
+<p style="color:red;font-weight:bold;">{{ erro }}</p>
+{% endif %}
+
+<form method="POST">
+    <label>CÓDIGO DE MATRÍCULA</label><br>
+    <input type="text" name="codigo" required style="text-transform:uppercase;">
+    <br><br>
+    <button type="submit">CONTINUAR</button>
+</form>
+
+</body>
+</html>
