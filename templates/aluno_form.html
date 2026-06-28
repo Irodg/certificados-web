@@ -185,9 +185,12 @@ CADASTRAR ALUNO
         <input
             type="text"
             name="cpf"
-            maxlength="11"
+            id="cpf"
+            placeholder="000.000.000-00"
+            maxlength="14"
             inputmode="numeric"
             value="{{ aluno[3] if aluno and aluno[3] else '' }}"
+            oninput="mascaraCPF(this)"
         >
     </div>
 </div>
@@ -205,9 +208,12 @@ CADASTRAR ALUNO
         <input
             type="text"
             name="cpf_responsavel"
-            maxlength="11"
+            id="cpf_responsavel"
+            placeholder="000.000.000-00"
+            maxlength="14"
             inputmode="numeric"
             value="{{ aluno[5] if aluno and aluno[5] else '' }}"
+            oninput="mascaraCPF(this)"
         >
     </div>
 
@@ -323,6 +329,22 @@ function mostrarDesligamento(){
 
 mostrarDesligamento();
 </script>
+    
+<script>
+function mascaraCPF(campo){
 
+    let v = campo.value.replace(/\D/g,'');
+
+    if(v.length>11)
+        v=v.substring(0,11);
+
+    v=v.replace(/(\d{3})(\d)/,"$1.$2");
+    v=v.replace(/(\d{3})(\d)/,"$1.$2");
+    v=v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+
+    campo.value=v;
+}
+</script>
+    
 </body>
 </html>
