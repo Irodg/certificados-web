@@ -96,6 +96,25 @@ body{
     letter-spacing:1px;
 }
 
+.matricula-box{
+    margin-left:auto;
+    text-align:right;
+    font-weight:900;
+    border:1.4px solid #000;
+    padding:2mm 4mm;
+    border-radius:4px;
+    background:rgba(255,255,255,.85);
+}
+
+.matricula-label{
+    font-size:7pt;
+}
+
+.matricula-numero{
+    font-size:16pt;
+    letter-spacing:1px;
+}
+    
 .secao{
     border:1.4px solid #000;
     border-radius:4px;
@@ -220,7 +239,15 @@ body{
 
 <div class="cabecalho">
     <img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+
     <div class="titulo">ALUNO CRIST OSS BJJ</div>
+
+    <div class="matricula-box">
+        <div class="matricula-label">Nº MATRÍCULA</div>
+        <div class="matricula-numero">
+            {{ aluno[17] or '---' }}
+        </div>
+    </div>
 </div>
 
 <div class="secao">
