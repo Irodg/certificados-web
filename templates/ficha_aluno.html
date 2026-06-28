@@ -55,14 +55,16 @@ body{
     overflow:hidden;
 
     display:grid;
+    display:grid;
     grid-template-rows:
-        27mm
-        58mm
-        48mm
-        30mm
-        48mm
+        24mm
+        54mm
         42mm
-        20mm;
+        58mm
+        42mm
+        32mm
+        18mm;
+    gap:2.5mm;
 }
 
 .ficha::before{
@@ -178,7 +180,7 @@ body{
 }
 
 .obs{
-    min-height:14mm;
+    min-height:30mm;
     justify-content:flex-start;
 }
 
@@ -206,11 +208,11 @@ body{
     align-items:center;
     justify-content:center;
     text-align:center;
-    font-size:13pt;
-    line-height:1.2;
+    font-size:9pt;
+    line-height:1.15;
     font-weight:bold;
     background:rgba(255,255,255,.85);
-    padding:1.5mm;
+    padding:1mm;
 }
 
 @media print{
