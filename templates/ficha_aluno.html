@@ -65,7 +65,51 @@ body{
         12mm;
     gap:2mm;
 }
+.ficha::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:url("{{ url_for('static', filename='logo_crist_oss.png') }}") center center no-repeat;
+    background-size:125mm;
+    opacity:.06;
+    z-index:0;
+}
 
+.conteudo{
+    position:relative;
+    z-index:1;
+    display:contents;
+}
+
+.cabecalho{
+    display:flex;
+    align-items:center;
+    gap:10mm;
+}
+
+.logo{
+    width:22mm;
+    height:22mm;
+    object-fit:contain;
+}
+
+.titulo{
+    font-size:20pt;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.secao-titulo{
+    font-size:10pt;
+    font-weight:900;
+    padding:2mm 3mm;
+    border-bottom:1.4px solid #000;
+    background:#f2f2f2;
+}
+
+.grade{
+    display:grid;
+}
 .secao{
     border:1.4px solid #000;
     border-radius:4px;
