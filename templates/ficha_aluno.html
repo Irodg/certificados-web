@@ -34,7 +34,7 @@ body{
     height:45px;
     background:#000;
     color:#fff;
-    border:none;
+    border:0;
     border-radius:8px;
     font-weight:bold;
     text-decoration:none;
@@ -48,31 +48,23 @@ body{
     width:200mm;
     height:287mm;
     margin:0 auto;
+    padding:6mm;
     background:#fff;
     border:2px solid #000;
-    padding:6mm;
     position:relative;
     overflow:hidden;
-
     display:grid;
-    grid-template-rows:
-        24mm
-        68mm
-        58mm
-        58mm
-        42mm
-        18mm
-        12mm;
+    grid-template-rows:23mm 68mm 58mm 58mm 42mm 20mm 14mm;
     gap:2mm;
 }
+
 .ficha::before{
     content:"";
     position:absolute;
     inset:0;
-    background:url("{{ url_for('static', filename='logo_crist_oss.png') }}") center center no-repeat;
+    background:url("{{ url_for('static', filename='logo_crist_oss.png') }}") center no-repeat;
     background-size:125mm;
     opacity:.06;
-    z-index:0;
 }
 
 .conteudo{
@@ -99,6 +91,13 @@ body{
     letter-spacing:1px;
 }
 
+.secao{
+    border:1.4px solid #000;
+    border-radius:4px;
+    overflow:hidden;
+    background:rgba(255,255,255,.78);
+}
+
 .secao-titulo{
     font-size:10pt;
     font-weight:900;
@@ -107,34 +106,30 @@ body{
     background:#f2f2f2;
 }
 
-.grade{
+.grade-aluno{
     display:grid;
-}
-.secao{
-    border:1.4px solid #000;
-    border-radius:4px;
-    overflow:hidden;
-    display:block;
-    background:rgba(255,255,255,.78);
+    grid-template-columns:1fr 30mm;
 }
 
 .grade-campos{
     display:grid;
     grid-template-columns:1fr 1fr;
-    height:auto;
 }
 
 .campo{
+    min-height:11mm;
     padding:1.6mm 3mm;
     border-right:1px solid #888;
     border-bottom:1px solid #888;
-    display:block;
-    min-height:11mm;
+}
+
+.campo:nth-child(2n){
+    border-right:0;
 }
 
 .campo-full{
     grid-column:1 / 3;
-    border-right:none;
+    border-right:0;
 }
 
 .label{
@@ -148,11 +143,6 @@ body{
     line-height:1.15;
     font-weight:900;
     word-break:break-word;
-}
-
-.grade-aluno{
-    grid-template-columns:1fr 30mm;
-    min-height:55mm;
 }
 
 .foto-box{
@@ -172,7 +162,6 @@ body{
 
 .obs{
     min-height:24mm;
-    justify-content:flex-start;
 }
 
 .rodape{
@@ -181,6 +170,15 @@ body{
     align-items:center;
     font-size:8pt;
     font-weight:bold;
+}
+
+.assinatura{
+    text-align:center;
+}
+
+.linha-assinatura{
+    border-top:1px solid #000;
+    padding-top:2mm;
 }
 
 .aviso{
@@ -196,6 +194,7 @@ body{
     background:rgba(255,255,255,.85);
     padding:1mm;
 }
+
 @media print{
     body{
         background:#fff;
@@ -206,8 +205,6 @@ body{
     }
 
     .ficha{
-        width:200mm;
-        height:287mm;
         margin:0;
         page-break-inside:avoid;
         page-break-after:avoid;
@@ -234,7 +231,7 @@ body{
 <div class="secao">
     <div class="secao-titulo">DADOS DO ALUNO</div>
 
-    <div class="grade grade-aluno">
+    <div class="grade-aluno">
         <div class="grade-campos">
             <div class="campo campo-full">
                 <div class="label">NOME COMPLETO:</div>
