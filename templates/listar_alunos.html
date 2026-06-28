@@ -5,7 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>ALUNOS CADASTRADOS</title>
-
+    
+<input
+    type="text"
+    id="buscaAluno"
+    placeholder="PESQUISAR ALUNO..."
+    onkeyup="filtrarAlunos()"
+    style="
+        width:100%;
+        padding:14px;
+        margin-bottom:20px;
+        border:1px solid #bbb;
+        border-radius:12px;
+        font-size:16px;
+        text-transform:uppercase;
+    "
+>
+    
 <style>
 *{ box-sizing:border-box; }
 
@@ -189,7 +205,7 @@ h1{
 <div class="grid-alunos">
 
 {% for aluno in alunos %}
-<div class="aluno-card">
+<div class="aluno-card" data-nome="{{ aluno[1] }}">
 
     {% if aluno[6] %}
         <img class="foto-aluno" src="{{ aluno[6] }}" alt="Foto do aluno">
@@ -245,4 +261,22 @@ h1{
 </div>
 
 </body>
+    
+<script>
+function filtrarAlunos(){
+    const busca = document.getElementById("buscaAluno").value.toUpperCase();
+    const cards = document.querySelectorAll(".aluno-card");
+
+    cards.forEach(card => {
+        const nome = card.getAttribute("data-nome").toUpperCase();
+
+        if(nome.includes(busca)){
+            card.style.display = "block";
+        }else{
+            card.style.display = "none";
+        }
+    });
+}
+</script>  
+    
 </html>
