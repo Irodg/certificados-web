@@ -1090,6 +1090,22 @@ def admin():
 # ======================================================
 # ROTAS ALUNOS
 # ======================================================
+@app.route("/matriculas/gerar", methods=["GET", "POST"])
+def gerar_matricula():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    codigo = None
+    expira_em = None
+
+    if request.method == "POST":
+        codigo, expira_em = criar_codigo_matricula(session["id"])
+
+    return render_template(
+        "gerar_matricula.html",
+        codigo=codigo,
+        expira_em=expira_em
+    )
 
 @app.route("/alunos")
 def alunos():
