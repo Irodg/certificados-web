@@ -214,7 +214,8 @@ def obter_alunos():
             faixa,
             graus,
             sede,
-            status
+            status,
+            foto_url
         FROM alunos
         ORDER BY nome
     """)
