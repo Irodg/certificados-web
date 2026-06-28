@@ -35,7 +35,8 @@ from alunos import (
     salvar_aluno_do_formulario,
     buscar_aluno_por_id,
     atualizar_aluno,
-    excluir_aluno
+    excluir_aluno,
+    converter_data_para_banco
 )
 
 
@@ -1156,7 +1157,7 @@ def editar_aluno(aluno_id):
         atualizar_aluno(
             aluno_id,
             request.form.get("nome", "").strip().upper(),
-            request.form.get("data_nascimento", "").strip(),
+            converter_data_para_banco(request.form.get("data_nascimento", "")),
             request.form.get("cpf", "").strip(),
             request.form.get("responsavel", "").strip().upper(),
             request.form.get("cpf_responsavel", "").strip(),
@@ -1167,7 +1168,7 @@ def editar_aluno(aluno_id):
             request.form.get("sede", "").strip().upper(),
             request.form.get("status", "ativo").strip(),
             request.form.get("motivo_desligamento", "").strip().upper(),
-            request.form.get("data_desligamento", "").strip(),
+            converter_data_para_banco(request.form.get("data_desligamento", "")),
             request.form.get("observacoes", "").strip().upper()
         )
 
