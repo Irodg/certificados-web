@@ -19,7 +19,8 @@ from database import conectar_db
 from matriculas import (
     criar_tabela_codigos_matricula,
     atualizar_tabela_alunos_matricula,
-    criar_codigo_matricula
+    criar_codigo_matricula,
+    validar_codigo_matricula
 )
 
 from usuarios import (
@@ -1090,6 +1091,22 @@ def admin():
 # ======================================================
 # ROTAS ALUNOS
 # ======================================================
+@app.route("/matricula", methods=["GET", "POST"])
+def matricula_publica():
+    erro = None
+
+    if request.method == "POST":
+        codigo = request.form.get("codigo", "").strip().upper()
+
+        valido, resultado = validar_codigo_matricula(codigo)
+
+        if valido:
+            return redirect(url_for("matricula_formulario", codigo=resultado))
+
+        erro = resultado
+
+    return render_template("matricula_codigo.html", erro=erro)
+
 
 @app.route("/matriculas")
 def menu_matriculas():
