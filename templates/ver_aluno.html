@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FICHA DO ALUNO</title>
+
+<style>
+*{box-sizing:border-box;}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eeeeee;
+}
+
+.container{
+    min-height:100vh;
+    padding:25px 15px;
+}
+
+.card{
+    max-width:760px;
+    margin:auto;
+    background:white;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.logo{
+    display:block;
+    width:130px;
+    margin:0 auto 20px;
+}
+
+h1{
+    text-align:center;
+    font-size:24px;
+}
+
+.foto{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    object-fit:cover;
+    display:block;
+    margin:20px auto;
+    background:#ddd;
+}
+
+.info{
+    font-size:16px;
+    line-height:1.8;
+}
+
+.bloco{
+    border-top:1px solid #ddd;
+    padding-top:15px;
+    margin-top:15px;
+}
+
+.status-ativo{
+    color:green;
+    font-weight:bold;
+}
+
+.status-desligado{
+    color:red;
+    font-weight:bold;
+}
+
+.btn{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:56px;
+    margin-top:14px;
+    background:#000;
+    color:white;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<img
+    class="logo"
+    src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+    alt="Logo Crist Oss"
+>
+
+<h1>FICHA DO ALUNO</h1>
+
+{% if aluno[15] %}
+<img class="foto" src="{{ aluno[15] }}" alt="Foto do aluno">
+{% else %}
+<img class="foto" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Sem foto">
+{% endif %}
+
+<div class="info">
+
+<div class="bloco">
+<strong>Nome:</strong> {{ aluno[1] }}<br>
+<strong>Data de nascimento:</strong> {{ aluno[2] or 'NÃO INFORMADA' }}<br>
+<strong>CPF:</strong> {{ aluno[3] or 'NÃO INFORMADO' }}
+</div>
+
+<div class="bloco">
+<strong>Responsável:</strong> {{ aluno[4] or 'NÃO INFORMADO' }}<br>
+<strong>CPF do responsável:</strong> {{ aluno[5] or 'NÃO INFORMADO' }}<br>
+<strong>Telefone:</strong> {{ aluno[6] or 'NÃO INFORMADO' }}<br>
+<strong>Endereço:</strong> {{ aluno[7] or 'NÃO INFORMADO' }}
+</div>
+
+<div class="bloco">
+<strong>Faixa:</strong> {{ aluno[8] or 'NÃO INFORMADA' }}<br>
+<strong>Graus:</strong> {{ aluno[9] or '0' }}<br>
+<strong>Sede:</strong> {{ aluno[10] or 'NÃO INFORMADA' }}<br>
+<strong>Data de matrícula:</strong> {{ aluno[16] or 'NÃO INFORMADA' }}
+</div>
+
+<div class="bloco">
+<strong>Status:</strong>
+{% if aluno[11] == 'desligado' %}
+<span class="status-desligado">DESLIGADO</span><br>
+<strong>Motivo:</strong> {{ aluno[12] or 'NÃO INFORMADO' }}<br>
+<strong>Data do desligamento:</strong> {{ aluno[13] or 'NÃO INFORMADA' }}
+{% else %}
+<span class="status-ativo">ATIVO</span>
+{% endif %}
+</div>
+
+<div class="bloco">
+<strong>Observações:</strong><br>
+{{ aluno[14] or 'NENHUMA OBSERVAÇÃO.' }}
+</div>
+
+</div>
+
+<a class="btn" href="{{ url_for('listar_alunos') }}">
+    VOLTAR
+</a>
+
+</div>
+</div>
+
+</body>
+</html>
