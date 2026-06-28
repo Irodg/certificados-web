@@ -54,8 +54,15 @@ body{
     position:relative;
     overflow:hidden;
     display:grid;
-    grid-template-rows:23mm 68mm 58mm 58mm 42mm 20mm 14mm;
-    gap:2mm;
+    grid-template-rows:
+        23mm
+        68mm
+        58mm
+        46mm
+        48mm
+        20mm
+        14mm;
+        gap:2mm;
 }
 
 .ficha::before{
@@ -161,7 +168,8 @@ body{
 }
 
 .obs{
-    min-height:24mm;
+    min-height:18mm;
+    border-bottom:none !important;
 }
 
 .rodape{
@@ -321,7 +329,12 @@ body{
 
         <div class="campo campo-full obs">
             <div class="label">OBSERVAÇÕES:</div>
-            <div class="valor">{{ aluno[14] or 'NENHUMA OBSERVAÇÃO.' }}</div>
+        
+            {% if aluno[14] %}
+                <div class="valor">{{ aluno[14] }}</div>
+            {% endif %}
+        
+            <div style="height:22mm;"></div>
         </div>
     </div>
 </div>
