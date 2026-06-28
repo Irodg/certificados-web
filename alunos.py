@@ -181,6 +181,67 @@ def buscar_aluno_por_id(aluno_id):
     conn.close()
 
     return aluno
+    
+def atualizar_aluno(
+    aluno_id,
+    nome,
+    data_nascimento,
+    cpf,
+    responsavel,
+    cpf_responsavel,
+    telefone,
+    endereco,
+    faixa,
+    graus,
+    sede,
+    status,
+    motivo_desligamento,
+    data_desligamento,
+    observacoes
+):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE alunos
+        SET
+            nome = %s,
+            data_nascimento = %s,
+            cpf = %s,
+            responsavel = %s,
+            cpf_responsavel = %s,
+            telefone = %s,
+            endereco = %s,
+            faixa = %s,
+            graus = %s,
+            sede = %s,
+            status = %s,
+            motivo_desligamento = %s,
+            data_desligamento = %s,
+            observacoes = %s
+        WHERE id = %s
+    """, (
+        nome,
+        data_nascimento or None,
+        cpf,
+        responsavel,
+        cpf_responsavel,
+        telefone,
+        endereco,
+        faixa,
+        graus,
+        sede,
+        status,
+        motivo_desligamento,
+        data_desligamento or None,
+        observacoes,
+        aluno_id
+    ))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
 def obter_alunos():
     conn = conectar_db()
     cur = conn.cursor()
