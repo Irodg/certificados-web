@@ -171,9 +171,12 @@ CADASTRAR ALUNO
     <div>
         <label>DATA DE NASCIMENTO</label>
         <input
-            type="date"
+            type="text"
             name="data_nascimento"
-            value="{{ aluno[2] if aluno and aluno[2] else '' }}"
+            placeholder="DD/MM/AAAA"
+            maxlength="10"
+            value="{% if aluno and aluno[2] %}{{ aluno[2].strftime('%d/%m/%Y') }}{% endif %}"
+            oninput="mascaraData(this)"
         >
     </div>
 
@@ -277,9 +280,12 @@ CADASTRAR ALUNO
 
     <label>DATA DO DESLIGAMENTO</label>
     <input
-        type="date"
+        type="text"
         name="data_desligamento"
-        value="{{ aluno[13] if aluno and aluno[13] else '' }}"
+        placeholder="DD/MM/AAAA"
+        maxlength="10"
+        value="{% if aluno and aluno[13] %}{{ aluno[13].strftime('%d/%m/%Y') }}{% endif %}"
+        oninput="mascaraData(this)"
     >
 </div>
 
