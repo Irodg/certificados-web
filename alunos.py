@@ -68,7 +68,8 @@ def criar_aluno(
     motivo_desligamento,
     data_desligamento,
     observacoes,
-    foto_url
+    foto_url,
+    numero_matricula
 ):
     conn = conectar_db()
     cur = conn.cursor()
@@ -89,9 +90,10 @@ def criar_aluno(
             motivo_desligamento,
             data_desligamento,
             observacoes,
-            foto_url
+            foto_url,
+            numero_matricula
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """, (
         nome,
@@ -108,7 +110,8 @@ def criar_aluno(
         motivo_desligamento,
         data_desligamento or None,
         observacoes,
-        foto_url
+        foto_url,
+        numero_matricula
     ))
 
     aluno_id = cur.fetchone()[0]
@@ -120,7 +123,7 @@ def criar_aluno(
     return aluno_id
 
 
-def salvar_aluno_do_formulario(form, files):
+def salvar_aluno_do_formulario(form, files, numero_matricula=None):
     foto = files.get("foto")
     foto_url = ""
 
@@ -151,7 +154,8 @@ def salvar_aluno_do_formulario(form, files):
         form.get("motivo_desligamento", "").strip().upper(),
         converter_data_para_banco(form.get("data_desligamento", "")),
         form.get("observacoes", "").strip().upper(),
-        foto_url
+        foto_url,
+        numero_matricula
     )
     
 def buscar_aluno_por_id(aluno_id):
