@@ -34,6 +34,7 @@ from alunos import (
     obter_alunos,
     salvar_aluno_do_formulario,
     buscar_aluno_por_id
+    atualizar_aluno
 )
 
 
@@ -1137,6 +1138,42 @@ def ver_aluno(aluno_id):
     return render_template(
         "ver_aluno.html",
         aluno=aluno
+    )
+@app.route("/alunos/<int:aluno_id>/editar", methods=["GET", "POST"])
+def editar_aluno(aluno_id):
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    aluno = buscar_aluno_por_id(aluno_id)
+
+    if not aluno:
+        return "Aluno não encontrado.", 404
+
+    if request.method == "POST":
+        atualizar_aluno(
+            aluno_id,
+            request.form.get("nome", "").strip().upper(),
+            request.form.get("data_nascimento", "").strip(),
+            request.form.get("cpf", "").strip(),
+            request.form.get("responsavel", "").strip().upper(),
+            request.form.get("cpf_responsavel", "").strip(),
+            request.form.get("telefone", "").strip(),
+            request.form.get("endereco", "").strip().upper(),
+            request.form.get("faixa", "").strip(),
+            request.form.get("graus", "").strip(),
+            request.form.get("sede", "").strip().upper(),
+            request.form.get("status", "ativo").strip(),
+            request.form.get("motivo_desligamento", "").strip().upper(),
+            request.form.get("data_desligamento", "").strip(),
+            request.form.get("observacoes", "").strip().upper()
+        )
+
+        return redirect(url_for("ver_aluno", aluno_id=aluno_id))
+
+    return render_template(
+        "editar_aluno.html",
+        aluno=aluno,
+        faixas=faixas
     )    
 # ======================================================
 # ROTAS CERTIFICADO
