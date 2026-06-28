@@ -150,7 +150,38 @@ h1{
 <a class="btn" href="{{ url_for('listar_alunos') }}">
     VOLTAR
 </a>
+<form
+    method="POST"
+    action="{{ url_for('excluir_aluno_rota', aluno_id=aluno[0]) }}"
+    onsubmit="return confirmarExclusao();"
+>
+    <input
+        type="password"
+        name="senha"
+        id="senhaExcluir"
+        placeholder="DIGITE SUA SENHA PARA EXCLUIR"
+        required
+        style="
+            width:100%;
+            padding:14px;
+            margin-top:18px;
+            border:1px solid #bbb;
+            border-radius:12px;
+            font-size:16px;
+            text-transform:uppercase;
+        "
+    >
 
+    <button class="btn" type="submit">
+        EXCLUIR ALUNO
+    </button>
+</form>
+
+<script>
+function confirmarExclusao(){
+    return confirm("TEM CERTEZA QUE DESEJA EXCLUIR ESTE ALUNO? ESSA AÇÃO NÃO PODE SER DESFEITA.");
+}
+</script>
 </div>
 </div>
 
