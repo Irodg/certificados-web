@@ -1092,6 +1092,7 @@ def admin():
 # ======================================================
 # ROTAS ALUNOS
 # ======================================================
+
 @app.route("/matricula/<codigo>", methods=["GET", "POST"])
 def matricula_formulario(codigo):
     codigo = codigo.strip().upper()
@@ -1102,7 +1103,12 @@ def matricula_formulario(codigo):
         return resultado, 400
 
     if request.method == "POST":
-        aluno_id = salvar_aluno_do_formulario(request.form, request.files)
+        aluno_id = salvar_aluno_do_formulario(
+            request.form,
+            request.files,
+            numero_matricula=codigo
+        )
+
         marcar_codigo_como_usado(codigo, aluno_id)
 
         return "MATRÍCULA REALIZADA COM SUCESSO."
