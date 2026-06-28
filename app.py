@@ -20,7 +20,8 @@ from matriculas import (
     criar_tabela_codigos_matricula,
     atualizar_tabela_alunos_matricula,
     criar_codigo_matricula,
-    validar_codigo_matricula
+    validar_codigo_matricula,
+    marcar_codigo_como_usado
 )
 
 from usuarios import (
@@ -1091,6 +1092,30 @@ def admin():
 # ======================================================
 # ROTAS ALUNOS
 # ======================================================
+@app.route("/matricula/<codigo>", methods=["GET", "POST"])
+def matricula_formulario(codigo):
+    codigo = codigo.strip().upper()
+
+    valido, resultado = validar_codigo_matricula(codigo)
+
+    if not valido:
+        return resultado, 400
+
+    if request.method == "POST":
+        aluno_id = salvar_aluno_do_formulario(request.form, request.files)
+        marcar_codigo_como_usado(codigo, aluno_id)
+
+        return "MATRÍCULA REALIZADA COM SUCESSO."
+
+    return render_template(
+        "aluno_form.html",
+        aluno=None,
+        faixas=faixas,
+        editando=False,
+        modo_publico=True,
+        codigo_matricula=codigo
+    )
+    
 @app.route("/matricula", methods=["GET", "POST"])
 def matricula_publica():
     erro = None
