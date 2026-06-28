@@ -1090,6 +1090,16 @@ def admin():
 # ======================================================
 # ROTAS ALUNOS
 # ======================================================
+
+@app.route("/matriculas")
+def menu_matriculas():
+
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    return render_template("menu_matriculas.html")
+
+
 @app.route("/matriculas/gerar", methods=["GET", "POST"])
 def gerar_matricula():
     if not usuario_logado():
