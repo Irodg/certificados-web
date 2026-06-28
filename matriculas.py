@@ -105,3 +105,20 @@ def criar_codigo_matricula(usuario_id):
     conn.close()
 
     return resultado
+    
+def marcar_codigo_como_usado(codigo, aluno_id):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE codigos_matricula
+        SET
+            status = 'usado',
+            usado_em = CURRENT_TIMESTAMP,
+            aluno_id = %s
+        WHERE codigo = %s
+    """, (aluno_id, codigo))
+
+    conn.commit()
+    cur.close()
+    conn.close()
