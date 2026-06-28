@@ -21,7 +21,8 @@ from matriculas import (
     atualizar_tabela_alunos_matricula,
     criar_codigo_matricula,
     validar_codigo_matricula,
-    marcar_codigo_como_usado
+    marcar_codigo_como_usado,
+    listar_codigos_por_status
 )
 
 from usuarios import (
@@ -1198,8 +1199,17 @@ def novo_aluno():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        salvar_aluno_do_formulario(request.form, request.files)
-        return redirect(url_for("listar_alunos"))
+        codigo, expira_em = criar_codigo_matricula(session["id"])
+    
+        aluno_id = salvar_aluno_do_formulario(
+            request.form,
+            request.files,
+            numero_matricula=codigo
+        )
+    
+        marcar_codigo_como_usado(codigo, aluno_id)
+    
+        return redirect(url_for("ver_aluno", aluno_id=aluno_id))
 
     return render_template(
         "aluno_form.html",
@@ -1315,6 +1325,19 @@ def ficha_aluno(aluno_id):
         "ficha_aluno.html",
         aluno=aluno
     )
+
+@app.route("/matriculas/utilizados")
+def codigos_utilizados():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    codigos = listar_codigos_por_status("usado")
+
+    return render_template(
+        "codigos_utilizados.html",
+        codigos=codigos
+    )
+
 # ======================================================
 # ROTAS CERTIFICADO
 # ======================================================
