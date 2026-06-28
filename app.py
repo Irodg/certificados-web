@@ -1107,14 +1107,32 @@ def gerar_matricula():
 
     codigo = None
     expira_em = None
+    whatsapp = ""
+    link_whatsapp = None
 
     if request.method == "POST":
+        whatsapp = request.form.get("whatsapp", "").strip()
+        whatsapp = "".join(filter(str.isdigit, whatsapp))
+
         codigo, expira_em = criar_codigo_matricula(session["id"])
+
+        if whatsapp:
+            mensagem = (
+                "Olá! Sua solicitação de matrícula na CRIST OSS BJJ foi gerada.%0A%0A"
+                f"Código de matrícula: {codigo}%0A%0A"
+                "Esse código é válido por 24 horas.%0A%0A"
+                f"Acesse o link abaixo para preencher seu cadastro:%0A"
+                f"{request.url_root}matricula"
+            )
+
+            link_whatsapp = f"https://wa.me/55{whatsapp}?text={mensagem}"
 
     return render_template(
         "gerar_matricula.html",
         codigo=codigo,
-        expira_em=expira_em
+        expira_em=expira_em,
+        whatsapp=whatsapp,
+        link_whatsapp=link_whatsapp
     )
 
 @app.route("/alunos")
