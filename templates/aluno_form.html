@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>CADASTRAR ALUNO</title>
+<title>{% if editando %}EDITAR ALUNO{% else %}CADASTRAR ALUNO{% endif %}</title>
 
 <style>
 *{ box-sizing:border-box; }
@@ -71,8 +71,13 @@ textarea{
     margin-bottom:15px;
 }
 
-.foto input{
-    background:white;
+.foto-atual{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+    display:block;
+    margin:0 auto 15px;
 }
 
 .grid{
@@ -111,18 +116,9 @@ textarea{
 }
 
 @media(max-width:600px){
-    .card{
-        padding:20px;
-    }
-
-    .grid{
-        grid-template-columns:1fr;
-        gap:0;
-    }
-
-    h1{
-        font-size:22px;
-    }
+    .card{ padding:20px; }
+    .grid{ grid-template-columns:1fr; gap:0; }
+    h1{ font-size:22px; }
 }
 </style>
 </head>
@@ -150,6 +146,11 @@ CADASTRAR ALUNO
 
 <div class="foto">
     <label>FOTO DO ALUNO</label>
+
+    {% if editando and aluno[15] %}
+    <img class="foto-atual" src="{{ aluno[15] }}" alt="Foto atual">
+    {% endif %}
+
     <input
         type="file"
         name="foto"
@@ -159,7 +160,6 @@ CADASTRAR ALUNO
 </div>
 
 <label>NOME COMPLETO</label>
-    
 <input
     type="text"
     name="nome"
@@ -170,32 +170,60 @@ CADASTRAR ALUNO
 <div class="grid">
     <div>
         <label>DATA DE NASCIMENTO</label>
-        <input type="date" name="data_nascimento">
+        <input
+            type="date"
+            name="data_nascimento"
+            value="{{ aluno[2] if aluno and aluno[2] else '' }}"
+        >
     </div>
 
     <div>
         <label>CPF DO ALUNO</label>
-        <input type="text" name="cpf" maxlength="11" inputmode="numeric">
+        <input
+            type="text"
+            name="cpf"
+            maxlength="11"
+            inputmode="numeric"
+            value="{{ aluno[3] if aluno and aluno[3] else '' }}"
+        >
     </div>
 </div>
 
 <label>NOME DO RESPONSÁVEL</label>
-<input type="text" name="responsavel">
+<input
+    type="text"
+    name="responsavel"
+    value="{{ aluno[4] if aluno and aluno[4] else '' }}"
+>
 
 <div class="grid">
     <div>
         <label>CPF DO RESPONSÁVEL</label>
-        <input type="text" name="cpf_responsavel" maxlength="11" inputmode="numeric">
+        <input
+            type="text"
+            name="cpf_responsavel"
+            maxlength="11"
+            inputmode="numeric"
+            value="{{ aluno[5] if aluno and aluno[5] else '' }}"
+        >
     </div>
 
     <div>
         <label>TELEFONE</label>
-        <input type="text" name="telefone">
+        <input
+            type="text"
+            name="telefone"
+            value="{{ aluno[6] if aluno and aluno[6] else '' }}"
+        >
     </div>
 </div>
 
 <label>ENDEREÇO</label>
-<input type="text" name="endereco">
+<input
+    type="text"
+    name="endereco"
+    value="{{ aluno[7] if aluno and aluno[7] else '' }}"
+>
 
 <div class="grid">
     <div>
@@ -203,43 +231,67 @@ CADASTRAR ALUNO
         <select name="faixa">
             <option value="">SELECIONE</option>
             {% for faixa in faixas %}
-                <option value="{{ faixa }}">{{ faixa.upper() }}</option>
+                <option
+                    value="{{ faixa }}"
+                    {% if aluno and aluno[8] == faixa %}selected{% endif %}
+                >
+                    {{ faixa.upper() }}
+                </option>
             {% endfor %}
         </select>
     </div>
 
     <div>
         <label>GRAUS</label>
-        <input type="number" name="graus" min="0" max="4">
+        <input
+            type="number"
+            name="graus"
+            min="0"
+            max="4"
+            value="{{ aluno[9] if aluno and aluno[9] else '' }}"
+        >
     </div>
 </div>
 
 <label>SEDE</label>
-<input type="text" name="sede" placeholder="EX: BATURITÉ">
+<input
+    type="text"
+    name="sede"
+    placeholder="EX: BATURITÉ"
+    value="{{ aluno[10] if aluno and aluno[10] else '' }}"
+>
 
 <label>STATUS</label>
 <select name="status" id="status" onchange="mostrarDesligamento()">
-    <option value="ativo">ATIVO</option>
-    <option value="desligado">DESLIGADO</option>
+    <option value="ativo" {% if not aluno or aluno[11] != 'desligado' %}selected{% endif %}>
+        ATIVO
+    </option>
+    <option value="desligado" {% if aluno and aluno[11] == 'desligado' %}selected{% endif %}>
+        DESLIGADO
+    </option>
 </select>
 
 <div id="desligadoBox" class="desligado-box">
     <label>MOTIVO DO DESLIGAMENTO</label>
-    <textarea name="motivo_desligamento"></textarea>
+    <textarea name="motivo_desligamento">{{ aluno[12] if aluno and aluno[12] else '' }}</textarea>
 
     <label>DATA DO DESLIGAMENTO</label>
-    <input type="date" name="data_desligamento">
+    <input
+        type="date"
+        name="data_desligamento"
+        value="{{ aluno[13] if aluno and aluno[13] else '' }}"
+    >
 </div>
 
 <label>OBSERVAÇÕES</label>
-<textarea name="observacoes"></textarea>
+<textarea name="observacoes">{{ aluno[14] if aluno and aluno[14] else '' }}</textarea>
 
 <button class="btn" type="submit">
-    {% if editando %}
-    SALVAR ALTERAÇÕES
-    {% else %}
-    SALVAR ALUNO
-    {% endif %}
+{% if editando %}
+SALVAR ALTERAÇÕES
+{% else %}
+SALVAR ALUNO
+{% endif %}
 </button>
 
 <a class="btn" href="{{ url_for('alunos') }}">
@@ -262,6 +314,8 @@ function mostrarDesligamento(){
         box.style.display = "none";
     }
 }
+
+mostrarDesligamento();
 </script>
 
 </body>
