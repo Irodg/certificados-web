@@ -1094,6 +1094,18 @@ def admin():
 # ROTAS ALUNOS
 # ======================================================
 
+@app.route("/matriculas/pendentes")
+def codigos_pendentes():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    codigos = listar_codigos_por_status("pendente")
+
+    return render_template(
+        "codigos_pendentes.html",
+        codigos=codigos
+    )
+
 @app.route("/matricula/<codigo>", methods=["GET", "POST"])
 def matricula_formulario(codigo):
     codigo = codigo.strip().upper()
