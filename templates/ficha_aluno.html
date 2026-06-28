@@ -40,11 +40,14 @@ body{
 }
 
 .ficha{
-    margin:0;
     width:210mm;
     height:297mm;
+    margin:0 auto 30px auto;
+    background:white;
+    padding:9mm;
     border:2px solid #000;
-    page-break-after:auto;
+    position:relative;
+    overflow:hidden;
 }
 
 .ficha::before{
@@ -66,7 +69,7 @@ body{
     display:flex;
     align-items:center;
     gap:15mm;
-    margin-bottom:6mm;
+    margin-bottom:10mm;
 }
 
 .logo{
@@ -84,7 +87,7 @@ body{
 .secao{
     border:1.5px solid #000;
     border-radius:5px;
-    margin-bottom:4mm;
+    margin-bottom:7mm;
     overflow:hidden;
 }
 
@@ -157,7 +160,7 @@ body{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:20mm;
-    margin-top:7mm;
+    margin-top:12mm;
     font-size:10pt;
     font-weight:bold;
 }
@@ -175,7 +178,7 @@ body{
 .aviso{
     border:1.5px solid #000;
     border-radius:5px;
-    margin-top:6mm;
+    margin-top:10mm;
     padding:4mm;
     text-align:center;
     font-size:9pt;
@@ -193,10 +196,10 @@ body{
 
     .ficha{
         margin:0;
-        border:2px solid #000;
         width:210mm;
-        min-height:297mm;
-        page-break-after:always;
+        height:297mm;
+        border:2px solid #000;
+        page-break-after:auto;
     }
 
     @page{
