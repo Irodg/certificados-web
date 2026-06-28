@@ -241,6 +241,19 @@ def atualizar_aluno(
     conn.commit()
     cur.close()
     conn.close()
+    
+def excluir_aluno(aluno_id):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM alunos
+        WHERE id = %s
+    """, (aluno_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def obter_alunos():
     conn = conectar_db()
