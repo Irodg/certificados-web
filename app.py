@@ -16,6 +16,12 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.units import mm
 from database import conectar_db
 
+from matriculas import (
+    criar_tabela_codigos_matricula,
+    atualizar_tabela_alunos_matricula,
+    criar_codigo_matricula
+)
+
 from usuarios import (
     criar_tabela_usuarios,
     buscar_usuario,
@@ -45,6 +51,8 @@ app = Flask(__name__)
 criar_tabela_usuarios()
 criar_tabela_alunos()
 atualizar_tabela_alunos()
+criar_tabela_codigos_matricula()
+atualizar_tabela_alunos_matricula()
 
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
 app.config["SESSION_PERMANENT"] = False
