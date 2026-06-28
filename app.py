@@ -34,7 +34,8 @@ from alunos import (
     obter_alunos,
     salvar_aluno_do_formulario,
     buscar_aluno_por_id,
-    atualizar_aluno
+    atualizar_aluno,
+    excluir_aluno
 )
 
 
@@ -1142,7 +1143,6 @@ def ver_aluno(aluno_id):
         aluno=aluno
     )
 @app.route("/alunos/<int:aluno_id>/editar", methods=["GET", "POST"])
-
 def editar_aluno(aluno_id):
     if not usuario_logado():
         return redirect(url_for("login"))
@@ -1179,6 +1179,26 @@ def editar_aluno(aluno_id):
         faixas=faixas,
         editando=True
 )
+
+@app.route("/alunos/<int:aluno_id>/excluir", methods=["POST"])
+def excluir_aluno_rota(aluno_id):
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    senha = request.form.get("senha", "").strip()
+    usuario_atual = buscar_usuario_por_id(session["id"])
+
+    if not usuario_atual or usuario_atual["senha"] != senha:
+        return "Senha incorreta. Exclusão cancelada.", 403
+
+    aluno = buscar_aluno_por_id(aluno_id)
+
+    if not aluno:
+        return "Aluno não encontrado.", 404
+
+    excluir_aluno(aluno_id)
+
+    return redirect(url_for("listar_alunos"))
 # ======================================================
 # ROTAS CERTIFICADO
 # ======================================================
