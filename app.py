@@ -1178,7 +1178,7 @@ def editar_aluno(aluno_id):
         aluno=aluno,
         faixas=faixas,
         editando=True
-)    
+)
 # ======================================================
 # ROTAS CERTIFICADO
 # ======================================================
