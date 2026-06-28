@@ -134,9 +134,9 @@ def salvar_aluno_do_formulario(form, files):
     criar_aluno(
         form.get("nome", "").strip().upper(),
         converter_data_para_banco(form.get("data_nascimento", "")),
-        form.get("cpf", "").strip(),
+        ''.join(filter(str.isdigit, form.get("cpf", ""))),
         form.get("responsavel", "").strip().upper(),
-        form.get("cpf_responsavel", "").strip(),
+        ''.join(filter(str.isdigit, form.get("cpf_responsavel", ""))),
         form.get("telefone", "").strip(),
         form.get("endereco", "").strip().upper(),
         form.get("faixa", "").strip(),
