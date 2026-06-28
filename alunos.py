@@ -147,7 +147,40 @@ def salvar_aluno_do_formulario(form, files):
         form.get("observacoes", "").strip().upper(),
         foto_url
     )
+    
+def buscar_aluno_por_id(aluno_id):
+    conn = conectar_db()
+    cur = conn.cursor()
 
+    cur.execute("""
+        SELECT
+            id,
+            nome,
+            data_nascimento,
+            cpf,
+            responsavel,
+            cpf_responsavel,
+            telefone,
+            endereco,
+            faixa,
+            graus,
+            sede,
+            status,
+            motivo_desligamento,
+            data_desligamento,
+            observacoes,
+            foto_url,
+            data_matricula
+        FROM alunos
+        WHERE id = %s
+    """, (aluno_id,))
+
+    aluno = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return aluno
 def obter_alunos():
     conn = conectar_db()
     cur = conn.cursor()
