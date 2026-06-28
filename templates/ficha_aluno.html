@@ -55,96 +55,37 @@ body{
     overflow:hidden;
 
     display:grid;
-    display:grid;
     grid-template-rows:
         24mm
-        54mm
-        42mm
+        68mm
+        58mm
         58mm
         42mm
-        32mm
-        18mm;
-    gap:2.5mm;
-}
-
-.ficha::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:url("{{ url_for('static', filename='logo_crist_oss.png') }}") center center no-repeat;
-    background-size:135mm;
-    opacity:.07;
-    z-index:0;
-}
-
-.conteudo{
-    position:relative;
-    z-index:1;
-    display:contents;
-}
-
-.cabecalho{
-    display:flex;
-    align-items:center;
-    gap:10mm;
-}
-
-.logo{
-    width:24mm;
-    height:24mm;
-    object-fit:contain;
-}
-
-.titulo{
-    font-size:22pt;
-    font-weight:900;
-    letter-spacing:1px;
+        18mm
+        12mm;
+    gap:2mm;
 }
 
 .secao{
     border:1.4px solid #000;
     border-radius:4px;
     overflow:hidden;
-    display:grid;
-    grid-template-rows:auto 1fr;
+    display:block;
     background:rgba(255,255,255,.78);
-}
-
-.secao-titulo{
-    font-size:10pt;
-    font-weight:900;
-    padding:2mm 3mm;
-    border-bottom:1.4px solid #000;
-    background:#f2f2f2;
-}
-
-.grade{
-    display:grid;
-    height:100%;
-}
-
-.grade-aluno{
-    grid-template-columns:1fr 30mm;
 }
 
 .grade-campos{
     display:grid;
     grid-template-columns:1fr 1fr;
-    height:100%;
+    height:auto;
 }
 
 .campo{
-    padding:1.8mm 3mm;
+    padding:1.6mm 3mm;
     border-right:1px solid #888;
     border-bottom:1px solid #888;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    min-height:9mm;
-}
-
-.campo:nth-child(2n){
-    border-right:none;
+    display:block;
+    min-height:11mm;
 }
 
 .campo-full{
@@ -153,15 +94,21 @@ body{
 }
 
 .label{
-    font-size:7pt;
+    font-size:6.8pt;
     font-weight:bold;
-    margin-bottom:1mm;
+    margin-bottom:.8mm;
 }
 
 .valor{
-    font-size:9.5pt;
+    font-size:9pt;
+    line-height:1.15;
     font-weight:900;
     word-break:break-word;
+}
+
+.grade-aluno{
+    grid-template-columns:1fr 30mm;
+    min-height:55mm;
 }
 
 .foto-box{
@@ -180,25 +127,16 @@ body{
 }
 
 .obs{
-    min-height:30mm;
+    min-height:24mm;
     justify-content:flex-start;
 }
 
 .rodape{
     display:grid;
     grid-template-columns:1fr 1fr;
-    align-items:end;
-    font-size:10pt;
+    align-items:center;
+    font-size:8pt;
     font-weight:bold;
-}
-
-.assinatura{
-    text-align:center;
-}
-
-.linha-assinatura{
-    border-top:1px solid #000;
-    padding-top:2mm;
 }
 
 .aviso{
@@ -208,13 +146,12 @@ body{
     align-items:center;
     justify-content:center;
     text-align:center;
-    font-size:9pt;
-    line-height:1.15;
+    font-size:7.5pt;
+    line-height:1.1;
     font-weight:bold;
     background:rgba(255,255,255,.85);
     padding:1mm;
 }
-
 @media print{
     body{
         background:#fff;
