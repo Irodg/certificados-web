@@ -1,1 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>CADASTRAR ALUNO</title>
+
+<style>
+*{ box-sizing:border-box; }
+
+html, body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eeeeee;
+}
+
+.container{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:30px 15px;
+}
+
+.card{
+    width:100%;
+    max-width:760px;
+    background:white;
+    border-radius:18px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.logo{
+    display:block;
+    width:150px;
+    max-width:45%;
+    margin:0 auto 22px auto;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+    font-size:26px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin:14px 0 6px;
+}
+
+input, select, textarea{
+    width:100%;
+    padding:13px;
+    font-size:16px;
+    border:1px solid #bbb;
+    border-radius:10px;
+    text-transform:uppercase;
+}
+
+textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.foto{
+    background:#f4f4f4;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+
+.foto input{
+    background:white;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.desligado-box{
+    display:none;
+    margin-top:10px;
+    padding:14px;
+    border-radius:12px;
+    background:#f4f4f4;
+}
+
+.btn{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:58px;
+    margin-top:18px;
+    background:#000;
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    font-size:18px;
+    font-weight:bold;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.btn:hover{
+    background:#1b1b1b;
+}
+
+@media(max-width:600px){
+    .card{
+        padding:20px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+        gap:0;
+    }
+
+    h1{
+        font-size:22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<img
+    class="logo"
+    src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+    alt="Logo Crist Oss"
+>
+
+<h1>EDITAR ALUNO</h1>
+
+<form method="POST" enctype="multipart/form-data">
+
+<div class="foto">
+    <label>FOTO DO ALUNO</label>
+    <input
+        type="file"
+        name="foto"
+        accept="image/*"
+        capture="user"
+    >
+</div>
+
+<label>NOME COMPLETO</label>
+<input type="text" name="nome" required>
+
+<div class="grid">
+    <div>
+        <label>DATA DE NASCIMENTO</label>
+        <input type="date" name="data_nascimento">
+    </div>
+
+    <div>
+        <label>CPF DO ALUNO</label>
+        <input type="text" name="cpf" maxlength="11" inputmode="numeric">
+    </div>
+</div>
+
+<label>NOME DO RESPONSÁVEL</label>
+<input type="text" name="responsavel">
+
+<div class="grid">
+    <div>
+        <label>CPF DO RESPONSÁVEL</label>
+        <input type="text" name="cpf_responsavel" maxlength="11" inputmode="numeric">
+    </div>
+
+    <div>
+        <label>TELEFONE</label>
+        <input type="text" name="telefone">
+    </div>
+</div>
+
+<label>ENDEREÇO</label>
+<input type="text" name="endereco">
+
+<div class="grid">
+    <div>
+        <label>FAIXA ATUAL</label>
+        <select name="faixa">
+            <option value="">SELECIONE</option>
+            {% for faixa in faixas %}
+                <option value="{{ faixa }}">{{ faixa.upper() }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label>GRAUS</label>
+        <input type="number" name="graus" min="0" max="4">
+    </div>
+</div>
+
+<label>SEDE</label>
+<input type="text" name="sede" placeholder="EX: BATURITÉ">
+
+<label>STATUS</label>
+<select name="status" id="status" onchange="mostrarDesligamento()">
+    <option value="ativo">ATIVO</option>
+    <option value="desligado">DESLIGADO</option>
+</select>
+
+<div id="desligadoBox" class="desligado-box">
+    <label>MOTIVO DO DESLIGAMENTO</label>
+    <textarea name="motivo_desligamento"></textarea>
+
+    <label>DATA DO DESLIGAMENTO</label>
+    <input type="date" name="data_desligamento">
+</div>
+
+<label>OBSERVAÇÕES</label>
+<textarea name="observacoes"></textarea>
+
+<button class="btn" type="submit">
+    SALVAR ALTERAÇÕES
+</button>
+
+<a class="btn" href="{{ url_for('alunos') }}">
+    VOLTAR
+</a>
+
+</form>
+
+</div>
+</div>
+
+<script>
+function mostrarDesligamento(){
+    const status = document.getElementById("status").value;
+    const box = document.getElementById("desligadoBox");
+
+    if(status === "desligado"){
+        box.style.display = "block";
+    }else{
+        box.style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
