@@ -2,8 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>FICHA DO ALUNO</title>
 
 <style>
@@ -11,28 +9,33 @@
     box-sizing:border-box;
 }
 
+@page{
+    size:A4;
+    margin:5mm;
+}
+
 body{
     margin:0;
     font-family:Arial, Helvetica, sans-serif;
-    background:#eeeeee;
+    background:#eee;
     color:#000;
     text-transform:uppercase;
 }
 
 .acoes{
-    max-width:210mm;
-    margin:20px auto;
+    width:200mm;
+    margin:15px auto;
     display:flex;
     gap:10px;
 }
 
 .btn{
     flex:1;
-    height:48px;
+    height:45px;
     background:#000;
-    color:white;
+    color:#fff;
     border:none;
-    border-radius:10px;
+    border-radius:8px;
     font-weight:bold;
     text-decoration:none;
     display:flex;
@@ -42,14 +45,25 @@ body{
 }
 
 .ficha{
-    width:100%;
-    max-width:200mm;
-    margin:0 auto 30px auto;
-    background:white;
-    padding:18px 18px 10px 18px;
+    width:200mm;
+    height:287mm;
+    margin:0 auto;
+    background:#fff;
     border:2px solid #000;
+    padding:6mm;
     position:relative;
     overflow:hidden;
+
+    display:grid;
+    grid-template-rows:
+        27mm
+        58mm
+        48mm
+        56mm
+        38mm
+        32mm
+        16mm;
+    gap:3mm;
 }
 
 .ficha::before{
@@ -57,21 +71,21 @@ body{
     position:absolute;
     inset:0;
     background:url("{{ url_for('static', filename='logo_crist_oss.png') }}") center center no-repeat;
-    background-size:120mm;
-    opacity:0.06;
+    background-size:135mm;
+    opacity:.07;
     z-index:0;
 }
 
 .conteudo{
     position:relative;
     z-index:1;
+    display:contents;
 }
 
 .cabecalho{
     display:flex;
     align-items:center;
     gap:10mm;
-    margin-bottom:5mm;
 }
 
 .logo{
@@ -81,43 +95,53 @@ body{
 }
 
 .titulo{
-    font-size:20pt;
+    font-size:22pt;
     font-weight:900;
     letter-spacing:1px;
 }
 
 .secao{
-    border:1.2px solid #000;
+    border:1.4px solid #000;
     border-radius:4px;
-    margin-bottom:4mm;
     overflow:hidden;
+    display:grid;
+    grid-template-rows:auto 1fr;
+    background:rgba(255,255,255,.78);
 }
 
 .secao-titulo{
     font-size:10pt;
     font-weight:900;
     padding:2mm 3mm;
-    border-bottom:1.2px solid #000;
-    background:#f5f5f5;
+    border-bottom:1.4px solid #000;
+    background:#f2f2f2;
 }
 
-.linha{
+.grade{
+    display:grid;
+    height:100%;
+}
+
+.grade-aluno{
+    grid-template-columns:1fr 30mm;
+}
+
+.grade-campos{
     display:grid;
     grid-template-columns:1fr 1fr;
-    border-bottom:1px solid #999;
-}
-
-.linha:last-child{
-    border-bottom:none;
+    height:100%;
 }
 
 .campo{
     padding:2mm 3mm;
-    border-right:1px solid #999;
-    min-height:11mm;
+    border-right:1px solid #888;
+    border-bottom:1px solid #888;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
 }
 
-.campo:last-child{
+.campo:nth-child(2n){
     border-right:none;
 }
 
@@ -138,13 +162,8 @@ body{
     word-break:break-word;
 }
 
-.area-aluno{
-    display:grid;
-    grid-template-columns:1fr 30mm;
-}
-
 .foto-box{
-    border-left:1.2px solid #000;
+    border-left:1.4px solid #000;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -153,24 +172,26 @@ body{
 
 .foto{
     width:25mm;
-    height:32mm;
+    height:34mm;
     object-fit:cover;
-    border-radius:3px;
-    border:1px solid #aaa;
+    border:1px solid #777;
+}
+
+.obs{
+    min-height:100%;
+    justify-content:flex-start;
 }
 
 .rodape{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:12mm;
-    margin-top:5mm;
+    align-items:end;
     font-size:8pt;
     font-weight:bold;
 }
 
 .assinatura{
     text-align:center;
-    padding-top:8mm;
 }
 
 .linha-assinatura{
@@ -179,28 +200,20 @@ body{
 }
 
 .aviso{
-    border:1.2px solid #000;
+    border:1.3px solid #000;
     border-radius:4px;
-    margin-top:4mm;
-    padding:2.5mm;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     text-align:center;
     font-size:7.5pt;
     font-weight:bold;
+    background:rgba(255,255,255,.85);
 }
 
 @media print{
-
-    @page{
-        size:A4;
-        margin:5mm;
-    }
-
-    html,
     body{
-        width:210mm;
-        height:297mm;
-        margin:0;
-        background:white;
+        background:#fff;
     }
 
     .acoes{
@@ -208,12 +221,9 @@ body{
     }
 
     .ficha{
-        width:100%;
-        max-width:none;
+        width:200mm;
+        height:287mm;
         margin:0;
-        padding:14px 14px 8px 14px;
-        border:2px solid #000;
-        box-sizing:border-box;
         page-break-inside:avoid;
         page-break-after:avoid;
     }
@@ -239,49 +249,41 @@ body{
 <div class="secao">
     <div class="secao-titulo">DADOS DO ALUNO</div>
 
-    <div class="area-aluno">
-        <div>
-            <div class="linha">
-                <div class="campo campo-full">
-                    <div class="label">NOME COMPLETO:</div>
-                    <div class="valor">{{ aluno[1] or 'NÃO INFORMADO' }}</div>
-                </div>
+    <div class="grade grade-aluno">
+        <div class="grade-campos">
+            <div class="campo campo-full">
+                <div class="label">NOME COMPLETO:</div>
+                <div class="valor">{{ aluno[1] or 'NÃO INFORMADO' }}</div>
             </div>
 
-            <div class="linha">
-                <div class="campo">
-                    <div class="label">DATA DE NASCIMENTO:</div>
-                    <div class="valor">{{ aluno[2].strftime('%d/%m/%Y') if aluno[2] else 'NÃO INFORMADA' }}</div>
-                </div>
-
-                <div class="campo">
-                    <div class="label">CPF DO ALUNO:</div>
-                    <div class="valor">{{ aluno[3] or 'NÃO INFORMADO' }}</div>
-                </div>
+            <div class="campo">
+                <div class="label">DATA DE NASCIMENTO:</div>
+                <div class="valor">{{ aluno[2].strftime('%d/%m/%Y') if aluno[2] else 'NÃO INFORMADA' }}</div>
             </div>
 
-            <div class="linha">
-                <div class="campo">
-                    <div class="label">FAIXA ATUAL:</div>
-                    <div class="valor">{{ aluno[8] or 'NÃO INFORMADA' }}</div>
-                </div>
-
-                <div class="campo">
-                    <div class="label">GRAUS:</div>
-                    <div class="valor">{{ aluno[9] or '0' }}</div>
-                </div>
+            <div class="campo">
+                <div class="label">CPF DO ALUNO:</div>
+                <div class="valor">{{ aluno[3] or 'NÃO INFORMADO' }}</div>
             </div>
 
-            <div class="linha">
-                <div class="campo">
-                    <div class="label">SEDE:</div>
-                    <div class="valor">{{ aluno[10] or 'NÃO INFORMADA' }}</div>
-                </div>
+            <div class="campo">
+                <div class="label">FAIXA ATUAL:</div>
+                <div class="valor">{{ aluno[8] or 'NÃO INFORMADA' }}</div>
+            </div>
 
-                <div class="campo">
-                    <div class="label">STATUS:</div>
-                    <div class="valor">{{ aluno[11] or 'ATIVO' }}</div>
-                </div>
+            <div class="campo">
+                <div class="label">GRAUS:</div>
+                <div class="valor">{{ aluno[9] or '0' }}</div>
+            </div>
+
+            <div class="campo">
+                <div class="label">SEDE:</div>
+                <div class="valor">{{ aluno[10] or 'NÃO INFORMADA' }}</div>
+            </div>
+
+            <div class="campo">
+                <div class="label">STATUS:</div>
+                <div class="valor">{{ aluno[11] or 'ATIVO' }}</div>
             </div>
         </div>
 
@@ -298,14 +300,12 @@ body{
 <div class="secao">
     <div class="secao-titulo">DADOS DO RESPONSÁVEL</div>
 
-    <div class="linha">
+    <div class="grade-campos">
         <div class="campo campo-full">
             <div class="label">NOME DO RESPONSÁVEL:</div>
             <div class="valor">{{ aluno[4] or 'NÃO INFORMADO' }}</div>
         </div>
-    </div>
 
-    <div class="linha">
         <div class="campo">
             <div class="label">CPF DO RESPONSÁVEL:</div>
             <div class="valor">{{ aluno[5] or 'NÃO INFORMADO' }}</div>
@@ -315,9 +315,7 @@ body{
             <div class="label">TELEFONE:</div>
             <div class="valor">{{ aluno[6] or 'NÃO INFORMADO' }}</div>
         </div>
-    </div>
 
-    <div class="linha">
         <div class="campo campo-full">
             <div class="label">ENDEREÇO:</div>
             <div class="valor">{{ aluno[7] or 'NÃO INFORMADO' }}</div>
@@ -328,7 +326,7 @@ body{
 <div class="secao">
     <div class="secao-titulo">DADOS DO CADASTRO</div>
 
-    <div class="linha">
+    <div class="grade-campos">
         <div class="campo">
             <div class="label">DATA DE MATRÍCULA:</div>
             <div class="valor">{{ aluno[16].strftime('%d/%m/%Y') if aluno[16] else 'NÃO INFORMADA' }}</div>
@@ -338,10 +336,8 @@ body{
             <div class="label">ÚLTIMA ATUALIZAÇÃO:</div>
             <div class="valor">____/____/________</div>
         </div>
-    </div>
 
-    <div class="linha">
-        <div class="campo campo-full">
+        <div class="campo campo-full obs">
             <div class="label">OBSERVAÇÕES:</div>
             <div class="valor">{{ aluno[14] or 'NENHUMA OBSERVAÇÃO.' }}</div>
         </div>
@@ -351,7 +347,7 @@ body{
 <div class="secao">
     <div class="secao-titulo">DESLIGAMENTO (SE APLICÁVEL)</div>
 
-    <div class="linha">
+    <div class="grade-campos">
         <div class="campo">
             <div class="label">MOTIVO DO DESLIGAMENTO:</div>
             <div class="valor">{{ aluno[12] or 'NÃO SE APLICA' }}</div>
@@ -365,9 +361,7 @@ body{
 </div>
 
 <div class="rodape">
-    <div>
-        DATA DE EMISSÃO: ____/____/________
-    </div>
+    <div>DATA DE EMISSÃO: ____/____/________</div>
 
     <div class="assinatura">
         <div class="linha-assinatura">
