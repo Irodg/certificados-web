@@ -2,7 +2,6 @@ import os
 import io
 import re
 import uuid
-import psycopg2
 import cloudinary
 import cloudinary.uploader
 
@@ -15,6 +14,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.units import mm
+from database import conectar_db
 
 
 app = Flask(__name__)
@@ -35,17 +35,6 @@ cloudinary.config(
     api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
     secure=True
 )
-
-
-# ======================================================
-# DATABASE
-# ======================================================
-
-def conectar_db():
-    return psycopg2.connect(
-        DATABASE_URL,
-        sslmode="require"
-    )
 
 
 def criar_tabela_usuarios():
