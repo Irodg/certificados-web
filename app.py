@@ -33,7 +33,7 @@ from alunos import (
     atualizar_tabela_alunos,
     obter_alunos,
     salvar_aluno_do_formulario,
-    buscar_aluno_por_id
+    buscar_aluno_por_id,
     atualizar_aluno
 )
 
