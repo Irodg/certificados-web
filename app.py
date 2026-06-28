@@ -1200,6 +1200,21 @@ def excluir_aluno_rota(aluno_id):
     excluir_aluno(aluno_id)
 
     return redirect(url_for("listar_alunos"))
+    
+@app.route("/alunos/<int:aluno_id>/ficha")
+def ficha_aluno(aluno_id):
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    aluno = buscar_aluno_por_id(aluno_id)
+
+    if not aluno:
+        return "Aluno não encontrado.", 404
+
+    return render_template(
+        "ficha_aluno.html",
+        aluno=aluno
+    )
 # ======================================================
 # ROTAS CERTIFICADO
 # ======================================================
