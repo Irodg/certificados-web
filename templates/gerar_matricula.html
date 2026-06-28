@@ -33,6 +33,23 @@ h1{
     font-size:24px;
 }
 
+label{
+    display:block;
+    text-align:left;
+    font-weight:bold;
+    margin-top:20px;
+    margin-bottom:8px;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    font-size:17px;
+    border:1px solid #bbb;
+    border-radius:12px;
+    box-sizing:border-box;
+}
+
 .codigo{
     font-size:34px;
     font-weight:bold;
@@ -44,6 +61,7 @@ h1{
     font-size:15px;
     color:#333;
     margin-bottom:20px;
+    line-height:1.5;
 }
 
 .btn{
@@ -73,13 +91,26 @@ h1{
 <h1>GERAR CÓDIGO DE MATRÍCULA</h1>
 
 <form method="POST">
+
+    <label>WHATSAPP DO INTERESSADO</label>
+    <input
+        type="text"
+        name="whatsapp"
+        placeholder="85999999999"
+        value="{{ whatsapp or '' }}"
+        inputmode="numeric"
+    >
+
     <button class="btn" type="submit">
         GERAR CÓDIGO
     </button>
+
 </form>
 
 {% if codigo %}
+
     <div class="codigo">{{ codigo }}</div>
+
     <div class="info">
         Código válido por 24 horas.<br>
         Expira em: {{ expira_em.strftime('%d/%m/%Y %H:%M') }}
@@ -89,9 +120,16 @@ h1{
         Link público:<br>
         {{ request.url_root }}matricula
     </div>
+
+    {% if link_whatsapp %}
+    <a class="btn" href="{{ link_whatsapp }}" target="_blank">
+        ENVIAR PELO WHATSAPP
+    </a>
+    {% endif %}
+
 {% endif %}
 
-<a class="btn" href="{{ url_for('alunos') }}">
+<a class="btn" href="{{ url_for('menu_matriculas') }}">
     VOLTAR
 </a>
 
