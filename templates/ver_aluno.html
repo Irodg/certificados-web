@@ -111,7 +111,7 @@ h1{
 
 <div class="bloco">
 <strong>Nome:</strong> {{ aluno[1] }}<br>
-<strong>Data de nascimento:</strong> {{ aluno[2] or 'NÃO INFORMADA' }}<br>
+<strong>Data de nascimento:</strong> {{ aluno[2].strftime('%d/%m/%Y') if aluno[2] else 'NÃO INFORMADA' }}}<br>
 <strong>CPF:</strong> {{ aluno[3] or 'NÃO INFORMADO' }}
 </div>
 
@@ -126,7 +126,7 @@ h1{
 <strong>Faixa:</strong> {{ aluno[8] or 'NÃO INFORMADA' }}<br>
 <strong>Graus:</strong> {{ aluno[9] or '0' }}<br>
 <strong>Sede:</strong> {{ aluno[10] or 'NÃO INFORMADA' }}<br>
-<strong>Data de matrícula:</strong> {{ aluno[16] or 'NÃO INFORMADA' }}
+<strong>Data de matrícula:</strong> {{ aluno[16].strftime('%d/%m/%Y') if aluno[16] else 'NÃO INFORMADA' }}
 </div>
 
 <div class="bloco">
