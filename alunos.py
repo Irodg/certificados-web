@@ -1,4 +1,5 @@
 from database import conectar_db
+from datetime import datetime
 import cloudinary.uploader
 
 def criar_tabela_alunos():
@@ -132,7 +133,7 @@ def salvar_aluno_do_formulario(form, files):
 
     criar_aluno(
         form.get("nome", "").strip().upper(),
-        form.get("data_nascimento", "").strip(),
+        converter_data_para_banco(form.get("data_nascimento", "")),
         form.get("cpf", "").strip(),
         form.get("responsavel", "").strip().upper(),
         form.get("cpf_responsavel", "").strip(),
@@ -143,7 +144,7 @@ def salvar_aluno_do_formulario(form, files):
         form.get("sede", "").strip().upper(),
         form.get("status", "ativo").strip(),
         form.get("motivo_desligamento", "").strip().upper(),
-        form.get("data_desligamento", "").strip(),
+        converter_data_para_banco(form.get("data_desligamento", "")),
         form.get("observacoes", "").strip().upper(),
         foto_url
     )
@@ -254,7 +255,17 @@ def excluir_aluno(aluno_id):
     conn.commit()
     cur.close()
     conn.close()
+def converter_data_para_banco(data):
+    data = data.strip()
 
+    if data == "":
+        return None
+
+    try:
+        return datetime.strptime(data, "%d/%m/%Y").date()
+    except ValueError:
+        return None
+        
 def obter_alunos():
     conn = conectar_db()
     cur = conn.cursor()
