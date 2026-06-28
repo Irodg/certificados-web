@@ -31,8 +31,8 @@ from usuarios import (
 from alunos import (
     criar_tabela_alunos,
     atualizar_tabela_alunos,
-    criar_aluno,
-    obter_alunos
+    obter_alunos,
+    salvar_aluno_do_formulario
 )
 
 
@@ -1094,41 +1094,14 @@ def novo_aluno():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        foto = request.files.get("foto")
-
-        foto_url = ""
-
-        if foto and foto.filename != "":
-            upload = cloudinary.uploader.upload(
-                foto,
-                folder="alunos_crist_oss"
-            )
-            foto_url = upload.get("secure_url", "")
-
-        criar_aluno(
-            request.form.get("nome", "").strip().upper(),
-            request.form.get("data_nascimento", "").strip(),
-            request.form.get("cpf", "").strip(),
-            request.form.get("responsavel", "").strip().upper(),
-            request.form.get("cpf_responsavel", "").strip(),
-            request.form.get("telefone", "").strip(),
-            request.form.get("endereco", "").strip().upper(),
-            request.form.get("faixa", "").strip(),
-            request.form.get("graus", "").strip(),
-            request.form.get("sede", "").strip().upper(),
-            request.form.get("status", "ativo").strip(),
-            request.form.get("motivo_desligamento", "").strip().upper(),
-            request.form.get("data_desligamento", "").strip(),
-            request.form.get("observacoes", "").strip().upper(),
-            foto_url
-        )
-
+        salvar_aluno_do_formulario(request.form, request.files)
         return redirect(url_for("listar_alunos"))
 
     return render_template(
         "aluno_form.html",
         faixas=faixas
     )
+    
 @app.route("/alunos/listar")
 def listar_alunos():
 
