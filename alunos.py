@@ -1,5 +1,5 @@
 from database import conectar_db
-
+import cloudinary.uploader
 
 def criar_tabela_alunos():
     conn = conectar_db()
@@ -113,6 +113,35 @@ def criar_aluno(
     cur.close()
     conn.close()
 
+
+def salvar_aluno_do_formulario(form, files):
+    foto = files.get("foto")
+    foto_url = ""
+
+    if foto and foto.filename != "":
+        upload = cloudinary.uploader.upload(
+            foto,
+            folder="alunos_crist_oss"
+        )
+        foto_url = upload.get("secure_url", "")
+
+    criar_aluno(
+        form.get("nome", "").strip().upper(),
+        form.get("data_nascimento", "").strip(),
+        form.get("cpf", "").strip(),
+        form.get("responsavel", "").strip().upper(),
+        form.get("cpf_responsavel", "").strip(),
+        form.get("telefone", "").strip(),
+        form.get("endereco", "").strip().upper(),
+        form.get("faixa", "").strip(),
+        form.get("graus", "").strip(),
+        form.get("sede", "").strip().upper(),
+        form.get("status", "ativo").strip(),
+        form.get("motivo_desligamento", "").strip().upper(),
+        form.get("data_desligamento", "").strip(),
+        form.get("observacoes", "").strip().upper(),
+        foto_url
+    )
 
 def obter_alunos():
     conn = conectar_db()
