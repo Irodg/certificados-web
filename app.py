@@ -1101,8 +1101,10 @@ def novo_aluno():
 
     return render_template(
         "aluno_form.html",
-        faixas=faixas
-    )
+        aluno=None,
+        faixas=faixas,
+        editando=False
+)
     
 @app.route("/alunos/listar")
 def listar_alunos():
@@ -1140,6 +1142,7 @@ def ver_aluno(aluno_id):
         aluno=aluno
     )
 @app.route("/alunos/<int:aluno_id>/editar", methods=["GET", "POST"])
+
 def editar_aluno(aluno_id):
     if not usuario_logado():
         return redirect(url_for("login"))
@@ -1171,10 +1174,11 @@ def editar_aluno(aluno_id):
         return redirect(url_for("ver_aluno", aluno_id=aluno_id))
 
     return render_template(
-        "editar_aluno.html",
+        "aluno_form.html",
         aluno=aluno,
-        faixas=faixas
-    )    
+        faixas=faixas,
+        editando=True
+)    
 # ======================================================
 # ROTAS CERTIFICADO
 # ======================================================
