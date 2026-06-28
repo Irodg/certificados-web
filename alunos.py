@@ -2,6 +2,7 @@ from database import conectar_db
 from datetime import datetime
 import cloudinary.uploader
 
+
 def criar_tabela_alunos():
     conn = conectar_db()
     cur = conn.cursor()
@@ -10,7 +11,7 @@ def criar_tabela_alunos():
         CREATE TABLE IF NOT EXISTS alunos (
             id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
-            data_nascimento DATE,e
+            data_nascimento DATE,
             cpf TEXT UNIQUE,
             responsavel TEXT,
             cpf_responsavel TEXT,
@@ -24,6 +25,7 @@ def criar_tabela_alunos():
             data_desligamento DATE,
             observacoes TEXT,
             foto_url TEXT,
+            numero_matricula TEXT UNIQUE,
             data_matricula DATE DEFAULT CURRENT_DATE,
             criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -42,7 +44,8 @@ def atualizar_tabela_alunos():
         "ALTER TABLE alunos ADD COLUMN IF NOT EXISTS graus TEXT",
         "ALTER TABLE alunos ADD COLUMN IF NOT EXISTS motivo_desligamento TEXT",
         "ALTER TABLE alunos ADD COLUMN IF NOT EXISTS data_desligamento DATE",
-        "ALTER TABLE alunos ADD COLUMN IF NOT EXISTS data_matricula DATE DEFAULT CURRENT_DATE"
+        "ALTER TABLE alunos ADD COLUMN IF NOT EXISTS data_matricula DATE DEFAULT CURRENT_DATE",
+        "ALTER TABLE alunos ADD COLUMN IF NOT EXISTS numero_matricula TEXT UNIQUE"
     ]
 
     for comando in comandos:
@@ -51,6 +54,18 @@ def atualizar_tabela_alunos():
     conn.commit()
     cur.close()
     conn.close()
+
+
+def converter_data_para_banco(data):
+    data = data.strip()
+
+    if data == "":
+        return None
+
+    try:
+        return datetime.strptime(data, "%d/%m/%Y").date()
+    except ValueError:
+        return None
 
 
 def criar_aluno(
@@ -69,7 +84,7 @@ def criar_aluno(
     data_desligamento,
     observacoes,
     foto_url,
-    numero_matricula
+    numero_matricula=None
 ):
     conn = conectar_db()
     cur = conn.cursor()
@@ -97,10 +112,10 @@ def criar_aluno(
         RETURNING id
     """, (
         nome,
-        data_nascimento or None,
-        cpf,
+        data_nascimento,
+        cpf or None,
         responsavel,
-        cpf_responsavel,
+        cpf_responsavel or None,
         telefone,
         endereco,
         faixa,
@@ -108,7 +123,7 @@ def criar_aluno(
         sede,
         status,
         motivo_desligamento,
-        data_desligamento or None,
+        data_desligamento,
         observacoes,
         foto_url,
         numero_matricula
@@ -137,6 +152,7 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
                 {"quality": "auto", "fetch_format": "auto"}
             ]
         )
+
         foto_url = upload.get("secure_url", "")
 
     return criar_aluno(
@@ -157,7 +173,8 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
         foto_url,
         numero_matricula
     )
-    
+
+
 def buscar_aluno_por_id(aluno_id):
     conn = conectar_db()
     cur = conn.cursor()
@@ -180,7 +197,8 @@ def buscar_aluno_por_id(aluno_id):
             data_desligamento,
             observacoes,
             foto_url,
-            data_matricula
+            data_matricula,
+            numero_matricula
         FROM alunos
         WHERE id = %s
     """, (aluno_id,))
@@ -191,7 +209,8 @@ def buscar_aluno_por_id(aluno_id):
     conn.close()
 
     return aluno
-    
+
+
 def atualizar_aluno(
     aluno_id,
     nome,
@@ -232,10 +251,10 @@ def atualizar_aluno(
         WHERE id = %s
     """, (
         nome,
-        data_nascimento or None,
-        cpf,
+        data_nascimento,
+        cpf or None,
         responsavel,
-        cpf_responsavel,
+        cpf_responsavel or None,
         telefone,
         endereco,
         faixa,
@@ -243,7 +262,7 @@ def atualizar_aluno(
         sede,
         status,
         motivo_desligamento,
-        data_desligamento or None,
+        data_desligamento,
         observacoes,
         aluno_id
     ))
@@ -251,7 +270,8 @@ def atualizar_aluno(
     conn.commit()
     cur.close()
     conn.close()
-    
+
+
 def excluir_aluno(aluno_id):
     conn = conectar_db()
     cur = conn.cursor()
@@ -264,17 +284,8 @@ def excluir_aluno(aluno_id):
     conn.commit()
     cur.close()
     conn.close()
-def converter_data_para_banco(data):
-    data = data.strip()
 
-    if data == "":
-        return None
 
-    try:
-        return datetime.strptime(data, "%d/%m/%Y").date()
-    except ValueError:
-        return None
-        
 def obter_alunos():
     conn = conectar_db()
     cur = conn.cursor()
