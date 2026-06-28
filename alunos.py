@@ -10,7 +10,7 @@ def criar_tabela_alunos():
         CREATE TABLE IF NOT EXISTS alunos (
             id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
-            data_nascimento DATE,
+            data_nascimento DATE,e
             cpf TEXT UNIQUE,
             responsavel TEXT,
             cpf_responsavel TEXT,
@@ -92,6 +92,7 @@ def criar_aluno(
             foto_url
         )
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
     """, (
         nome,
         data_nascimento or None,
@@ -110,9 +111,13 @@ def criar_aluno(
         foto_url
     ))
 
+    aluno_id = cur.fetchone()[0]
+
     conn.commit()
     cur.close()
     conn.close()
+
+    return aluno_id
 
 
 def salvar_aluno_do_formulario(form, files):
@@ -131,7 +136,7 @@ def salvar_aluno_do_formulario(form, files):
         )
         foto_url = upload.get("secure_url", "")
 
-    criar_aluno(
+    return criar_aluno(
         form.get("nome", "").strip().upper(),
         converter_data_para_banco(form.get("data_nascimento", "")),
         ''.join(filter(str.isdigit, form.get("cpf", ""))),
