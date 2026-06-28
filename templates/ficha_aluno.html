@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FICHA DO ALUNO</title>
+
+<style>
+*{ box-sizing:border-box; }
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#eeeeee;
+    color:#000;
+    text-transform:uppercase;
+}
+
+.acoes{
+    max-width:210mm;
+    margin:20px auto;
+    display:flex;
+    gap:10px;
+}
+
+.btn{
+    flex:1;
+    height:48px;
+    background:#000;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-weight:bold;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+.ficha{
+    width:210mm;
+    min-height:297mm;
+    margin:0 auto 30px auto;
+    background:white;
+    padding:12mm;
+    border:2px solid #000;
+    position:relative;
+    overflow:hidden;
+}
+
+.ficha::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:url("{{ url_for('static', filename='logo_crist_oss.png') }}") center center no-repeat;
+    background-size:145mm;
+    opacity:0.07;
+    z-index:0;
+}
+
+.conteudo{
+    position:relative;
+    z-index:1;
+}
+
+.cabecalho{
+    display:flex;
+    align-items:center;
+    gap:15mm;
+    margin-bottom:10mm;
+}
+
+.logo{
+    width:32mm;
+    height:32mm;
+    object-fit:contain;
+}
+
+.titulo{
+    font-size:25pt;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.secao{
+    border:1.5px solid #000;
+    border-radius:5px;
+    margin-bottom:7mm;
+    overflow:hidden;
+}
+
+.secao-titulo{
+    font-size:13pt;
+    font-weight:900;
+    padding:3mm 4mm;
+    border-bottom:1.5px solid #000;
+    background:#f5f5f5;
+}
+
+.linha{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    border-bottom:1px solid #999;
+}
+
+.linha:last-child{
+    border-bottom:none;
+}
+
+.campo{
+    padding:3mm 4mm;
+    border-right:1px solid #999;
+    min-height:16mm;
+}
+
+.campo:last-child{
+    border-right:none;
+}
+
+.campo-full{
+    grid-column:1 / 3;
+    border-right:none;
+}
+
+.label{
+    font-size:8.5pt;
+    font-weight:bold;
+    margin-bottom:2mm;
+}
+
+.valor{
+    font-size:12pt;
+    font-weight:900;
+}
+
+.area-aluno{
+    display:grid;
+    grid-template-columns:1fr 38mm;
+}
+
+.foto-box{
+    border-left:1.5px solid #000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:4mm;
+}
+
+.foto{
+    width:32mm;
+    height:42mm;
+    object-fit:cover;
+    border-radius:4px;
+    border:1px solid #aaa;
+}
+
+.rodape{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20mm;
+    margin-top:12mm;
+    font-size:10pt;
+    font-weight:bold;
+}
+
+.assinatura{
+    text-align:center;
+    padding-top:12mm;
+}
+
+.linha-assinatura{
+    border-top:1px solid #000;
+    padding-top:3mm;
+}
+
+.aviso{
+    border:1.5px solid #000;
+    border-radius:5px;
+    margin-top:10mm;
+    padding:4mm;
+    text-align:center;
+    font-size:9pt;
+    font-weight:bold;
+}
+
+@media print{
+    body{
+        background:white;
+    }
+
+    .acoes{
+        display:none;
+    }
+
+    .ficha{
+        margin:0;
+        border:2px solid #000;
+        width:210mm;
+        min-height:297mm;
+        page-break-after:always;
+    }
+
+    @page{
+        size:A4;
+        margin:0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="acoes">
+    <button class="btn" onclick="window.print()">IMPRIMIR</button>
+    <a class="btn" href="{{ url_for('ver_aluno', aluno_id=aluno[0]) }}">VOLTAR</a>
+</div>
+
+<div class="ficha">
+<div class="conteudo">
+
+<div class="cabecalho">
+    <img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+    <div class="titulo">ALUNO CRIST OSS BJJ</div>
+</div>
+
+<div class="secao">
+    <div class="secao-titulo">DADOS DO ALUNO</div>
+
+    <div class="area-aluno">
+        <div>
+            <div class="linha">
+                <div class="campo campo-full">
+                    <div class="label">NOME COMPLETO:</div>
+                    <div class="valor">{{ aluno[1] or 'NÃO INFORMADO' }}</div>
+                </div>
+            </div>
+
+            <div class="linha">
+                <div class="campo">
+                    <div class="label">DATA DE NASCIMENTO:</div>
+                    <div class="valor">{{ aluno[2].strftime('%d/%m/%Y') if aluno[2] else 'NÃO INFORMADA' }}</div>
+                </div>
+
+                <div class="campo">
+                    <div class="label">CPF DO ALUNO:</div>
+                    <div class="valor">{{ aluno[3] or 'NÃO INFORMADO' }}</div>
+                </div>
+            </div>
+
+            <div class="linha">
+                <div class="campo">
+                    <div class="label">FAIXA ATUAL:</div>
+                    <div class="valor">{{ aluno[8] or 'NÃO INFORMADA' }}</div>
+                </div>
+
+                <div class="campo">
+                    <div class="label">GRAUS:</div>
+                    <div class="valor">{{ aluno[9] or '0' }}</div>
+                </div>
+            </div>
+
+            <div class="linha">
+                <div class="campo">
+                    <div class="label">SEDE:</div>
+                    <div class="valor">{{ aluno[10] or 'NÃO INFORMADA' }}</div>
+                </div>
+
+                <div class="campo">
+                    <div class="label">STATUS:</div>
+                    <div class="valor">{{ aluno[11] or 'ATIVO' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="foto-box">
+            {% if aluno[15] %}
+                <img class="foto" src="{{ aluno[15] }}">
+            {% else %}
+                <div class="valor">SEM FOTO</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="secao">
+    <div class="secao-titulo">DADOS DO RESPONSÁVEL</div>
+
+    <div class="linha">
+        <div class="campo campo-full">
+            <div class="label">NOME DO RESPONSÁVEL:</div>
+            <div class="valor">{{ aluno[4] or 'NÃO INFORMADO' }}</div>
+        </div>
+    </div>
+
+    <div class="linha">
+        <div class="campo">
+            <div class="label">CPF DO RESPONSÁVEL:</div>
+            <div class="valor">{{ aluno[5] or 'NÃO INFORMADO' }}</div>
+        </div>
+
+        <div class="campo">
+            <div class="label">TELEFONE:</div>
+            <div class="valor">{{ aluno[6] or 'NÃO INFORMADO' }}</div>
+        </div>
+    </div>
+
+    <div class="linha">
+        <div class="campo campo-full">
+            <div class="label">ENDEREÇO:</div>
+            <div class="valor">{{ aluno[7] or 'NÃO INFORMADO' }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="secao">
+    <div class="secao-titulo">DADOS DO CADASTRO</div>
+
+    <div class="linha">
+        <div class="campo">
+            <div class="label">DATA DE MATRÍCULA:</div>
+            <div class="valor">{{ aluno[16].strftime('%d/%m/%Y') if aluno[16] else 'NÃO INFORMADA' }}</div>
+        </div>
+
+        <div class="campo">
+            <div class="label">ÚLTIMA ATUALIZAÇÃO:</div>
+            <div class="valor">____/____/________</div>
+        </div>
+    </div>
+
+    <div class="linha">
+        <div class="campo campo-full">
+            <div class="label">OBSERVAÇÕES:</div>
+            <div class="valor">{{ aluno[14] or 'NENHUMA OBSERVAÇÃO.' }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="secao">
+    <div class="secao-titulo">DESLIGAMENTO (SE APLICÁVEL)</div>
+
+    <div class="linha">
+        <div class="campo">
+            <div class="label">MOTIVO DO DESLIGAMENTO:</div>
+            <div class="valor">{{ aluno[12] or 'NÃO SE APLICA' }}</div>
+        </div>
+
+        <div class="campo">
+            <div class="label">DATA DO DESLIGAMENTO:</div>
+            <div class="valor">{{ aluno[13].strftime('%d/%m/%Y') if aluno[13] else 'NÃO SE APLICA' }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="rodape">
+    <div>
+        DATA DE EMISSÃO: ____/____/________
+    </div>
+
+    <div class="assinatura">
+        <div class="linha-assinatura">
+            RESPONSÁVEL<br>
+            CRIST OSS BJJ
+        </div>
+    </div>
+</div>
+
+<div class="aviso">
+    ESTA FICHA É DE USO INTERNO DA CRIST OSS BJJ.<br>
+    AS INFORMAÇÕES AQUI CONTIDAS SÃO CONFIDENCIAIS.
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
