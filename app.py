@@ -37,6 +37,11 @@ from alunos import (
 
 
 app = Flask(__name__)
+
+criar_tabela_usuarios()
+criar_tabela_alunos()
+atualizar_tabela_alunos()
+
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
 app.config["SESSION_PERMANENT"] = False
 
