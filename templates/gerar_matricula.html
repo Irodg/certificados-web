@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>GERAR MATRÍCULA</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eeeeee;
+}
+
+.container{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.card{
+    width:100%;
+    max-width:520px;
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+    text-align:center;
+}
+
+h1{
+    font-size:24px;
+}
+
+.codigo{
+    font-size:34px;
+    font-weight:bold;
+    letter-spacing:3px;
+    margin:25px 0 10px;
+}
+
+.info{
+    font-size:15px;
+    color:#333;
+    margin-bottom:20px;
+}
+
+.btn{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:56px;
+    margin-top:14px;
+    background:#000;
+    color:white;
+    border:0;
+    border-radius:14px;
+    font-size:17px;
+    font-weight:bold;
+    text-decoration:none;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>GERAR CÓDIGO DE MATRÍCULA</h1>
+
+<form method="POST">
+    <button class="btn" type="submit">
+        GERAR CÓDIGO
+    </button>
+</form>
+
+{% if codigo %}
+    <div class="codigo">{{ codigo }}</div>
+    <div class="info">
+        Código válido por 24 horas.<br>
+        Expira em: {{ expira_em.strftime('%d/%m/%Y %H:%M') }}
+    </div>
+
+    <div class="info">
+        Link público:<br>
+        {{ request.url_root }}matricula
+    </div>
+{% endif %}
+
+<a class="btn" href="{{ url_for('alunos') }}">
+    VOLTAR
+</a>
+
+</div>
+</div>
+
+</body>
+</html>
