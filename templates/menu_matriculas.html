@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+
+<title>MATRÍCULAS</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#ececec;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    padding:40px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:35px;
+}
+
+.botao{
+
+    display:block;
+
+    background:#1f1f1f;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+    text-align:center;
+
+    border-radius:10px;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+}
+
+.botao:hover{
+
+    background:#000;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>MATRÍCULAS</h1>
+
+<a class="botao"
+href="{{ url_for('gerar_matricula') }}">
+
+➕ GERAR CÓDIGO
+
+</a>
+
+<a class="botao"
+href="#">
+
+📋 CÓDIGOS PENDENTES
+
+</a>
+
+<a class="botao"
+href="#">
+
+✅ CÓDIGOS UTILIZADOS
+
+</a>
+
+<a class="botao"
+href="#">
+
+⌛ CÓDIGOS EXPIRADOS
+
+</a>
+
+<a class="botao"
+href="#">
+
+🔄 RENOVAR CÓDIGO
+
+</a>
+
+<a class="botao"
+href="{{ url_for('alunos') }}">
+
+⬅ VOLTAR
+
+</a>
+
+</div>
+
+</body>
+</html>
