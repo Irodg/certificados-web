@@ -49,7 +49,34 @@ def gerar_codigo_matricula(tamanho=8):
         for _ in range(tamanho)
     )
 
+def validar_codigo_matricula(codigo):
+    conn = conectar_db()
+    cur = conn.cursor()
 
+    cur.execute("""
+        SELECT id, codigo, status, expira_em
+        FROM codigos_matricula
+        WHERE codigo = %s
+    """, (codigo,))
+
+    resultado = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not resultado:
+        return False, "CÓDIGO INVÁLIDO."
+
+    codigo_id, codigo, status, expira_em = resultado
+
+    if status != "pendente":
+        return False, "CÓDIGO JÁ UTILIZADO OU CANCELADO."
+
+    if datetime.now() > expira_em:
+        return False, "CÓDIGO EXPIRADO. SOLICITE UM NOVO CÓDIGO."
+
+    return True, codigo
+    
 def criar_codigo_matricula(usuario_id):
     codigo = gerar_codigo_matricula()
     expira_em = datetime.now() + timedelta(hours=24)
