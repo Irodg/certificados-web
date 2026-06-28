@@ -40,11 +40,11 @@ body{
 }
 
 .ficha{
-    width:210mm;
-    height:297mm;
-    margin:0 auto 30px auto;
+    width:190mm;
+    min-height:277mm;
+    margin:10mm auto;
+    padding:8mm;
     background:white;
-    padding:9mm;
     border:2px solid #000;
     position:relative;
     overflow:hidden;
@@ -186,8 +186,15 @@ body{
 }
 
 @media print{
+
+    @page{
+        size:A4;
+        margin:10mm;
+    }
+
     body{
         background:white;
+        margin:0;
     }
 
     .acoes{
@@ -195,16 +202,17 @@ body{
     }
 
     .ficha{
+        width:100%;
+        min-height:auto;
         margin:0;
-        width:210mm;
-        height:297mm;
+        padding:8mm;
         border:2px solid #000;
-        page-break-after:auto;
+        page-break-inside:avoid;
+        page-break-after:avoid;
     }
 
-    @page{
-        size:A4;
-        margin:0;
+    .secao{
+        page-break-inside:avoid;
     }
 }
 </style>
