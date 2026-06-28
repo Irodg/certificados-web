@@ -32,7 +32,8 @@ from alunos import (
     criar_tabela_alunos,
     atualizar_tabela_alunos,
     obter_alunos,
-    salvar_aluno_do_formulario
+    salvar_aluno_do_formulario,
+    buscar_aluno_por_id
 )
 
 
@@ -1123,6 +1124,20 @@ def buscar_aluno():
 
     return "<h2>Busca de alunos em construção</h2>"
     
+@app.route("/alunos/<int:aluno_id>")
+def ver_aluno(aluno_id):
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    aluno = buscar_aluno_por_id(aluno_id)
+
+    if not aluno:
+        return "Aluno não encontrado.", 404
+
+    return render_template(
+        "ver_aluno.html",
+        aluno=aluno
+    )    
 # ======================================================
 # ROTAS CERTIFICADO
 # ======================================================
