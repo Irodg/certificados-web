@@ -78,11 +78,23 @@ def validar_codigo_matricula(codigo):
     return True, codigo
     
 def criar_codigo_matricula(usuario_id):
-    codigo = gerar_codigo_matricula()
     expira_em = datetime.now() + timedelta(hours=24)
 
     conn = conectar_db()
     cur = conn.cursor()
+
+    while True:
+        codigo = gerar_codigo_matricula()
+
+        cur.execute("""
+            SELECT id FROM codigos_matricula
+            WHERE codigo = %s
+        """, (codigo,))
+
+        existente = cur.fetchone()
+
+        if not existente:
+            break
 
     cur.execute("""
         INSERT INTO codigos_matricula (
@@ -122,3 +134,28 @@ def marcar_codigo_como_usado(codigo, aluno_id):
     conn.commit()
     cur.close()
     conn.close()
+    
+def listar_codigos_por_status(status):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            c.codigo,
+            c.status,
+            c.criado_em,
+            c.expira_em,
+            c.usado_em,
+            a.nome
+        FROM codigos_matricula c
+        LEFT JOIN alunos a ON a.id = c.aluno_id
+        WHERE c.status = %s
+        ORDER BY c.usado_em DESC NULLS LAST, c.criado_em DESC
+    """, (status,))
+
+    codigos = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return codigos
