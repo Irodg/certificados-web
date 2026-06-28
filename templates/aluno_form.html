@@ -7,7 +7,23 @@
 <title>{% if editando %}EDITAR ALUNO{% else %}CADASTRAR ALUNO{% endif %}</title>
 
 <style>
-*{ box-sizing:border-box; }
+
+{% if modo_publico %}
+<div style="
+    background:#f4f4f4;
+    border:1px solid #ccc;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:18px;
+    text-align:center;
+    font-weight:bold;
+">
+    CÓDIGO / Nº DE MATRÍCULA<br>
+    <span style="font-size:24px;">{{ codigo_matricula }}</span>
+</div>
+{% endif %}    
+    
+    *{ box-sizing:border-box; }
 
 html, body{
     margin:0;
@@ -135,7 +151,9 @@ textarea{
 >
 
 <h1>
-{% if editando %}
+{% if modo_publico %}
+MATRÍCULA CRIST OSS BJJ
+{% elif editando %}
 EDITAR ALUNO
 {% else %}
 CADASTRAR ALUNO
@@ -299,16 +317,20 @@ CADASTRAR ALUNO
 <textarea name="observacoes">{{ aluno[14] if aluno and aluno[14] else '' }}</textarea>
 
 <button class="btn" type="submit">
-{% if editando %}
+{% if modo_publico %}
+ENVIAR MATRÍCULA
+{% elif editando %}
 SALVAR ALTERAÇÕES
 {% else %}
 SALVAR ALUNO
 {% endif %}
 </button>
 
+{% if not modo_publico %}
 <a class="btn" href="{{ url_for('alunos') }}">
     VOLTAR
 </a>
+{% endif %}
 
 </form>
 
