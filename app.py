@@ -1004,7 +1004,6 @@ def minha_conta():
         
             alterar_foto(usuario_atual["id"], foto_url)
             session["foto"] = foto_url
-            )
 
             imagem = Image.open(foto)
             imagem = imagem.convert("RGB")
