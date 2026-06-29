@@ -72,10 +72,6 @@ app.config["SESSION_PERMANENT"] = False
 
 app.register_blueprint(login_bp)
 app.register_blueprint(admin_bp)
-<a class="btn" href="{{ url_for('alunos.alunos') }}">
-
-
-app.config["SESSION_PERMANENT"] = False
 app.register_blueprint(alunos_bp)
 
 UPLOAD_FOLDER = "static/uploads"
