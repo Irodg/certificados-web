@@ -67,9 +67,14 @@ criar_tabela_codigos_matricula()
 atualizar_tabela_codigos_matricula()
 atualizar_tabela_alunos_matricula()
 
+app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
+app.config["SESSION_PERMANENT"] = False
+
 app.register_blueprint(login_bp)
 app.register_blueprint(admin_bp)
-app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
+app.register_blueprint(alunos_bp)
+
+
 app.config["SESSION_PERMANENT"] = False
 app.register_blueprint(alunos_bp)
 
@@ -919,13 +924,13 @@ def gerar_pdf_declaracao(
     return buffer
 
 # ======================================================
-# ROTAS ALUNOS
+# ROTAS MATRÍCULAS
 # ======================================================
 
 @app.route("/matriculas/pendentes")
 def codigos_pendentes():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     atualizar_codigos_expirados()
 
@@ -939,7 +944,7 @@ def codigos_pendentes():
 @app.route("/matriculas/expirados")
 def codigos_expirados():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     atualizar_codigos_expirados()
 
@@ -1000,7 +1005,7 @@ def matricula_publica():
 def menu_matriculas():
 
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     return render_template("menu_matriculas.html")
 
@@ -1008,7 +1013,7 @@ def menu_matriculas():
 @app.route("/matriculas/gerar", methods=["GET", "POST"])
 def gerar_matricula():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     codigo = None
     expira_em = None
@@ -1044,7 +1049,7 @@ def gerar_matricula():
 @app.route("/matriculas/utilizados")
 def codigos_utilizados():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     codigos = listar_codigos_por_status("usado")
 
@@ -1060,7 +1065,7 @@ def codigos_utilizados():
 @app.route("/certificado", methods=["GET"])
 def certificado():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     return render_template(
         "index.html",
@@ -1074,7 +1079,7 @@ def certificado():
 @app.route("/certificados-lote", methods=["GET"])
 def certificados_lote():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     return render_template(
         "certificados_lote.html",
@@ -1087,7 +1092,7 @@ def certificados_lote():
 @app.route("/gerar", methods=["POST"])
 def gerar():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     nome = request.form.get("nome", "").strip()
     faixa = request.form.get("faixa", "").strip()
@@ -1119,7 +1124,7 @@ def gerar():
 @app.route("/gerar-lote", methods=["POST"])
 def gerar_lote():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     texto_lote = request.form.get("texto_lote", "").strip()
     sede = request.form.get("sede", "").strip()
@@ -1155,7 +1160,7 @@ def gerar_lote():
 @app.route("/pdf", methods=["GET"])
 def pdf():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     nome = request.args.get("nome", "").strip()
     faixa = request.args.get("faixa", "").strip()
@@ -1199,7 +1204,7 @@ def pdf():
 @app.route("/declaracao")
 def declaracao_menu():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     return render_template("declaracao_menu.html")
 
@@ -1207,7 +1212,7 @@ def declaracao_menu():
 @app.route("/declaracao/frequencia")
 def declaracao_frequencia():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     return render_template(
         "declaracao_form.html",
@@ -1222,7 +1227,7 @@ def declaracao_frequencia():
 @app.route("/declaracao/evento")
 def declaracao_evento():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     return render_template(
         "declaracao_form.html",
@@ -1237,7 +1242,7 @@ def declaracao_evento():
 @app.route("/declaracao/visualizar", methods=["POST"])
 def declaracao_visualizar():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     tipo = request.form.get("tipo", "").strip()
     nome_aluno = request.form.get("nome_aluno", "").strip()
@@ -1279,7 +1284,7 @@ def declaracao_visualizar():
 @app.route("/declaracao/pdf")
 def declaracao_pdf():
     if not usuario_logado():
-        return redirect(url_for("login"))
+        return redirect(url_for("login.login"))
 
     tipo = request.args.get("tipo", "").strip()
     nome_aluno = request.args.get("nome_aluno", "").strip()
