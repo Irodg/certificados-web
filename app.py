@@ -988,7 +988,23 @@ def minha_conta():
     mensagem = None
     erro = None
 
-    if not erro and foto and foto.filename != "":
+    if request.method == "POST":
+        novo_usuario = request.form.get("novo_usuario", "").strip()
+        nova_senha = request.form.get("nova_senha", "").strip()
+        foto = request.files.get("foto")
+
+        if novo_usuario != "":
+            existente = buscar_usuario(novo_usuario)
+
+            if existente and existente["id"] != usuario_atual["id"]:
+                erro = "USUÁRIO JÁ EXISTE."
+            else:
+                alterar_usuario(usuario_atual["id"], novo_usuario)
+                session["usuario"] = novo_usuario
+
+        if not erro and nova_senha != "":
+            alterar_senha(usuario_atual["id"], nova_senha)
+
         if not erro and foto and foto.filename != "":
             upload = cloudinary.uploader.upload(
                 foto,
@@ -999,24 +1015,11 @@ def minha_conta():
                     {"quality": "auto", "fetch_format": "auto"}
                 ]
             )
-        
+
             foto_url = upload.get("secure_url", "")
-        
+
             alterar_foto(usuario_atual["id"], foto_url)
             session["foto"] = foto_url
-
-            imagem = Image.open(foto)
-            imagem = imagem.convert("RGB")
-            imagem.thumbnail((600, 600))
-            imagem.save(
-                caminho,
-                format="JPEG",
-                quality=75,
-                optimize=True
-            )
-
-            alterar_foto(usuario_atual["id"], nome_arquivo)
-            session["foto"] = nome_arquivo
 
         if not erro:
             mensagem = "CONTA ATUALIZADA COM SUCESSO."
@@ -1084,7 +1087,6 @@ def admin():
         mensagem=mensagem,
         erro=erro
     )
-
 # ======================================================
 # ROTAS ALUNOS
 # ======================================================
