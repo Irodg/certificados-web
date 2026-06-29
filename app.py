@@ -22,7 +22,8 @@ from matriculas import (
     criar_codigo_matricula,
     validar_codigo_matricula,
     marcar_codigo_como_usado,
-    listar_codigos_por_status
+    listar_codigos_por_status,
+    atualizar_codigos_expirados
 )
 
 from usuarios import (
@@ -1099,10 +1100,26 @@ def codigos_pendentes():
     if not usuario_logado():
         return redirect(url_for("login"))
 
+    atualizar_codigos_expirados()
+
     codigos = listar_codigos_por_status("pendente")
 
     return render_template(
         "codigos_pendentes.html",
+        codigos=codigos
+    )
+
+@app.route("/matriculas/expirados")
+def codigos_expirados():
+    if not usuario_logado():
+        return redirect(url_for("login"))
+
+    atualizar_codigos_expirados()
+
+    codigos = listar_codigos_por_status("expirado")
+
+    return render_template(
+        "codigos_expirados.html",
         codigos=codigos
     )
 
