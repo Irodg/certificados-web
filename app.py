@@ -7,6 +7,7 @@ import cloudinary.uploader
 
 from routes.login_routes import login_bp
 from routes.admin_routes import admin_bp
+from routes.alunos_routes import alunos_bp
 
 from services.auth import usuario_logado, usuario_admin
 
@@ -70,6 +71,7 @@ app.register_blueprint(login_bp)
 app.register_blueprint(admin_bp)
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
 app.config["SESSION_PERMANENT"] = False
+app.register_blueprint(alunos_bp)
 
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
