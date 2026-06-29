@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>CÓDIGOS EXPIRADOS</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eeeeee;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:30px 15px;
+}
+
+.card{
+    background:white;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+h1{
+    text-align:center;
+}
+
+.item{
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:12px;
+    background:#fafafa;
+    text-transform:uppercase;
+}
+
+.codigo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.expirado{
+    color:red;
+    font-weight:bold;
+}
+
+.btn{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:56px;
+    margin-top:14px;
+    background:#000;
+    color:white;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>CÓDIGOS EXPIRADOS</h1>
+
+{% if codigos %}
+    {% for c in codigos %}
+    <div class="item">
+        <div class="codigo">{{ c[0] }}</div>
+        <strong>Status:</strong> <span class="expirado">{{ c[1] }}</span><br>
+        <strong>Criado em:</strong> {{ c[2].strftime('%d/%m/%Y %H:%M') if c[2] else '-' }}<br>
+        <strong>Expirou em:</strong> {{ c[3].strftime('%d/%m/%Y %H:%M') if c[3] else '-' }}<br>
+        <strong>Aluno:</strong> {{ c[5] or 'NÃO UTILIZADO' }}
+    </div>
+    {% endfor %}
+{% else %}
+    <p style="text-align:center;font-weight:bold;">
+        NENHUM CÓDIGO EXPIRADO.
+    </p>
+{% endif %}
+
+<a class="btn" href="{{ url_for('menu_matriculas') }}">
+    VOLTAR
+</a>
+
+</div>
+</div>
+
+</body>
+</html>
