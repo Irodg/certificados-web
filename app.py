@@ -6,6 +6,7 @@ import cloudinary
 import cloudinary.uploader
 
 from routes.login_routes import login_bp
+from routes.admin_routes import admin_bp
 from flask import Flask, render_template, request, send_file, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -62,6 +63,7 @@ atualizar_tabela_codigos_matricula()
 atualizar_tabela_alunos_matricula()
 
 app.register_blueprint(login_bp)
+app.register_blueprint(admin_bp)
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
 app.config["SESSION_PERMANENT"] = False
 
