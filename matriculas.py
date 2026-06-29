@@ -161,7 +161,8 @@ def listar_codigos_por_status(status):
             c.criado_em,
             c.expira_em,
             c.usado_em,
-            a.nome
+            a.nome,
+            c.whatsapp_destino
         FROM codigos_matricula c
         LEFT JOIN alunos a ON a.id = c.aluno_id
         WHERE c.status = %s
@@ -174,7 +175,6 @@ def listar_codigos_por_status(status):
     conn.close()
 
     return codigos
-
 
 def atualizar_codigos_expirados():
     conn = conectar_db()
