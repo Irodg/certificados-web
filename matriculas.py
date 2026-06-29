@@ -18,14 +18,27 @@ def criar_tabela_codigos_matricula():
             expira_em TIMESTAMP NOT NULL,
             usado_em TIMESTAMP,
             aluno_id INTEGER,
-            criado_por INTEGER
+            criado_por INTEGER,
+            whatsapp_destino TEXT
         )
     """)
 
     conn.commit()
     cur.close()
     conn.close()
+    
+def atualizar_tabela_codigos_matricula():
+    conn = conectar_db()
+    cur = conn.cursor()
 
+    cur.execute("""
+        ALTER TABLE codigos_matricula
+        ADD COLUMN IF NOT EXISTS whatsapp_destino TEXT
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def atualizar_tabela_alunos_matricula():
     conn = conectar_db()
@@ -77,7 +90,7 @@ def validar_codigo_matricula(codigo):
 
     return True, codigo
     
-def criar_codigo_matricula(usuario_id):
+def criar_codigo_matricula(usuario_id, whatsapp_destino=None):
     expira_em = datetime.now() + timedelta(hours=24)
 
     conn = conectar_db()
@@ -100,14 +113,16 @@ def criar_codigo_matricula(usuario_id):
         INSERT INTO codigos_matricula (
             codigo,
             expira_em,
-            criado_por
+            criado_por,
+            whatsapp_destino
         )
-        VALUES (%s, %s, %s)
+        VALUES (%s, %s, %s, %s)
         RETURNING codigo, expira_em
     """, (
         codigo,
         expira_em,
-        usuario_id
+        usuario_id,
+        whatsapp_destino
     ))
 
     resultado = cur.fetchone()
