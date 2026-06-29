@@ -988,29 +988,22 @@ def minha_conta():
     mensagem = None
     erro = None
 
-    if request.method == "POST":
-        novo_usuario = request.form.get("novo_usuario", "").strip()
-        nova_senha = request.form.get("nova_senha", "").strip()
-        foto = request.files.get("foto")
-
-        if novo_usuario != "":
-            existente = buscar_usuario(novo_usuario)
-
-            if existente and existente["id"] != usuario_atual["id"]:
-                erro = "USUÁRIO JÁ EXISTE."
-            else:
-                alterar_usuario(usuario_atual["id"], novo_usuario)
-                session["usuario"] = novo_usuario
-
-        if not erro and nova_senha != "":
-            alterar_senha(usuario_atual["id"], nova_senha)
-
+    if not erro and foto and foto.filename != "":
         if not erro and foto and foto.filename != "":
-            nome_arquivo = str(uuid.uuid4()) + ".jpg"
-
-            caminho = os.path.join(
-                app.config["UPLOAD_FOLDER"],
-                secure_filename(nome_arquivo)
+            upload = cloudinary.uploader.upload(
+                foto,
+                folder="usuarios_crist_oss",
+                resource_type="image",
+                transformation=[
+                    {"width": 600, "height": 600, "crop": "fill", "gravity": "face"},
+                    {"quality": "auto", "fetch_format": "auto"}
+                ]
+            )
+        
+            foto_url = upload.get("secure_url", "")
+        
+            alterar_foto(usuario_atual["id"], foto_url)
+            session["foto"] = foto_url
             )
 
             imagem = Image.open(foto)
