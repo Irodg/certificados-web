@@ -66,16 +66,20 @@ h1{
 <h1>CÓDIGOS PENDENTES</h1>
 
 {% if codigos %}
+
     {% for c in codigos %}
     <div class="item">
+
         <div class="codigo">{{ c[0] }}</div>
+
         <strong>Status:</strong> {{ c[1] }}<br>
         <strong>Criado em:</strong> {{ c[2].strftime('%d/%m/%Y %H:%M') if c[2] else '-' }}<br>
         <strong>Expira em:</strong> {{ c[3].strftime('%d/%m/%Y %H:%M') if c[3] else '-' }}<br>
-        <strong>Aluno:</strong> {{ c[5] or 'AINDA NÃO UTILIZADO' }}<br>  {% if c[6] %}
+        <strong>Aluno:</strong> {{ c[5] or 'AINDA NÃO UTILIZADO' }}<br>
+
         {% if c[6] %}
             <strong>WhatsApp:</strong> {{ c[6] }}<br>
-        
+
             <a
                 class="btn"
                 target="_blank"
@@ -83,13 +87,17 @@ h1{
             >
                 📲 REENVIAR PELO WHATSAPP
             </a>
-    {% endif %}
+        {% endif %}
+
     </div>
     {% endfor %}
+
 {% else %}
+
     <p style="text-align:center;font-weight:bold;">
         NENHUM CÓDIGO PENDENTE.
     </p>
+
 {% endif %}
 
 <a class="btn" href="{{ url_for('menu_matriculas') }}">
