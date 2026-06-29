@@ -7,6 +7,10 @@ import cloudinary.uploader
 
 from routes.login_routes import login_bp
 from routes.admin_routes import admin_bp
+
+from services.auth import usuario_logado, usuario_admin
+
+
 from flask import Flask, render_template, request, send_file, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -127,15 +131,6 @@ FONTE_TEXTO = "Helvetica"
 # ======================================================
 # FUNÇÕES GERAIS
 # ======================================================
-
-def usuario_logado():
-    return session.get("logado") is True
-
-
-def usuario_admin():
-    return session.get("tipo") == "admin"
-
-
 def nome_valido(nome):
     return len(nome.strip().split()) >= 2
 
