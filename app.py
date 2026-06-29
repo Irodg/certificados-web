@@ -5,6 +5,7 @@ import uuid
 import cloudinary
 import cloudinary.uploader
 
+from routes.login_routes import login_bp
 from flask import Flask, render_template, request, send_file, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -60,6 +61,7 @@ criar_tabela_codigos_matricula()
 atualizar_tabela_codigos_matricula()
 atualizar_tabela_alunos_matricula()
 
+app.register_blueprint(login_bp)
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
 app.config["SESSION_PERMANENT"] = False
 
@@ -916,63 +918,6 @@ def gerar_pdf_declaracao(
     buffer.seek(0)
 
     return buffer
-
-
-# ======================================================
-# ROTAS LOGIN / MENU
-# ======================================================
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        usuario = request.form.get("usuario", "").strip()
-        senha = request.form.get("senha", "").strip()
-
-        user = buscar_usuario(usuario)
-
-        if user and user["senha"] == senha:
-            session["logado"] = True
-            session["usuario"] = user["usuario"]
-            session["tipo"] = user["tipo"]
-            session["foto"] = user["foto"]
-            session["id"] = user["id"]
-
-            return redirect(url_for("menu"))
-
-        return render_template(
-            "login.html",
-            erro="USUÁRIO OU SENHA INVÁLIDOS."
-        )
-
-    return render_template("login.html")
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
-
-
-@app.route("/")
-def raiz():
-    if not usuario_logado():
-        return redirect(url_for("login"))
-
-    return redirect(url_for("menu"))
-
-
-@app.route("/menu")
-def menu():
-    if not usuario_logado():
-        return redirect(url_for("login"))
-
-    return render_template(
-        "menu.html",
-        usuario=session.get("usuario"),
-        foto=session.get("foto"),
-        tipo=session.get("tipo")
-    )
-
 
 # ======================================================
 # ROTAS CONTA / ADMIN
