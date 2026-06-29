@@ -23,7 +23,8 @@ from matriculas import (
     validar_codigo_matricula,
     marcar_codigo_como_usado,
     listar_codigos_por_status,
-    atualizar_codigos_expirados
+    atualizar_codigos_expirados,
+    atualizar_tabela_codigos_matricula
 )
 
 from usuarios import (
@@ -56,6 +57,7 @@ criar_tabela_usuarios()
 criar_tabela_alunos()
 atualizar_tabela_alunos()
 criar_tabela_codigos_matricula()
+atualizar_tabela_codigos_matricula()
 atualizar_tabela_alunos_matricula()
 
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
@@ -1192,7 +1194,7 @@ def gerar_matricula():
         whatsapp = request.form.get("whatsapp", "").strip()
         whatsapp = "".join(filter(str.isdigit, whatsapp))
 
-        codigo, expira_em = criar_codigo_matricula(session["id"])
+        codigo, expira_em = criar_codigo_matricula(session["id"], whatsapp)
 
         if whatsapp:
             mensagem = (
