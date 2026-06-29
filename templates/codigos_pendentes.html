@@ -72,7 +72,18 @@ h1{
         <strong>Status:</strong> {{ c[1] }}<br>
         <strong>Criado em:</strong> {{ c[2].strftime('%d/%m/%Y %H:%M') if c[2] else '-' }}<br>
         <strong>Expira em:</strong> {{ c[3].strftime('%d/%m/%Y %H:%M') if c[3] else '-' }}<br>
-        <strong>Aluno:</strong> {{ c[5] or 'AINDA NÃO UTILIZADO' }}
+        <strong>Aluno:</strong> {{ c[5] or 'AINDA NÃO UTILIZADO' }}<br>  {% if c[6] %}
+        {% if c[6] %}
+            <strong>WhatsApp:</strong> {{ c[6] }}<br>
+        
+            <a
+                class="btn"
+                target="_blank"
+                href="https://wa.me/55{{ c[6] }}?text=Olá!%20Sua%20solicitação%20de%20matrícula%20na%20CRIST%20OSS%20BJJ%20foi%20gerada.%0A%0ACódigo%20de%20matrícula:%20{{ c[0] }}%0A%0AEsse%20código%20é%20válido%20por%2024%20horas.%0A%0AAcesse%20o%20link%20abaixo%20para%20preencher%20seu%20cadastro:%0A{{ request.url_root }}matricula"
+            >
+                📲 REENVIAR PELO WHATSAPP
+            </a>
+    {% endif %}
     </div>
     {% endfor %}
 {% else %}
