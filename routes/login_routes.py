@@ -6,8 +6,7 @@ from usuarios import buscar_usuario
 login_bp = Blueprint("login", __name__)
 
 
-def usuario_logado():
-    return session.get("logado") is True
+from services.auth import usuario_logado
 
 
 @login_bp.route("/login", methods=["GET", "POST"])
