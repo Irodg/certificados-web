@@ -181,15 +181,14 @@ h1{
 
 <div class="topbar">
     <a class="user-button" href="{{ url_for('minha_conta') }}">
+
         <img
-            {% if foto and foto.startswith('http') %}
-                <img src="{{ foto }}" alt="Foto do usuário">
-            {% else %}
-                <img src="{{ url_for('static', filename='uploads/' + foto) }}" alt="Foto do usuário">
-            {% endif %}
+            src="{% if foto and foto.startswith('http') %}{{ foto }}{% else %}{{ url_for('static', filename='uploads/' + (foto or 'default.png')) }}{% endif %}"
             alt="Foto do usuário"
         >
+
         <span>{{ usuario }}</span>
+
     </a>
 </div>
 
