@@ -264,76 +264,62 @@ button:hover{
         </form>
 
         <h2>USUÁRIOS CADASTRADOS</h2>
-
-        {% for usuario in usuarios %}
-
-        <div class="usuario-box">
-
+        
+        {% for u in usuarios %}
+        <div class="usuario-card">
+        
             <div class="usuario-topo">
-                <img
-                    src="{{ url_for('static', filename='uploads/' + usuario.foto) }}"
-                    alt="Foto"
-                >
-
+        
+                {% if u.foto and u.foto.startswith('http') %}
+                    <img
+                        class="foto-usuario"
+                        src="{{ u.foto }}"
+                        alt="Foto"
+                    >
+                {% else %}
+                    <img
+                        class="foto-usuario"
+                        src="{{ url_for('static', filename='uploads/' ~ (u.foto or 'default.png')) }}"
+                        alt="Foto"
+                    >
+                {% endif %}
+        
                 <div>
-                    <div class="usuario-nome">
-                        {{ usuario.usuario }}
-                    </div>
-
-                    <div class="usuario-tipo">
-                        {{ usuario.tipo }}
-                    </div>
+                    <strong>{{ u.usuario }}</strong><br>
+                    <small>{{ u.tipo }}</small>
                 </div>
+        
             </div>
-
+        
             <form method="POST">
-
                 <input type="hidden" name="acao" value="alterar_senha">
-
-                <input
-                    type="hidden"
-                    name="usuario_id"
-                    value="{{ usuario.id }}"
-                >
-
+                <input type="hidden" name="usuario_id" value="{{ u.id }}">
+        
                 <label>NOVA SENHA</label>
-
-                <div class="acoes">
+        
+                <div class="linha-senha">
                     <input
                         type="password"
                         name="nova_senha"
                         placeholder="NOVA SENHA"
                     >
-
+        
                     <button type="submit">
                         ALTERAR
                     </button>
                 </div>
-
             </form>
-
-            <form method="POST">
-
+        
+            <form method="POST" onsubmit="return confirm('TEM CERTEZA QUE DESEJA EXCLUIR ESTE USUÁRIO?');">
                 <input type="hidden" name="acao" value="excluir">
-
-                <input
-                    type="hidden"
-                    name="usuario_id"
-                    value="{{ usuario.id }}"
-                >
-
-                <button
-                    class="excluir"
-                    type="submit"
-                    onclick="return confirm('DESEJA REALMENTE EXCLUIR ESTE USUÁRIO?')"
-                >
+                <input type="hidden" name="usuario_id" value="{{ u.id }}">
+        
+                <button class="excluir" type="submit">
                     EXCLUIR USUÁRIO
                 </button>
-
             </form>
-
+        
         </div>
-
         {% endfor %}
 
         <a class="voltar" href="{{ url_for('menu') }}">
