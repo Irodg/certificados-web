@@ -159,3 +159,19 @@ def listar_codigos_por_status(status):
     conn.close()
 
     return codigos
+
+
+def atualizar_codigos_expirados():
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE codigos_matricula
+        SET status = 'expirado'
+        WHERE status = 'pendente'
+        AND expira_em < CURRENT_TIMESTAMP
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
