@@ -123,12 +123,13 @@ button:hover{
     margin-bottom:14px;
 }
 
-.usuario-topo img{
+.foto-usuario{
     width:52px;
     height:52px;
     border-radius:50%;
     object-fit:cover;
     border:2px solid #202020;
+    background:#ddd;
 }
 
 .usuario-nome{
@@ -207,19 +208,11 @@ button:hover{
 <div class="container">
     <div class="card">
 
-       {% if u.foto and u.foto.startswith('http') %}
-            <img
-                class="foto-usuario"
-                src="{{ u.foto }}"
-                alt="Foto"
-            >
-        {% else %}
-            <img
-                class="foto-usuario"
-                src="{{ url_for('static', filename='uploads/' ~ (u.foto or 'default.png')) }}"
-                alt="Foto"
-            >
-        {% endif %}
+        <img
+            class="logo"
+            src="{{ url_for('static', filename='logo_crist_oss.png') }}"
+            alt="Logo Crist Oss"
+        >
 
         <h1>GERENCIAR USUÁRIOS</h1>
 
@@ -264,62 +257,86 @@ button:hover{
         </form>
 
         <h2>USUÁRIOS CADASTRADOS</h2>
-        
-        {% for u in usuarios %}
-        <div class="usuario-card">
-        
+
+        {% for usuario in usuarios %}
+
+        <div class="usuario-box">
+
             <div class="usuario-topo">
-        
-                {% if u.foto and u.foto.startswith('http') %}
+
+                {% if usuario.foto and usuario.foto.startswith('http') %}
                     <img
                         class="foto-usuario"
-                        src="{{ u.foto }}"
+                        src="{{ usuario.foto }}"
                         alt="Foto"
                     >
                 {% else %}
                     <img
                         class="foto-usuario"
-                        src="{{ url_for('static', filename='uploads/' ~ (u.foto or 'default.png')) }}"
+                        src="{{ url_for('static', filename='uploads/' ~ (usuario.foto or 'default.png')) }}"
                         alt="Foto"
                     >
                 {% endif %}
-        
+
                 <div>
-                    <strong>{{ u.usuario }}</strong><br>
-                    <small>{{ u.tipo }}</small>
+                    <div class="usuario-nome">
+                        {{ usuario.usuario }}
+                    </div>
+
+                    <div class="usuario-tipo">
+                        {{ usuario.tipo }}
+                    </div>
                 </div>
-        
             </div>
-        
+
             <form method="POST">
+
                 <input type="hidden" name="acao" value="alterar_senha">
-                <input type="hidden" name="usuario_id" value="{{ u.id }}">
-        
+
+                <input
+                    type="hidden"
+                    name="usuario_id"
+                    value="{{ usuario.id }}"
+                >
+
                 <label>NOVA SENHA</label>
-        
-                <div class="linha-senha">
+
+                <div class="acoes">
                     <input
                         type="password"
                         name="nova_senha"
                         placeholder="NOVA SENHA"
                     >
-        
+
                     <button type="submit">
                         ALTERAR
                     </button>
                 </div>
+
             </form>
-        
-            <form method="POST" onsubmit="return confirm('TEM CERTEZA QUE DESEJA EXCLUIR ESTE USUÁRIO?');">
+
+            <form method="POST">
+
                 <input type="hidden" name="acao" value="excluir">
-                <input type="hidden" name="usuario_id" value="{{ u.id }}">
-        
-                <button class="excluir" type="submit">
+
+                <input
+                    type="hidden"
+                    name="usuario_id"
+                    value="{{ usuario.id }}"
+                >
+
+                <button
+                    class="excluir"
+                    type="submit"
+                    onclick="return confirm('DESEJA REALMENTE EXCLUIR ESTE USUÁRIO?')"
+                >
                     EXCLUIR USUÁRIO
                 </button>
+
             </form>
-        
+
         </div>
+
         {% endfor %}
 
         <a class="voltar" href="{{ url_for('menu') }}">
