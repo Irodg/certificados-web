@@ -265,7 +265,7 @@ body{
 
             <div class="campo">
                 <div class="label">CPF DO ALUNO:</div>
-                <div class="valor">{{ aluno[3] or 'NÃO INFORMADO' }}</div>
+                <div class="valor">{{ aluno[3]|cpf }}</div>
             </div>
 
             <div class="campo">
@@ -310,7 +310,7 @@ body{
 
         <div class="campo">
             <div class="label">CPF DO RESPONSÁVEL:</div>
-            <div class="valor">{{ aluno[5] or 'NÃO INFORMADO' }}</div>
+            <div class="valor">{{ aluno[5]|cpf }}</div>
         </div>
 
         <div class="campo">
