@@ -57,7 +57,7 @@ def atualizar_tabela_alunos():
 
 
 def converter_data_para_banco(data):
-    data = data.strip()
+    data = (data or "").strip()
 
     if data == "":
         return None
@@ -84,7 +84,8 @@ def criar_aluno(
     data_desligamento,
     observacoes,
     foto_url,
-    numero_matricula=None
+    numero_matricula=None,
+    data_matricula=None
 ):
     conn = conectar_db()
     cur = conn.cursor()
@@ -106,16 +107,17 @@ def criar_aluno(
             data_desligamento,
             observacoes,
             foto_url,
-            numero_matricula
+            numero_matricula,
+            data_matricula
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """, (
         nome,
         data_nascimento,
         cpf or None,
-        responsavel,
         cpf_responsavel or None,
+        responsavel,
         telefone,
         endereco,
         faixa,
@@ -126,7 +128,8 @@ def criar_aluno(
         data_desligamento,
         observacoes,
         foto_url,
-        numero_matricula
+        numero_matricula,
+        data_matricula
     ))
 
     aluno_id = cur.fetchone()[0]
@@ -155,6 +158,11 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
 
         foto_url = upload.get("secure_url", "")
 
+    data_matricula = converter_data_para_banco(form.get("data_matricula", ""))
+
+    if data_matricula is None:
+        data_matricula = datetime.now().date()
+
     return criar_aluno(
         form.get("nome", "").strip().upper(),
         converter_data_para_banco(form.get("data_nascimento", "")),
@@ -171,7 +179,8 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
         converter_data_para_banco(form.get("data_desligamento", "")),
         form.get("observacoes", "").strip().upper(),
         foto_url,
-        numero_matricula
+        numero_matricula,
+        data_matricula
     )
 
 
@@ -226,7 +235,8 @@ def atualizar_aluno(
     status,
     motivo_desligamento,
     data_desligamento,
-    observacoes
+    observacoes,
+    data_matricula
 ):
     conn = conectar_db()
     cur = conn.cursor()
@@ -247,7 +257,8 @@ def atualizar_aluno(
             status = %s,
             motivo_desligamento = %s,
             data_desligamento = %s,
-            observacoes = %s
+            observacoes = %s,
+            data_matricula = %s
         WHERE id = %s
     """, (
         nome,
@@ -264,6 +275,7 @@ def atualizar_aluno(
         motivo_desligamento,
         data_desligamento,
         observacoes,
+        data_matricula,
         aluno_id
     ))
 
