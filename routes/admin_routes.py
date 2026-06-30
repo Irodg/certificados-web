@@ -1,3 +1,6 @@
+import io
+from PIL import Image, ImageOps
+
 from flask import (
     Blueprint,
     render_template,
@@ -52,8 +55,17 @@ def minha_conta():
             alterar_senha(usuario_atual["id"], nova_senha)
 
         if not erro and foto and foto.filename != "":
+            imagem = Image.open(foto)
+            imagem = ImageOps.exif_transpose(imagem)
+            imagem = imagem.convert("RGB")
+            imagem.thumbnail((900, 900))
+        
+            buffer = io.BytesIO()
+            imagem.save(buffer, format="JPEG", quality=75, optimize=True)
+            buffer.seek(0)
+        
             upload = cloudinary.uploader.upload(
-                foto,
+                buffer,
                 folder="usuarios_crist_oss",
                 resource_type="image",
                 transformation=[
