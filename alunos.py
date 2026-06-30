@@ -66,7 +66,29 @@ def converter_data_para_banco(data):
         return datetime.strptime(data, "%d/%m/%Y").date()
     except ValueError:
         return None
+        
+def cpf_aluno_ja_cadastrado(cpf):
+    cpf = ''.join(filter(str.isdigit, cpf or ""))
 
+    if cpf == "":
+        return False
+
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id
+        FROM alunos
+        WHERE cpf = %s
+        LIMIT 1
+    """, (cpf,))
+
+    existe = cur.fetchone() is not None
+
+    cur.close()
+    conn.close()
+
+    return existe
 
 def criar_aluno(
     nome,
@@ -145,6 +167,11 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
     foto = files.get("foto")
     foto_url = ""
 
+    cpf = ''.join(filter(str.isdigit, form.get("cpf", "")))
+
+    if cpf_aluno_ja_cadastrado(cpf):
+        raise ValueError("JÁ EXISTE UM ALUNO CADASTRADO COM ESTE CPF.")
+
     if foto and foto.filename != "":
         upload = cloudinary.uploader.upload(
             foto,
@@ -166,7 +193,7 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
     return criar_aluno(
         form.get("nome", "").strip().upper(),
         converter_data_para_banco(form.get("data_nascimento", "")),
-        ''.join(filter(str.isdigit, form.get("cpf", ""))),
+        cpf,
         form.get("responsavel", "").strip().upper(),
         ''.join(filter(str.isdigit, form.get("cpf_responsavel", ""))),
         form.get("telefone", "").strip(),
