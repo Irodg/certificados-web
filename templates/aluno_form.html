@@ -199,27 +199,39 @@ CADASTRAR ALUNO
 <form method="POST" enctype="multipart/form-data">
 
 <div class="foto">
+
     <label>FOTO DO ALUNO</label>
 
-    {% if editando and aluno[15] %}
-        <img class="foto-atual" src="{{ aluno[15] }}" alt="Foto atual">
-    {% endif %}
+    <img
+        id="previewFoto"
+        class="foto-atual"
+        {% if editando and aluno[15] %}
+            src="{{ aluno[15] }}"
+        {% else %}
+            style="display:none;"
+        {% endif %}
+    >
+
     <input
         type="file"
-        name="foto"
         id="fotoInput"
+        name="foto"
         accept="image/*"
         style="display:none;"
     >
-    
+
     <div class="grid">
-        <button class="btn" type="button" onclick="abrirCamera()">
+
+        <button type="button" class="btn" onclick="abrirCamera()">
             📷 TIRAR FOTO
         </button>
-    
-        <button class="btn" type="button" onclick="abrirGaleria()">
+
+        <button type="button" class="btn" onclick="abrirGaleria()">
             🖼️ ESCOLHER DA GALERIA
         </button>
+
+    </div>
+
 </div>
 
 <label>NOME COMPLETO</label>
@@ -455,7 +467,7 @@ document.querySelectorAll(".data").forEach(input => {
     input.addEventListener("input", () => mascaraData(input));
 });
     
-<script>
+
 function abrirCamera(){
     const input = document.getElementById("fotoInput");
     input.setAttribute("capture", "user");
@@ -467,7 +479,24 @@ function abrirGaleria(){
     input.removeAttribute("capture");
     input.click();
 }
-</script>
+
+document.getElementById("fotoInput").addEventListener("change", function(e){
+
+    if(!e.target.files.length) return;
+
+    const arquivo = e.target.files[0];
+
+    const leitor = new FileReader();
+
+    leitor.onload = function(ev){
+
+        const img = document.getElementById("previewFoto");
+
+        img.src = ev.target.result;
+        img.style.display = "block";
+    };
+    leitor.readAsDataURL(arquivo);
+});    
 mostrarDesligamento();
 </script>
 
