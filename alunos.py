@@ -263,48 +263,90 @@ def atualizar_aluno(
     motivo_desligamento,
     data_desligamento,
     observacoes,
-    data_matricula
+    data_matricula,
+    foto_url=None
 ):
     conn = conectar_db()
     cur = conn.cursor()
 
-    cur.execute("""
-        UPDATE alunos
-        SET
-            nome = %s,
-            data_nascimento = %s,
-            cpf = %s,
-            responsavel = %s,
-            cpf_responsavel = %s,
-            telefone = %s,
-            endereco = %s,
-            faixa = %s,
-            graus = %s,
-            sede = %s,
-            status = %s,
-            motivo_desligamento = %s,
-            data_desligamento = %s,
-            observacoes = %s,
-            data_matricula = %s
-        WHERE id = %s
-    """, (
-        nome,
-        data_nascimento,
-        cpf or None,
-        responsavel,
-        cpf_responsavel or None,
-        telefone,
-        endereco,
-        faixa,
-        graus,
-        sede,
-        status,
-        motivo_desligamento,
-        data_desligamento,
-        observacoes,
-        data_matricula,
-        aluno_id
-    ))
+    if foto_url:
+        cur.execute("""
+            UPDATE alunos
+            SET
+                nome = %s,
+                data_nascimento = %s,
+                cpf = %s,
+                responsavel = %s,
+                cpf_responsavel = %s,
+                telefone = %s,
+                endereco = %s,
+                faixa = %s,
+                graus = %s,
+                sede = %s,
+                status = %s,
+                motivo_desligamento = %s,
+                data_desligamento = %s,
+                observacoes = %s,
+                data_matricula = %s,
+                foto_url = %s
+            WHERE id = %s
+        """, (
+            nome,
+            data_nascimento,
+            cpf or None,
+            responsavel,
+            cpf_responsavel or None,
+            telefone,
+            endereco,
+            faixa,
+            graus,
+            sede,
+            status,
+            motivo_desligamento,
+            data_desligamento,
+            observacoes,
+            data_matricula,
+            foto_url,
+            aluno_id
+        ))
+    else:
+        cur.execute("""
+            UPDATE alunos
+            SET
+                nome = %s,
+                data_nascimento = %s,
+                cpf = %s,
+                responsavel = %s,
+                cpf_responsavel = %s,
+                telefone = %s,
+                endereco = %s,
+                faixa = %s,
+                graus = %s,
+                sede = %s,
+                status = %s,
+                motivo_desligamento = %s,
+                data_desligamento = %s,
+                observacoes = %s,
+                data_matricula = %s
+            WHERE id = %s
+        """, (
+            nome,
+            data_nascimento,
+            cpf or None,
+            responsavel,
+            cpf_responsavel or None,
+            telefone,
+            endereco,
+            faixa,
+            graus,
+            sede,
+            status,
+            motivo_desligamento,
+            data_desligamento,
+            observacoes,
+            data_matricula,
+            aluno_id
+        ))
 
     conn.commit()
     cur.close()
