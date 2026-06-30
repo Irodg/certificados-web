@@ -51,11 +51,20 @@ def novo_aluno():
     if request.method == "POST":
         codigo, expira_em = criar_codigo_matricula(None)
 
-        aluno_id = salvar_aluno_do_formulario(
-            request.form,
-            request.files,
-            numero_matricula=codigo
-        )
+        try:
+            aluno_id = salvar_aluno_do_formulario(
+                request.form,
+                request.files,
+                numero_matricula=codigo
+            )
+        except ValueError as erro:
+            return render_template(
+                "aluno_form.html",
+                aluno=None,
+                faixas=faixas,
+                editando=False,
+                erro=str(erro)
+            )
 
         marcar_codigo_como_usado(codigo, aluno_id)
 
