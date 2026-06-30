@@ -121,33 +121,6 @@ def ver_aluno(aluno_id):
 
 @alunos_bp.route("/alunos/<int:aluno_id>/editar", methods=["GET", "POST"])
 def editar_aluno(aluno_id):
-    foto = (     request.files.get("foto_camera")     
-    or request.files.get("foto_galeria") )
-    
-    foto_url = None
-    
-    if foto and foto.filename != "":
-        imagem = Image.open(foto)
-        imagem = ImageOps.exif_transpose(imagem)
-        imagem = imagem.convert("RGB")
-        imagem.thumbnail((900, 900))
-        
-        
-        buffer = io.BytesIO()
-        imagem.save(buffer, format="JPEG", quality=75, optimize=True)
-        buffer.seek(0)
-        
-        upload = cloudinary.uploader.upload(
-            buffer,
-            folder="alunos_crist_oss",
-            resource_type="image",
-            transformation=[
-                {"width": 600, "height": 600, "crop": "fill", "gravity": "face"},
-                {"quality": "auto", "fetch_format": "auto"}
-            ]
-        )
-    
-        foto_url = upload.get("secure_url", "")
     if not usuario_logado():
         return redirect(url_for("login.login"))
 
@@ -165,6 +138,35 @@ def editar_aluno(aluno_id):
         return "Aluno não encontrado.", 404
 
     if request.method == "POST":
+        foto = (
+            request.files.get("foto_camera")
+            or request.files.get("foto_galeria")
+        )
+
+        foto_url = None
+
+        if foto and foto.filename != "":
+            imagem = Image.open(foto)
+            imagem = ImageOps.exif_transpose(imagem)
+            imagem = imagem.convert("RGB")
+            imagem.thumbnail((900, 900))
+
+            buffer = io.BytesIO()
+            imagem.save(buffer, format="JPEG", quality=75, optimize=True)
+            buffer.seek(0)
+
+            upload = cloudinary.uploader.upload(
+                buffer,
+                folder="alunos_crist_oss",
+                resource_type="image",
+                transformation=[
+                    {"width": 600, "height": 600, "crop": "fill", "gravity": "face"},
+                    {"quality": "auto", "fetch_format": "auto"}
+                ]
+            )
+
+            foto_url = upload.get("secure_url", "")
+
         atualizar_aluno(
             aluno_id,
             request.form.get("nome", "").strip().upper(),
@@ -183,7 +185,7 @@ def editar_aluno(aluno_id):
             request.form.get("observacoes", "").strip().upper(),
             converter_data_para_banco(request.form.get("data_matricula", "")),
             foto_url
-        )        
+        )
 
         return redirect(url_for("alunos.ver_aluno", aluno_id=aluno_id))
 
