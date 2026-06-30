@@ -116,12 +116,12 @@ h1{
 <strong>DATA DE MATRÍCULA:</strong> {{ aluno[16].strftime('%d/%m/%Y') if aluno[16] else 'NÃO INFORMADA' }}<br>
 <strong>NOME:</strong> {{ aluno[1] or 'NÃO INFORMADO' }}<br>
 <strong>DATA DE NASCIMENTO:</strong> {{ aluno[2].strftime('%d/%m/%Y') if aluno[2] else 'NÃO INFORMADA' }}<br>
-<strong>CPF:</strong> {{ aluno[3] or 'NÃO INFORMADO' }}
+<strong>CPF:</strong> {{ aluno[3]|cpf }}
 </div>
 
 <div class="bloco">
 <strong>RESPONSÁVEL:</strong> {{ aluno[4] or 'NÃO INFORMADO' }}<br>
-<strong>CPF DO RESPONSÁVEL:</strong> {{ aluno[5] or 'NÃO INFORMADO' }}<br>
+<strong>CPF DO RESPONSÁVEL:</strong> {{ aluno[5]|cpf }}<br>
 <strong>TELEFONE:</strong> {{ aluno[6] or 'NÃO INFORMADO' }}<br>
 <strong>ENDEREÇO:</strong> {{ aluno[7] or 'NÃO INFORMADO' }}
 </div>
