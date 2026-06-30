@@ -1,7 +1,6 @@
-import cloudinary.uploader
-
-from PIL import Image
 import io
+import cloudinary.uploader
+from PIL import Image
 
 from flask import (
     Blueprint,
