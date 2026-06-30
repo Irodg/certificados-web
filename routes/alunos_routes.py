@@ -1,5 +1,8 @@
 import cloudinary.uploader
 
+from PIL import Image
+import io
+
 from flask import (
     Blueprint,
     render_template,
@@ -123,8 +126,16 @@ def editar_aluno(aluno_id):
     foto_url = None
     
     if foto and foto.filename != "":
+        imagem = Image.open(foto)
+        imagem = imagem.convert("RGB")
+        imagem.thumbnail((900, 900))
+        
+        buffer = io.BytesIO()
+        imagem.save(buffer, format="JPEG", quality=75, optimize=True)
+        buffer.seek(0)
+        
         upload = cloudinary.uploader.upload(
-            foto,
+            buffer,
             folder="alunos_crist_oss",
             resource_type="image",
             transformation=[
