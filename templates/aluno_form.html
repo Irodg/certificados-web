@@ -454,7 +454,20 @@ document.querySelectorAll(".telefone").forEach(input => {
 document.querySelectorAll(".data").forEach(input => {
     input.addEventListener("input", () => mascaraData(input));
 });
+    
+<script>
+function abrirCamera(){
+    const input = document.getElementById("fotoInput");
+    input.setAttribute("capture", "user");
+    input.click();
+}
 
+function abrirGaleria(){
+    const input = document.getElementById("fotoInput");
+    input.removeAttribute("capture");
+    input.click();
+}
+</script>
 mostrarDesligamento();
 </script>
 
