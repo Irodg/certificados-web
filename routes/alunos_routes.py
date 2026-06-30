@@ -142,7 +142,7 @@ def editar_aluno(aluno_id):
             converter_data_para_banco(request.form.get("data_desligamento", "")),
             request.form.get("observacoes", "").strip().upper(),
             converter_data_para_banco(request.form.get("data_matricula", ""))
-        )
+        )        
 
         return redirect(url_for("alunos.ver_aluno", aluno_id=aluno_id))
 
