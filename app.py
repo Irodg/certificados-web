@@ -87,6 +87,21 @@ cloudinary.config(
     secure=True
 )
 # ======================================================
+# LOCAIS PROVISÓRIOS DE BLOCOS DE PROGRAMAÇÃO
+# ======================================================
+
+def formatar_cpf(cpf):
+    cpf = ''.join(filter(str.isdigit, str(cpf or '')))
+
+    if len(cpf) != 11:
+        return cpf or 'NÃO INFORMADO'
+
+    return f"{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}"
+
+
+app.jinja_env.filters["cpf"] = formatar_cpf
+
+# ======================================================
 # CONFIG
 # ======================================================
 
