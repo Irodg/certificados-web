@@ -56,6 +56,16 @@ body{
     border:4px solid #202020;
 }
 
+.preview-foto{
+    display:block;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+    margin:0 auto 18px auto;
+    border:4px solid #202020;
+}
+
 h1{
     text-align:center;
     margin-bottom:25px;
@@ -78,7 +88,15 @@ input{
     font-size:16px;
 }
 
-button{
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:18px;
+}
+
+button,
+.btn{
     width:100%;
     padding:16px;
     border:none;
@@ -91,7 +109,8 @@ button{
     text-transform:uppercase;
 }
 
-button:hover{
+button:hover,
+.btn:hover{
     background:#000;
 }
 
@@ -145,7 +164,8 @@ button:hover{
         margin-bottom:12px;
     }
 
-    .avatar{
+    .avatar,
+    .preview-foto{
         width:90px;
         height:90px;
         margin-bottom:14px;
@@ -166,7 +186,13 @@ button:hover{
         margin-bottom:12px;
     }
 
-    button{
+    .grid{
+        grid-template-columns:1fr;
+        gap:8px;
+    }
+
+    button,
+    .btn{
         padding:12px;
         font-size:15px;
     }
@@ -196,29 +222,66 @@ button:hover{
         <h1>MINHA CONTA</h1>
 
         {% if erro %}
-            <div class="erro">
-                {{ erro }}
-            </div>
+            <div class="erro">{{ erro }}</div>
         {% endif %}
 
         {% if mensagem %}
-            <div class="sucesso">
-                {{ mensagem }}
-            </div>
+            <div class="sucesso">{{ mensagem }}</div>
         {% endif %}
 
-        <form
-            method="POST"
-            enctype="multipart/form-data"
-        >
+        <form method="POST" enctype="multipart/form-data">
 
             <label>FOTO DO USUÁRIO</label>
 
+            {% if usuario.foto and usuario.foto.startswith('http') %}
+                <img
+                    id="previewFoto"
+                    class="preview-foto"
+                    src="{{ usuario.foto }}"
+                    alt="Prévia da foto"
+                >
+            {% elif usuario.foto %}
+                <img
+                    id="previewFoto"
+                    class="preview-foto"
+                    src="{{ url_for('static', filename='uploads/' + usuario.foto) }}"
+                    alt="Prévia da foto"
+                >
+            {% else %}
+                <img
+                    id="previewFoto"
+                    class="preview-foto"
+                    style="display:none;"
+                    alt="Prévia da foto"
+                >
+            {% endif %}
+
             <input
                 type="file"
-                name="foto"
+                id="fotoCamera"
+                name="foto_camera"
                 accept="image/*"
-                >
+                capture="user"
+                style="display:none;"
+            >
+
+            <input
+                type="file"
+                id="fotoGaleria"
+                name="foto_galeria"
+                accept="image/*"
+                style="display:none;"
+            >
+
+            <div class="grid">
+                <button type="button" class="btn" onclick="abrirCamera()">
+                    📷 TIRAR FOTO
+                </button>
+
+                <button type="button" class="btn" onclick="abrirGaleria()">
+                    🖼️ GALERIA
+                </button>
+            </div>
 
             <label>NOVO USUÁRIO</label>
 
@@ -251,6 +314,38 @@ button:hover{
 
     </div>
 </div>
+
+<script>
+function abrirCamera(){
+    document.getElementById("fotoCamera").click();
+}
+
+function abrirGaleria(){
+    document.getElementById("fotoGaleria").click();
+}
+
+function mostrarPreview(input){
+    if(!input.files || !input.files.length) return;
+
+    const leitor = new FileReader();
+
+    leitor.onload = function(ev){
+        const img = document.getElementById("previewFoto");
+        img.src = ev.target.result;
+        img.style.display = "block";
+    };
+
+    leitor.readAsDataURL(input.files[0]);
+}
+
+document.getElementById("fotoCamera").addEventListener("change", function(){
+    mostrarPreview(this);
+});
+
+document.getElementById("fotoGaleria").addEventListener("change", function(){
+    mostrarPreview(this);
+});
+</script>
 
 </body>
 </html>
