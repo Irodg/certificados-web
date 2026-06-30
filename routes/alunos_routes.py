@@ -121,7 +121,9 @@ def ver_aluno(aluno_id):
 
 @alunos_bp.route("/alunos/<int:aluno_id>/editar", methods=["GET", "POST"])
 def editar_aluno(aluno_id):
-    foto = request.files.get("foto")
+    foto = (     request.files.get("foto_camera")     
+    or request.files.get("foto_galeria") )
+    
     foto_url = None
     
     if foto and foto.filename != "":
