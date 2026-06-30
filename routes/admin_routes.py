@@ -40,7 +40,7 @@ def minha_conta():
     if request.method == "POST":
         novo_usuario = request.form.get("novo_usuario", "").strip()
         nova_senha = request.form.get("nova_senha", "").strip()
-        foto = request.files.get("foto")
+        foto = request.files.get("foto_camera") or request.files.get("foto_galeria")
 
         if novo_usuario != "":
             existente = buscar_usuario(novo_usuario)
