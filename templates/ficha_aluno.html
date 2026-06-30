@@ -114,7 +114,7 @@ body{
     font-size:16pt;
     letter-spacing:1px;
 }
-    
+
 .secao{
     border:1.4px solid #000;
     border-radius:4px;
@@ -238,15 +238,13 @@ body{
 <div class="conteudo">
 
 <div class="cabecalho">
-    <img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+    <img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}" alt="Logo Crist Oss">
 
     <div class="titulo">ALUNO CRIST OSS BJJ</div>
 
     <div class="matricula-box">
         <div class="matricula-label">Nº MATRÍCULA</div>
-        <div class="matricula-numero">
-            {{ aluno[17] or '---' }}
-        </div>
+        <div class="matricula-numero">{{ aluno[17] or '---' }}</div>
     </div>
 </div>
 
@@ -293,7 +291,7 @@ body{
 
         <div class="foto-box">
             {% if aluno[15] %}
-                <img class="foto" src="{{ aluno[15] }}">
+                <img class="foto" src="{{ aluno[15] }}" alt="Foto do aluno">
             {% else %}
                 <div class="valor">SEM FOTO</div>
             {% endif %}
@@ -332,22 +330,24 @@ body{
 
     <div class="grade-campos">
         <div class="campo">
+            <div class="label">Nº DA MATRÍCULA:</div>
+            <div class="valor">{{ aluno[17] or 'NÃO INFORMADO' }}</div>
+        </div>
+
+        <div class="campo">
             <div class="label">DATA DE MATRÍCULA:</div>
             <div class="valor">{{ aluno[16].strftime('%d/%m/%Y') if aluno[16] else 'NÃO INFORMADA' }}</div>
         </div>
 
-        <div class="campo">
-            <div class="label">ÚLTIMA ATUALIZAÇÃO:</div>
-            <div class="valor">____/____/________</div>
-        </div>
-
         <div class="campo campo-full obs">
             <div class="label">OBSERVAÇÕES:</div>
-        
+
             {% if aluno[14] %}
                 <div class="valor">{{ aluno[14] }}</div>
+            {% else %}
+                <div class="valor">NENHUMA OBSERVAÇÃO.</div>
             {% endif %}
-        
+
             <div style="height:22mm;"></div>
         </div>
     </div>
@@ -379,6 +379,7 @@ body{
         </div>
     </div>
 </div>
+
 </div>
 </div>
 
