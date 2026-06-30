@@ -155,16 +155,16 @@ h1{
 
 </div>
 
-<a class="btn" href="{{ url_for('ficha_aluno', aluno_id=aluno[0]) }}" target="_blank">
+<a class="btn" href="{{ url_for('alunos.ficha_aluno', aluno_id=aluno[0]) }}" target="_blank">
     GERAR FICHA
 </a>
 
-<a class="btn" href="{{ url_for('listar_alunos') }}">
+<a class="btn" href="{{ url_for('alunos.listar_alunos') }}">
     VOLTAR
 </a>
 <form
     method="POST"
-    action="{{ url_for('excluir_aluno_rota', aluno_id=aluno[0]) }}"
+    action="{{ url_for('alunos.excluir_aluno_rota', aluno_id=aluno[0]) }}"
     onsubmit="return confirmarExclusao();"
 >
     <input
