@@ -204,12 +204,22 @@ CADASTRAR ALUNO
     {% if editando and aluno[15] %}
         <img class="foto-atual" src="{{ aluno[15] }}" alt="Foto atual">
     {% endif %}
-
     <input
         type="file"
         name="foto"
+        id="fotoInput"
         accept="image/*"
-        >
+        style="display:none;"
+    >
+    
+    <div class="grid">
+        <button class="btn" type="button" onclick="abrirCamera()">
+            📷 TIRAR FOTO
+        </button>
+    
+        <button class="btn" type="button" onclick="abrirGaleria()">
+            🖼️ ESCOLHER DA GALERIA
+        </button>
 </div>
 
 <label>NOME COMPLETO</label>
