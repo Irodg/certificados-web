@@ -455,19 +455,6 @@ function mostrarDesligamento(){
     box.style.display = status === "desligado" ? "block" : "none";
 }
 
-document.querySelectorAll(".cpf").forEach(input => {
-    input.addEventListener("input", () => mascaraCPF(input));
-});
-
-document.querySelectorAll(".telefone").forEach(input => {
-    input.addEventListener("input", () => mascaraTelefone(input));
-});
-
-document.querySelectorAll(".data").forEach(input => {
-    input.addEventListener("input", () => mascaraData(input));
-});
-    
-
 function abrirCamera(){
     const input = document.getElementById("fotoInput");
     input.setAttribute("capture", "user");
@@ -480,23 +467,34 @@ function abrirGaleria(){
     input.click();
 }
 
-document.getElementById("fotoInput").addEventListener("change", function(e){
+document.querySelectorAll(".cpf").forEach(input => {
+    input.addEventListener("input", () => mascaraCPF(input));
+});
 
+document.querySelectorAll(".telefone").forEach(input => {
+    input.addEventListener("input", () => mascaraTelefone(input));
+});
+
+document.querySelectorAll(".data").forEach(input => {
+    input.addEventListener("input", () => mascaraData(input));
+});
+
+document.getElementById("fotoInput").addEventListener("change", function(e){
     if(!e.target.files.length) return;
 
     const arquivo = e.target.files[0];
-
     const leitor = new FileReader();
 
     leitor.onload = function(ev){
-
         const img = document.getElementById("previewFoto");
 
         img.src = ev.target.result;
         img.style.display = "block";
     };
+
     leitor.readAsDataURL(arquivo);
-});    
+});
+
 mostrarDesligamento();
 </script>
 
