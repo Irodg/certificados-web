@@ -7,25 +7,12 @@
 <title>{% if editando %}EDITAR ALUNO{% else %}CADASTRAR ALUNO{% endif %}</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
 
-{% if modo_publico %}
-<div style="
-    background:#f4f4f4;
-    border:1px solid #ccc;
-    border-radius:12px;
-    padding:15px;
-    margin-bottom:18px;
-    text-align:center;
-    font-weight:bold;
-">
-    CÓDIGO / Nº DE MATRÍCULA<br>
-    <span style="font-size:24px;">{{ codigo_matricula }}</span>
-</div>
-{% endif %}    
-    
-    *{ box-sizing:border-box; }
-
-html, body{
+html,
+body{
     margin:0;
     font-family:Arial,sans-serif;
     background:#eeeeee;
@@ -60,13 +47,31 @@ h1{
     font-size:26px;
 }
 
+.codigo-box{
+    background:#f4f4f4;
+    border:1px solid #ccc;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:18px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.codigo-box span{
+    display:block;
+    font-size:24px;
+    margin-top:5px;
+}
+
 label{
     display:block;
     font-weight:bold;
     margin:14px 0 6px;
 }
 
-input, select, textarea{
+input,
+select,
+textarea{
     width:100%;
     padding:13px;
     font-size:16px;
@@ -132,9 +137,18 @@ textarea{
 }
 
 @media(max-width:600px){
-    .card{ padding:20px; }
-    .grid{ grid-template-columns:1fr; gap:0; }
-    h1{ font-size:22px; }
+    .card{
+        padding:20px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+        gap:0;
+    }
+
+    h1{
+        font-size:22px;
+    }
 }
 </style>
 </head>
@@ -160,13 +174,20 @@ CADASTRAR ALUNO
 {% endif %}
 </h1>
 
+{% if modo_publico %}
+<div class="codigo-box">
+    CÓDIGO / Nº DE MATRÍCULA
+    <span>{{ codigo_matricula }}</span>
+</div>
+{% endif %}
+
 <form method="POST" enctype="multipart/form-data">
 
 <div class="foto">
     <label>FOTO DO ALUNO</label>
 
     {% if editando and aluno[15] %}
-    <img class="foto-atual" src="{{ aluno[15] }}" alt="Foto atual">
+        <img class="foto-atual" src="{{ aluno[15] }}" alt="Foto atual">
     {% endif %}
 
     <input
@@ -191,27 +212,38 @@ CADASTRAR ALUNO
         <input
             type="text"
             name="data_nascimento"
-            placeholder="DD/MM/AAAA"
+            class="data"
+            placeholder="00/00/0000"
             maxlength="10"
+            inputmode="numeric"
             value="{% if aluno and aluno[2] %}{{ aluno[2].strftime('%d/%m/%Y') }}{% endif %}"
-            oninput="mascaraData(this)"
         >
     </div>
 
     <div>
-        <label>CPF DO ALUNO</label>
+        <label>DATA DA MATRÍCULA</label>
         <input
             type="text"
-            name="cpf"
-            id="cpf"
-            placeholder="000.000.000-00"
-            maxlength="14"
+            name="data_matricula"
+            class="data"
+            placeholder="00/00/0000"
+            maxlength="10"
             inputmode="numeric"
-            value="{{ aluno[3] if aluno and aluno[3] else '' }}"
-            oninput="mascaraCPF(this)"
+            value="{% if aluno and aluno[16] %}{{ aluno[16].strftime('%d/%m/%Y') }}{% endif %}"
         >
     </div>
 </div>
+
+<label>CPF DO ALUNO</label>
+<input
+    type="text"
+    name="cpf"
+    class="cpf"
+    placeholder="000.000.000-00"
+    maxlength="14"
+    inputmode="numeric"
+    value="{{ aluno[3] if aluno and aluno[3] else '' }}"
+>
 
 <label>NOME DO RESPONSÁVEL</label>
 <input
@@ -226,12 +258,11 @@ CADASTRAR ALUNO
         <input
             type="text"
             name="cpf_responsavel"
-            id="cpf_responsavel"
+            class="cpf"
             placeholder="000.000.000-00"
             maxlength="14"
             inputmode="numeric"
             value="{{ aluno[5] if aluno and aluno[5] else '' }}"
-            oninput="mascaraCPF(this)"
         >
     </div>
 
@@ -240,6 +271,10 @@ CADASTRAR ALUNO
         <input
             type="text"
             name="telefone"
+            class="telefone"
+            placeholder="(85) 9 0000-0000"
+            maxlength="16"
+            inputmode="numeric"
             value="{{ aluno[6] if aluno and aluno[6] else '' }}"
         >
     </div>
@@ -275,6 +310,7 @@ CADASTRAR ALUNO
             name="graus"
             min="0"
             max="4"
+            inputmode="numeric"
             value="{{ aluno[9] if aluno and aluno[9] else '' }}"
         >
     </div>
@@ -306,10 +342,11 @@ CADASTRAR ALUNO
     <input
         type="text"
         name="data_desligamento"
-        placeholder="DD/MM/AAAA"
+        class="data"
+        placeholder="00/00/0000"
         maxlength="10"
+        inputmode="numeric"
         value="{% if aluno and aluno[13] %}{{ aluno[13].strftime('%d/%m/%Y') }}{% endif %}"
-        oninput="mascaraData(this)"
     >
 </div>
 
@@ -338,35 +375,64 @@ SALVAR ALUNO
 </div>
 
 <script>
+function somenteNumeros(valor){
+    return valor.replace(/\D/g, "");
+}
+
+function mascaraCPF(input){
+    let v = somenteNumeros(input.value).slice(0, 11);
+
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d)/, "$1.$2");
+    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+    input.value = v;
+}
+
+function mascaraTelefone(input){
+    let v = somenteNumeros(input.value).slice(0, 11);
+
+    if(v.length <= 10){
+        v = v.replace(/(\d{2})(\d)/, "($1) $2");
+        v = v.replace(/(\d{4})(\d)/, "$1-$2");
+    }else{
+        v = v.replace(/(\d{2})(\d)/, "($1) $2");
+        v = v.replace(/(\d{1})(\d{4})(\d)/, "$1 $2-$3");
+    }
+
+    input.value = v;
+}
+
+function mascaraData(input){
+    let v = somenteNumeros(input.value).slice(0, 8);
+
+    v = v.replace(/(\d{2})(\d)/, "$1/$2");
+    v = v.replace(/(\d{2})(\d)/, "$1/$2");
+
+    input.value = v;
+}
+
 function mostrarDesligamento(){
     const status = document.getElementById("status").value;
     const box = document.getElementById("desligadoBox");
 
-    if(status === "desligado"){
-        box.style.display = "block";
-    }else{
-        box.style.display = "none";
-    }
+    box.style.display = status === "desligado" ? "block" : "none";
 }
+
+document.querySelectorAll(".cpf").forEach(input => {
+    input.addEventListener("input", () => mascaraCPF(input));
+});
+
+document.querySelectorAll(".telefone").forEach(input => {
+    input.addEventListener("input", () => mascaraTelefone(input));
+});
+
+document.querySelectorAll(".data").forEach(input => {
+    input.addEventListener("input", () => mascaraData(input));
+});
 
 mostrarDesligamento();
 </script>
-    
-<script>
-function mascaraCPF(campo){
 
-    let v = campo.value.replace(/\D/g,'');
-
-    if(v.length>11)
-        v=v.substring(0,11);
-
-    v=v.replace(/(\d{3})(\d)/,"$1.$2");
-    v=v.replace(/(\d{3})(\d)/,"$1.$2");
-    v=v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
-
-    campo.value=v;
-}
-</script>
-    
 </body>
 </html>
