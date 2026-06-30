@@ -212,24 +212,31 @@ CADASTRAR ALUNO
         {% endif %}
     >
 
+   <input
+        type="file"
+        id="fotoCamera"
+        name="foto_camera"
+        accept="image/*"
+        capture="user"
+        style="display:none;"
+    >
+    
     <input
         type="file"
-        id="fotoInput"
-        name="foto"
+        id="fotoGaleria"
+        name="foto_galeria"
         accept="image/*"
         style="display:none;"
     >
 
     <div class="grid">
-
         <button type="button" class="btn" onclick="abrirCamera()">
             📷 TIRAR FOTO
         </button>
-
+    
         <button type="button" class="btn" onclick="abrirGaleria()">
-            🖼️ ESCOLHER DA GALERIA
+            🖼️ GALERIA
         </button>
-
     </div>
 
 </div>
