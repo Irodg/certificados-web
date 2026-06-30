@@ -1,3 +1,5 @@
+import cloudinary.uploader
+
 from flask import (
     Blueprint,
     render_template,
@@ -117,6 +119,21 @@ def ver_aluno(aluno_id):
 
 @alunos_bp.route("/alunos/<int:aluno_id>/editar", methods=["GET", "POST"])
 def editar_aluno(aluno_id):
+    foto = request.files.get("foto")
+    foto_url = None
+    
+    if foto and foto.filename != "":
+        upload = cloudinary.uploader.upload(
+            foto,
+            folder="alunos_crist_oss",
+            resource_type="image",
+            transformation=[
+                {"width": 600, "height": 600, "crop": "fill", "gravity": "face"},
+                {"quality": "auto", "fetch_format": "auto"}
+            ]
+        )
+    
+        foto_url = upload.get("secure_url", "")
     if not usuario_logado():
         return redirect(url_for("login.login"))
 
@@ -150,7 +167,8 @@ def editar_aluno(aluno_id):
             request.form.get("motivo_desligamento", "").strip().upper(),
             converter_data_para_banco(request.form.get("data_desligamento", "")),
             request.form.get("observacoes", "").strip().upper(),
-            converter_data_para_banco(request.form.get("data_matricula", ""))
+            converter_data_para_banco(request.form.get("data_matricula", "")),
+            foto_url
         )        
 
         return redirect(url_for("alunos.ver_aluno", aluno_id=aluno_id))
