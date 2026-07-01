@@ -463,17 +463,13 @@ function mostrarDesligamento(){
 }
 
 function abrirCamera(){
-    const input = document.getElementById("fotoInput");
-    input.setAttribute("capture", "user");
-    input.click();
+    document.getElementById("fotoCamera").click();
 }
 
 function abrirGaleria(){
-    const input = document.getElementById("fotoInput");
-    input.removeAttribute("capture");
-    input.click();
+    document.getElementById("fotoGaleria").click();
 }
-
+    
 document.querySelectorAll(".cpf").forEach(input => {
     input.addEventListener("input", () => mascaraCPF(input));
 });
@@ -486,7 +482,11 @@ document.querySelectorAll(".data").forEach(input => {
     input.addEventListener("input", () => mascaraData(input));
 });
 
-document.getElementById("fotoInput").addEventListener("change", function(e){
+document.getElementById("fotoCamera").addEventListener("change", function(e){
+    mostrarPreviewFoto(e);
+});
+
+function mostrarPreviewFoto(e){
     if(!e.target.files.length) return;
 
     const arquivo = e.target.files[0];
@@ -500,6 +500,14 @@ document.getElementById("fotoInput").addEventListener("change", function(e){
     };
 
     leitor.readAsDataURL(arquivo);
+}
+
+document.getElementById("fotoCamera").addEventListener("change", function(e){
+    mostrarPreviewFoto(e);
+});
+
+document.getElementById("fotoGaleria").addEventListener("change", function(e){
+    mostrarPreviewFoto(e);
 });
 
 mostrarDesligamento();
