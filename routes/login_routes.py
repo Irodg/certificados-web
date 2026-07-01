@@ -18,6 +18,7 @@ def login():
         user = buscar_usuario(usuario)
 
         if user and user["senha"] == senha:
+            session.permanent = True
             session["logado"] = True
             session["usuario"] = user["usuario"]
             session["tipo"] = user["tipo"]
