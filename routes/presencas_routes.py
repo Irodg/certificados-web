@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from datetime import date
 
 from services.auth import usuario_logado
@@ -68,6 +68,36 @@ def presencas():
         presentes_ids=presentes_ids,
         erro=None
     )
+@presencas_bp.route("/presencas/autosave", methods=["POST"])
+def autosave_presencas():
+    if not usuario_logado():
+        return jsonify({
+            "ok": False,
+            "erro": "USUÁRIO NÃO LOGADO."
+        }), 401
+
+    treino_id = request.form.get("treino_id")
+    alunos_presentes = request.form.getlist("alunos_presentes")
+
+    if not treino_id:
+        return jsonify({
+            "ok": False,
+            "erro": "TREINO NÃO INFORMADO."
+        }), 400
+
+    try:
+        salvar_presencas_standby(treino_id, alunos_presentes)
+    except ValueError as erro:
+        return jsonify({
+            "ok": False,
+            "erro": str(erro)
+        }), 400
+
+    return jsonify({
+        "ok": True,
+        "mensagem": "PRESENÇA SALVA EM STANDBY."
+    })
+
 @presencas_bp.route("/presencas/historico")
 def historico_presencas():
     if not usuario_logado():
