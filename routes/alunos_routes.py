@@ -146,26 +146,36 @@ def editar_aluno(aluno_id):
         foto_url = None
 
         if foto and foto.filename != "":
-            imagem = Image.open(foto)
-            imagem = ImageOps.exif_transpose(imagem)
-            imagem = imagem.convert("RGB")
-            imagem.thumbnail((900, 900))
-
-            buffer = io.BytesIO()
-            imagem.save(buffer, format="JPEG", quality=75, optimize=True)
-            buffer.seek(0)
-
-            upload = cloudinary.uploader.upload(
-                buffer,
-                folder="alunos_crist_oss",
-                resource_type="image",
-                transformation=[
-                    {"width": 600, "height": 600, "crop": "fill", "gravity": "face"},
-                    {"quality": "auto", "fetch_format": "auto"}
-                ]
-            )
-
-            foto_url = upload.get("secure_url", "")
+            try:
+                imagem = Image.open(foto)
+                imagem = ImageOps.exif_transpose(imagem)
+                imagem = imagem.convert("RGB")
+                imagem.thumbnail((700, 700))
+        
+                buffer = io.BytesIO()
+                imagem.save(buffer, format="JPEG", quality=60, optimize=True)
+                buffer.seek(0)
+        
+                upload = cloudinary.uploader.upload(
+                    buffer,
+                    folder="alunos_crist_oss",
+                    resource_type="image",
+                    transformation=[
+                        {"width": 600, "height": 600, "crop": "fill", "gravity": "face"},
+                        {"quality": "auto", "fetch_format": "auto"}
+                    ]
+                )
+        
+                foto_url = upload.get("secure_url", "")
+        
+            except Exception:
+                return render_template(
+                    "aluno_form.html",
+                    aluno=aluno,
+                    faixas=faixas,
+                    editando=True,
+                    erro="A FOTO ESTÁ MUITO PESADA OU INVÁLIDA. TENTE OUTRA FOTO OU USE A GALERIA."
+                )
 
         atualizar_aluno(
             aluno_id,
