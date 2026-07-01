@@ -5,10 +5,12 @@ from services.auth import usuario_logado
 from alunos import obter_alunos
 from presencas import (
     obter_ou_criar_treino_do_dia,
-    salvar_presencas,
+    salvar_presencas_standby,
+    lancar_presenca_no_historico,
     listar_treinos,
     listar_presentes_do_treino,
-    buscar_treino_por_id
+    buscar_treino_por_id,
+    listar_ids_presentes_do_treino
 )
 
 
@@ -21,21 +23,51 @@ def presencas():
         return redirect(url_for("login.login"))
 
     hoje = date.today()
+
+    if hoje.weekday() not in [0, 2, 4]:
+        return render_template(
+            "presencas.html",
+            treino_id=None,
+            data_treino=hoje,
+            alunos=[],
+            presentes_ids=[],
+            erro="HOJE NÃO É DIA DE TREINO. AS AULAS SÃO SEGUNDA, QUARTA E SEXTA."
+        )
+
     treino_id = obter_ou_criar_treino_do_dia(hoje)
     alunos = obter_alunos()
+    presentes_ids = listar_ids_presentes_do_treino(treino_id)
 
     if request.method == "POST":
+        acao = request.form.get("acao")
         alunos_presentes = request.form.getlist("alunos_presentes")
-        salvar_presencas(treino_id, alunos_presentes)
+
+        try:
+            salvar_presencas_standby(treino_id, alunos_presentes)
+
+            if acao == "lancar":
+                lancar_presenca_no_historico(treino_id)
+
+        except ValueError as erro:
+            return render_template(
+                "presencas.html",
+                treino_id=treino_id,
+                data_treino=hoje,
+                alunos=alunos,
+                presentes_ids=presentes_ids,
+                erro=str(erro)
+            )
+
         return redirect(url_for("presencas.presencas"))
 
     return render_template(
         "presencas.html",
         treino_id=treino_id,
         data_treino=hoje,
-        alunos=alunos
+        alunos=alunos,
+        presentes_ids=presentes_ids,
+        erro=None
     )
-
 @presencas_bp.route("/presencas/historico")
 def historico_presencas():
     if not usuario_logado():
