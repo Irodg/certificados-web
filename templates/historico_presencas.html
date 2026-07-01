@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HISTÓRICO DE PRESENÇAS</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#eee;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:25px 15px;
+}
+
+.card{
+    background:white;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.logo{
+    display:block;
+    width:130px;
+    margin:0 auto 20px;
+}
+
+h1{
+    text-align:center;
+}
+
+.treino{
+    display:block;
+    padding:15px;
+    margin-bottom:12px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    background:#fafafa;
+    color:#000;
+    text-decoration:none;
+    font-weight:bold;
+    text-transform:uppercase;
+}
+
+.info{
+    color:#555;
+    font-size:14px;
+    margin-top:5px;
+}
+
+.btn{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:56px;
+    margin-top:16px;
+    background:#000;
+    color:#fff;
+    border-radius:14px;
+    text-decoration:none;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+
+<h1>HISTÓRICO DE PRESENÇAS</h1>
+
+{% if treinos %}
+    {% for treino in treinos %}
+        <a class="treino" href="{{ url_for('presencas.ver_presenca', treino_id=treino[0]) }}">
+            {{ treino[1].strftime('%d/%m/%Y') }} — {{ treino[2] }}
+            <div class="info">
+                HORÁRIO: {{ treino[3] }} | PRESENTES: {{ treino[4] }}
+            </div>
+        </a>
+    {% endfor %}
+{% else %}
+    <p style="text-align:center;font-weight:bold;">
+        NENHUMA PRESENÇA LANÇADA.
+    </p>
+{% endif %}
+
+<a class="btn" href="{{ url_for('presencas.presencas') }}">
+    PRESENÇA DE HOJE
+</a>
+
+<a class="btn" href="{{ url_for('login.menu') }}">
+    VOLTAR
+</a>
+
+</div>
+</div>
+
+</body>
+</html>
