@@ -97,3 +97,75 @@ def salvar_presencas(treino_id, alunos_presentes):
     conn.commit()
     cur.close()
     conn.close()
+
+def listar_treinos():
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            t.id,
+            t.data_treino,
+            t.dia_semana,
+            t.horario,
+            COUNT(pa.id) AS total_presentes
+        FROM presencas_treino t
+        LEFT JOIN presencas_alunos pa ON pa.treino_id = t.id
+        GROUP BY t.id
+        ORDER BY t.data_treino DESC
+    """)
+
+    treinos = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return treinos
+
+
+def listar_presentes_do_treino(treino_id):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            a.id,
+            a.nome,
+            a.faixa,
+            a.graus,
+            a.sede,
+            a.foto_url
+        FROM presencas_alunos pa
+        JOIN alunos a ON a.id = pa.aluno_id
+        WHERE pa.treino_id = %s
+        ORDER BY a.nome
+    """, (treino_id,))
+
+    presentes = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return presentes
+
+
+def buscar_treino_por_id(treino_id):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            id,
+            data_treino,
+            dia_semana,
+            horario
+        FROM presencas_treino
+        WHERE id = %s
+    """, (treino_id,))
+
+    treino = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return treino
