@@ -5,7 +5,7 @@ import uuid
 import cloudinary
 import cloudinary.uploader
 
-from presencas import criar_tabela_presencas
+from presencas import criar_tabela_presencas, atualizar_tabela_presencas
 from routes.presencas_routes import presencas_bp
 
 from routes.login_routes import login_bp
@@ -70,6 +70,7 @@ criar_tabela_codigos_matricula()
 atualizar_tabela_codigos_matricula()
 atualizar_tabela_alunos_matricula()
 criar_tabela_presencas()
+atualizar_tabela_presencas()
 
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
 app.config["SESSION_PERMANENT"] = True
