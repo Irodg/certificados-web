@@ -6,6 +6,7 @@ import cloudinary
 import cloudinary.uploader
 
 from presencas import criar_tabela_presencas
+from routes.presencas_routes import presencas_bp
 
 from routes.login_routes import login_bp
 from routes.admin_routes import admin_bp
@@ -84,6 +85,7 @@ app.config.update(
 app.register_blueprint(login_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(alunos_bp)
+app.register_blueprint(presencas_bp)
 
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
