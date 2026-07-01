@@ -2,6 +2,8 @@ from database import conectar_db
 from datetime import datetime
 import cloudinary.uploader
 
+import io
+from PIL import Image, ImageOps
 
 def criar_tabela_alunos():
     conn = conectar_db()
@@ -164,17 +166,26 @@ def criar_aluno(
 
 
 def salvar_aluno_do_formulario(form, files, numero_matricula=None):
-    foto = files.get("foto")
+    foto = files.get("foto_camera") or files.get("foto_galeria") or files.get("foto")
     foto_url = ""
 
     cpf = ''.join(filter(str.isdigit, form.get("cpf", "")))
 
     if cpf_aluno_ja_cadastrado(cpf):
         raise ValueError("JÁ EXISTE UM ALUNO CADASTRADO COM ESTE CPF.")
-
+    
     if foto and foto.filename != "":
+        imagem = Image.open(foto)
+        imagem = ImageOps.exif_transpose(imagem)
+        imagem = imagem.convert("RGB")
+        imagem.thumbnail((900, 900))
+    
+        buffer = io.BytesIO()
+        imagem.save(buffer, format="JPEG", quality=75, optimize=True)
+        buffer.seek(0)
+    
         upload = cloudinary.uploader.upload(
-            foto,
+            buffer,
             folder="alunos_crist_oss",
             resource_type="image",
             transformation=[
@@ -182,7 +193,7 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
                 {"quality": "auto", "fetch_format": "auto"}
             ]
         )
-
+    
         foto_url = upload.get("secure_url", "")
 
     data_matricula = converter_data_para_banco(form.get("data_matricula", ""))
