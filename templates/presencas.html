@@ -134,7 +134,9 @@ h1{
 
 {% if alunos %}
 <form method="POST">
-
+    
+<input type="hidden" name="treino_id" id="treinoId" value="{{ treino_id }}">
+    
 {% for aluno in alunos %}
 <div class="aluno">
     <input
@@ -182,6 +184,34 @@ h1{
 
 </div>
 </div>
+<script>
+let tempoAutosave = null;
 
+function agendarAutosave(){
+    clearTimeout(tempoAutosave);
+
+    tempoAutosave = setTimeout(() => {
+        salvarStandbyAutomatico();
+    }, 30000);
+}
+
+function salvarStandbyAutomatico(){
+    const form = document.querySelector("form");
+
+    if(!form) return;
+
+    const dados = new FormData(form);
+
+    fetch("{{ url_for('presencas.autosave_presencas') }}", {
+        method: "POST",
+        body: dados
+    });
+}
+
+document.querySelectorAll('input[name="alunos_presentes"]').forEach(input => {
+    input.addEventListener("change", agendarAutosave);
+});
+</script>
+    
 </body>
 </html>
