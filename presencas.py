@@ -29,9 +29,25 @@ def criar_tabela_presencas():
         )
     """)
 
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS presencas_feitos (
+            id SERIAL PRIMARY KEY,
+            aluno_id INTEGER REFERENCES alunos(id) ON DELETE CASCADE,
+            tipo TEXT NOT NULL,
+            descricao TEXT,
+            data_feito DATE NOT NULL,
+            treino_id INTEGER REFERENCES presencas_treino(id) ON DELETE SET NULL,
+            faixa TEXT,
+            graus TEXT,
+            analisado BOOLEAN DEFAULT FALSE,
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     conn.commit()
     cur.close()
     conn.close()
+
 
 def atualizar_tabela_presencas():
     conn = conectar_db()
@@ -67,7 +83,8 @@ def obter_ou_criar_treino_do_dia(data_treino):
     dia_semana = dias[data_treino.weekday()]
 
     cur.execute("""
-        SELECT id FROM presencas_treino
+        SELECT id
+        FROM presencas_treino
         WHERE data_treino = %s
     """, (data_treino,))
 
@@ -79,9 +96,10 @@ def obter_ou_criar_treino_do_dia(data_treino):
         cur.execute("""
             INSERT INTO presencas_treino (
                 data_treino,
-                dia_semana
+                dia_semana,
+                status
             )
-            VALUES (%s, %s)
+            VALUES (%s, %s, 'standby')
             RETURNING id
         """, (data_treino, dia_semana))
 
@@ -93,9 +111,47 @@ def obter_ou_criar_treino_do_dia(data_treino):
 
     return treino_id
 
-def salvar_presencas(treino_id, alunos_presentes):
+
+def buscar_treino_por_id(treino_id):
     conn = conectar_db()
     cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            id,
+            data_treino,
+            dia_semana,
+            horario,
+            status,
+            lancado_em
+        FROM presencas_treino
+        WHERE id = %s
+    """, (treino_id,))
+
+    treino = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return treino
+
+
+def salvar_presencas_standby(treino_id, alunos_presentes):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT status
+        FROM presencas_treino
+        WHERE id = %s
+    """, (treino_id,))
+
+    treino = cur.fetchone()
+
+    if treino and treino[0] == "lancado":
+        cur.close()
+        conn.close()
+        raise ValueError("ESTE TREINO JÁ FOI LANÇADO NO HISTÓRICO E NÃO PODE SER ALTERADO.")
 
     cur.execute("""
         DELETE FROM presencas_alunos
@@ -116,6 +172,28 @@ def salvar_presencas(treino_id, alunos_presentes):
     cur.close()
     conn.close()
 
+
+def lancar_presenca_no_historico(treino_id):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE presencas_treino
+        SET
+            status = 'lancado',
+            lancado_em = CURRENT_TIMESTAMP
+        WHERE id = %s
+    """, (treino_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def salvar_presencas(treino_id, alunos_presentes):
+    salvar_presencas_standby(treino_id, alunos_presentes)
+
+
 def listar_treinos():
     conn = conectar_db()
     cur = conn.cursor()
@@ -126,9 +204,12 @@ def listar_treinos():
             t.data_treino,
             t.dia_semana,
             t.horario,
-            COUNT(pa.id) AS total_presentes
+            COUNT(pa.id) AS total_presentes,
+            t.status,
+            t.lancado_em
         FROM presencas_treino t
         LEFT JOIN presencas_alunos pa ON pa.treino_id = t.id
+        WHERE t.status = 'lancado'
         GROUP BY t.id
         ORDER BY t.data_treino DESC
     """)
@@ -167,23 +248,19 @@ def listar_presentes_do_treino(treino_id):
     return presentes
 
 
-def buscar_treino_por_id(treino_id):
+def listar_ids_presentes_do_treino(treino_id):
     conn = conectar_db()
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT
-            id,
-            data_treino,
-            dia_semana,
-            horario
-        FROM presencas_treino
-        WHERE id = %s
+        SELECT aluno_id
+        FROM presencas_alunos
+        WHERE treino_id = %s
     """, (treino_id,))
 
-    treino = cur.fetchone()
+    presentes = [linha[0] for linha in cur.fetchall()]
 
     cur.close()
     conn.close()
 
-    return treino
+    return presentes
