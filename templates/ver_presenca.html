@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRESENTES DO TREINO</title>
+
+<style>
+body{ margin:0; font-family:Arial,sans-serif; background:#eee; }
+.container{ max-width:900px; margin:auto; padding:25px 15px; }
+.card{ background:white; border-radius:18px; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,.12); }
+.logo{ display:block; width:130px; margin:0 auto 20px; }
+h1,h2{ text-align:center; }
+.aluno{ padding:14px; border:1px solid #ddd; border-radius:12px; margin-bottom:10px; background:#fafafa; text-transform:uppercase; }
+.nome{ font-weight:bold; }
+.info{ color:#555; font-size:13px; margin-top:4px; }
+.btn{ display:flex; justify-content:center; align-items:center; width:100%; height:56px; margin-top:16px; background:#000; color:#fff; border-radius:14px; text-decoration:none; font-weight:bold; }
+</style>
+</head>
+
+<body>
+<div class="container">
+<div class="card">
+
+<img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}">
+
+<h1>PRESENTES DO TREINO</h1>
+<h2>{{ treino[1].strftime('%d/%m/%Y') }} — {{ treino[2] }} — {{ treino[3] }}</h2>
+
+{% if presentes %}
+    {% for aluno in presentes %}
+        <div class="aluno">
+            <div class="nome">{{ aluno[1] }}</div>
+            <div class="info">
+                FAIXA: {{ aluno[2] or 'NÃO INFORMADA' }} |
+                GRAUS: {{ aluno[3] or '0' }} |
+                SEDE: {{ aluno[4] or 'NÃO INFORMADA' }}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p style="text-align:center;font-weight:bold;">NENHUM ALUNO PRESENTE.</p>
+{% endif %}
+
+<a class="btn" href="{{ url_for('presencas.historico_presencas') }}">
+    VOLTAR AO HISTÓRICO
+</a>
+
+<a class="btn" href="{{ url_for('login.menu') }}">
+    MENU
+</a>
+
+</div>
+</div>
+</body>
+</html>
