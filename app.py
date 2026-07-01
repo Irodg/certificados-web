@@ -68,7 +68,15 @@ atualizar_tabela_codigos_matricula()
 atualizar_tabela_alunos_matricula()
 
 app.secret_key = os.environ.get("SECRET_KEY", "certificados_secret_key")
-app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_PERMANENT"] = True
+
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_NAME="crist_oss_session",
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024
+)
 
 app.register_blueprint(login_bp)
 app.register_blueprint(admin_bp)
