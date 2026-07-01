@@ -211,10 +211,14 @@ h1{
             DECLARAÇÃO
         </a>
 
-       <a class="btn" href="{{ url_for('alunos.alunos') }}">
+        <a class="btn" href="{{ url_for('alunos.alunos') }}">
             👨‍🎓 ALUNOS
-       </a>
+        </a>
 
+        <a class="btn" href="{{ url_for('presencas.presencas') }}">
+            PRESENÇAS
+        </a>
+        
         {% if tipo == "admin" %}
         <a class="btn admin" href="{{ url_for('admin.admin') }}">
             GERENCIAR USUÁRIOS
