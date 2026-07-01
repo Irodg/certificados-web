@@ -74,3 +74,26 @@ def obter_ou_criar_treino_do_dia(data_treino):
     conn.close()
 
     return treino_id
+
+def salvar_presencas(treino_id, alunos_presentes):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM presencas_alunos
+        WHERE treino_id = %s
+    """, (treino_id,))
+
+    for aluno_id in alunos_presentes:
+        cur.execute("""
+            INSERT INTO presencas_alunos (
+                treino_id,
+                aluno_id,
+                presente
+            )
+            VALUES (%s, %s, TRUE)
+        """, (treino_id, aluno_id))
+
+    conn.commit()
+    cur.close()
+    conn.close()
