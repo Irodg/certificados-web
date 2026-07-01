@@ -12,6 +12,8 @@ def criar_tabela_presencas():
             data_treino DATE NOT NULL UNIQUE,
             dia_semana TEXT,
             horario TEXT DEFAULT '18:00',
+            status TEXT DEFAULT 'standby',
+            lancado_em TIMESTAMP,
             criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -26,6 +28,22 @@ def criar_tabela_presencas():
             UNIQUE(treino_id, aluno_id)
         )
     """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def atualizar_tabela_presencas():
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    comandos = [
+        "ALTER TABLE presencas_treino ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'standby'",
+        "ALTER TABLE presencas_treino ADD COLUMN IF NOT EXISTS lancado_em TIMESTAMP"
+    ]
+
+    for comando in comandos:
+        cur.execute(comando)
 
     conn.commit()
     cur.close()
