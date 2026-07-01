@@ -178,10 +178,10 @@ def salvar_aluno_do_formulario(form, files, numero_matricula=None):
         imagem = Image.open(foto)
         imagem = ImageOps.exif_transpose(imagem)
         imagem = imagem.convert("RGB")
-        imagem.thumbnail((900, 900))
+        imagem.thumbnail((700, 700))
     
         buffer = io.BytesIO()
-        imagem.save(buffer, format="JPEG", quality=75, optimize=True)
+        imagem.save(buffer, format="JPEG", quality=60, optimize=True)
         buffer.seek(0)
     
         upload = cloudinary.uploader.upload(
