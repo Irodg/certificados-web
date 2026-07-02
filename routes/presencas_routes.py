@@ -31,6 +31,7 @@ def presencas():
             data_treino=hoje,
             alunos=[],
             presentes_ids=[],
+            treinos=listar_treinos(),
             erro="HOJE NÃO É DIA DE TREINO. AS AULAS SÃO SEGUNDA, QUARTA E SEXTA."
         )
 
@@ -55,6 +56,7 @@ def presencas():
                 data_treino=hoje,
                 alunos=alunos,
                 presentes_ids=presentes_ids,
+                treinos=listar_treinos(),
                 erro=str(erro)
             )
 
