@@ -24,17 +24,6 @@ def presencas():
 
     hoje = date.today()
 
-    if hoje.weekday() not in [0, 2, 4]:
-        return render_template(
-            "presencas.html",
-            treino_id=None,
-            data_treino=hoje,
-            alunos=[],
-            presentes_ids=[],
-            treinos=listar_treinos(),
-            erro="HOJE NÃO É DIA DE TREINO. AS AULAS SÃO SEGUNDA, QUARTA E SEXTA."
-        )
-
     treino_id = obter_ou_criar_treino_do_dia(hoje)
     alunos = obter_alunos()
     presentes_ids = listar_ids_presentes_do_treino(treino_id)
