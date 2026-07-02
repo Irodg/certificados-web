@@ -264,3 +264,16 @@ def listar_ids_presentes_do_treino(treino_id):
     conn.close()
 
     return presentes
+    
+def apagar_treino(treino_id):
+    conn = conectar_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM presencas_treino
+        WHERE id = %s
+    """, (treino_id,))
+
+    conn.commit()
+    cur.close()
+    conn.close()
