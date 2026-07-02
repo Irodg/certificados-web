@@ -7,6 +7,28 @@
 <title>PRESENÇAS</title>
 
 <style>
+    
+.aluno.presente{
+    border-color:#008a3d;
+    background:#eafff1;
+}
+    
+.contador{
+    text-align:center;
+    font-weight:bold;
+    margin-bottom:14px;
+}
+
+.pesquisa{
+    width:100%;
+    padding:14px;
+    margin-bottom:18px;
+    border:1px solid #bbb;
+    border-radius:12px;
+    font-size:16px;
+    text-transform:uppercase;
+}
+    
 *{ box-sizing:border-box; }
 
 body{
@@ -204,7 +226,17 @@ h1{
     <div class="data">
         DATA: {{ data_treino.strftime('%d/%m/%Y') }} — AULA 18:00
     </div>
-
+    <div class="contador">
+        PRESENTES: <span id="totalPresentes">0</span> |
+        AUSENTES: <span id="totalAusentes">0</span>
+    </div>
+    
+    <input
+        type="text"
+        id="pesquisaAluno"
+        class="pesquisa"
+        placeholder="PESQUISAR ALUNO..."
+    >
     {% if erro %}
         <div class="erro">{{ erro }}</div>
     {% endif %}
@@ -346,6 +378,40 @@ function salvarStandbyAutomatico(){
 document.querySelectorAll('input[name="alunos_presentes"]').forEach(input => {
     input.addEventListener("change", agendarAutosave);
 });
+
+function atualizarContador(){
+    const checks = document.querySelectorAll(".check-presenca");
+    const marcados = document.querySelectorAll(".check-presenca:checked");
+
+    document.getElementById("totalPresentes").innerText = marcados.length;
+    document.getElementById("totalAusentes").innerText = checks.length - marcados.length;
+
+    checks.forEach(check => {
+        const linha = check.closest(".aluno");
+
+        if(check.checked){
+            linha.classList.add("presente");
+        }else{
+            linha.classList.remove("presente");
+        }
+    });
+}
+
+document.querySelectorAll(".check-presenca").forEach(input => {
+    input.addEventListener("change", atualizarContador);
+});
+
+document.getElementById("pesquisaAluno").addEventListener("input", function(){
+    const termo = this.value.toUpperCase();
+
+    document.querySelectorAll(".aluno").forEach(linha => {
+        const texto = linha.innerText.toUpperCase();
+
+        linha.style.display = texto.includes(termo) ? "flex" : "none";
+    });
+});
+
+atualizarContador();    
 </script>
 
 </body>
