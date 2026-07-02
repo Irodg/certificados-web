@@ -384,14 +384,16 @@ def obter_alunos():
 
     cur.execute("""
         SELECT
-            id,
-            nome,
-            faixa,
-            graus,
-            sede,
-            status,
-            foto_url
+            id,                 -- 0
+            nome,               -- 1
+            faixa,              -- 2
+            graus,              -- 3
+            sede,               -- 4
+            status,             -- 5
+            foto_url,           -- 6
+            numero_matricula    -- 7
         FROM alunos
+        WHERE status = 'ativo'
         ORDER BY nome
     """)
 
