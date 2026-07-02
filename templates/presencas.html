@@ -37,7 +37,36 @@ body{
 
 h1{
     text-align:center;
-    margin-bottom:10px;
+    margin-bottom:16px;
+}
+
+.abas{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.aba-btn{
+    height:48px;
+    border:none;
+    border-radius:12px;
+    background:#ddd;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.aba-btn.ativa{
+    background:#000;
+    color:white;
+}
+
+.aba{
+    display:none;
+}
+
+.aba.ativa{
+    display:block;
 }
 
 .data{
@@ -57,15 +86,22 @@ h1{
     font-weight:bold;
 }
 
-.aluno{
-    display:flex;
-    align-items:center;
-    gap:12px;
+.aluno,
+.treino{
+    display:block;
     padding:12px;
     border:1px solid #ddd;
     border-radius:12px;
     margin-bottom:10px;
     background:#fafafa;
+    text-decoration:none;
+    color:#000;
+}
+
+.aluno{
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
 .aluno input{
@@ -116,67 +152,96 @@ h1{
 <div class="container">
 <div class="card">
 
-<img
-    class="logo"
-    src="{{ url_for('static', filename='logo_crist_oss.png') }}"
-    alt="Logo Crist Oss"
->
+<img class="logo" src="{{ url_for('static', filename='logo_crist_oss.png') }}" alt="Logo Crist Oss">
 
 <h1>PRESENÇAS</h1>
 
-<div class="data">
-    DATA: {{ data_treino.strftime('%d/%m/%Y') }} — AULA 18:00
+<div class="abas">
+    <button class="aba-btn ativa" type="button" onclick="abrirAba('chamada', this)">
+        CHAMADA DO DIA
+    </button>
+
+    <button class="aba-btn" type="button" onclick="abrirAba('historico', this)">
+        HISTÓRICO
+    </button>
 </div>
 
-{% if erro %}
-    <div class="erro">{{ erro }}</div>
-{% endif %}
+<div id="chamada" class="aba ativa">
 
-{% if alunos %}
-<form method="POST">
-    
-<input type="hidden" name="treino_id" id="treinoId" value="{{ treino_id }}">
-    
-{% for aluno in alunos %}
-<div class="aluno">
-    <input
-        type="checkbox"
-        name="alunos_presentes"
-        value="{{ aluno[0] }}"
-        {% if aluno[0] in presentes_ids %}checked{% endif %}
-    >
-
-    <div>
-        <div class="nome">{{ aluno[1] }}</div>
-        <div class="info">
-            FAIXA: {{ aluno[2] or 'NÃO INFORMADA' }} |
-            GRAUS: {{ aluno[3] or '0' }} |
-            SEDE: {{ aluno[4] or 'NÃO INFORMADA' }}
-        </div>
+    <div class="data">
+        DATA: {{ data_treino.strftime('%d/%m/%Y') }} — AULA 18:00
     </div>
+
+    {% if erro %}
+        <div class="erro">{{ erro }}</div>
+    {% endif %}
+
+    {% if alunos %}
+    <form method="POST">
+
+        <input type="hidden" name="treino_id" id="treinoId" value="{{ treino_id }}">
+
+        {% for aluno in alunos %}
+        <div class="aluno">
+            <input
+                type="checkbox"
+                name="alunos_presentes"
+                value="{{ aluno[0] }}"
+                {% if aluno[0] in presentes_ids %}checked{% endif %}
+            >
+
+            <div>
+                <div class="nome">{{ aluno[1] }}</div>
+                <div class="info">
+                    FAIXA: {{ aluno[2] or 'NÃO INFORMADA' }} |
+                    GRAUS: {{ aluno[3] or '0' }} |
+                    SEDE: {{ aluno[4] or 'NÃO INFORMADA' }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <button class="btn btn-secundario" type="submit" name="acao" value="standby">
+            SALVAR STANDBY
+        </button>
+
+        <button
+            class="btn btn-lancar"
+            type="submit"
+            name="acao"
+            value="lancar"
+            onclick="return confirm('DESEJA LANÇAR ESTA PRESENÇA NO HISTÓRICO? DEPOIS DISSO NÃO SERÁ POSSÍVEL ALTERAR.')"
+        >
+            LANÇAR NO HISTÓRICO
+        </button>
+
+    </form>
+    {% endif %}
+
 </div>
-{% endfor %}
 
-<button class="btn btn-secundario" type="submit" name="acao" value="standby">
-    SALVAR STANDBY
-</button>
+<div id="historico" class="aba">
 
-<button
-    class="btn btn-lancar"
-    type="submit"
-    name="acao"
-    value="lancar"
-    onclick="return confirm('DESEJA LANÇAR ESTA PRESENÇA NO HISTÓRICO? DEPOIS DISSO NÃO SERÁ POSSÍVEL ALTERAR.')"
->
-    LANÇAR NO HISTÓRICO
-</button>
+    {% if treinos %}
+        {% for treino in treinos %}
+            <a class="treino" href="{{ url_for('presencas.ver_presenca', treino_id=treino[0]) }}">
+                <div class="nome">
+                    {{ treino[1].strftime('%d/%m/%Y') }} — {{ treino[2] }}
+                </div>
 
-</form>
-{% endif %}
+                <div class="info">
+                    HORÁRIO: {{ treino[3] }} |
+                    PRESENTES: {{ treino[4] }}
+                </div>
+            </a>
+        {% endfor %}
+    {% else %}
+        <p style="text-align:center;font-weight:bold;">
+            NENHUMA PRESENÇA LANÇADA.
+        </p>
+    {% endif %}
 
-<a class="btn" href="{{ url_for('presencas.historico_presencas') }}">
-    HISTÓRICO DE PRESENÇAS
-</a>
+</div>
 
 <a class="btn" href="{{ url_for('login.menu') }}">
     VOLTAR
@@ -184,7 +249,21 @@ h1{
 
 </div>
 </div>
+
 <script>
+function abrirAba(id, botao){
+    document.querySelectorAll(".aba").forEach(aba => {
+        aba.classList.remove("ativa");
+    });
+
+    document.querySelectorAll(".aba-btn").forEach(btn => {
+        btn.classList.remove("ativa");
+    });
+
+    document.getElementById(id).classList.add("ativa");
+    botao.classList.add("ativa");
+}
+
 let tempoAutosave = null;
 
 function agendarAutosave(){
@@ -212,6 +291,6 @@ document.querySelectorAll('input[name="alunos_presentes"]').forEach(input => {
     input.addEventListener("change", agendarAutosave);
 });
 </script>
-    
+
 </body>
 </html>
