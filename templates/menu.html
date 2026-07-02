@@ -201,36 +201,30 @@ h1{
             alt="Logo Crist Oss"
         >
 
-        <h1>GRADUAÇÃO CRIST OSS BJJ</h1>
+        <h1>GESTÃO CRIST OSS BJJ</h1>
 
-        <a class="btn" href="{{ url_for('certificado') }}">
-            CERTIFICADO
-        </a>
-
-        <a class="btn" href="{{ url_for('declaracao_menu') }}">
-            DECLARAÇÃO
-        </a>
-        <a class="btn" href="{{ url_for('presencas.presencas') }}">
-            PRESENÇA DE HOJE
+        <a class="btn" href="{{ url_for('alunos.listar_alunos') }}">
+            ALUNOS
         </a>
         
-        <a class="btn" href="{{ url_for('presencas.historico_presencas') }}">
-            HISTÓRICO DE PRESENÇAS
-        </a>
-        <a class="btn" href="{{ url_for('alunos.alunos') }}">
-            👨‍🎓 ALUNOS
-        </a>
-
         <a class="btn" href="{{ url_for('presencas.presencas') }}">
             PRESENÇAS
         </a>
         
-        {% if tipo == "admin" %}
-        <a class="btn admin" href="{{ url_for('admin.admin') }}">
+        <a class="btn" href="{{ url_for('declaracoes.declaracoes') }}">
+            DECLARAÇÕES
+        </a>
+        
+        <a class="btn" href="{{ url_for('certificados.certificados') }}">
+            CERTIFICADOS
+        </a>
+        
+        {% if session["tipo"] == "admin" %}
+        <a class="btn" href="{{ url_for('admin.gerenciar_usuarios') }}">
             GERENCIAR USUÁRIOS
         </a>
         {% endif %}
-
+        
         <a class="btn sair" href="{{ url_for('login.logout') }}">
             SAIR
         </a>
