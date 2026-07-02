@@ -183,21 +183,44 @@ h1{
 
         {% for aluno in alunos %}
         <div class="aluno">
+        
             <input
                 type="checkbox"
+                class="check-presenca"
                 name="alunos_presentes"
                 value="{{ aluno[0] }}"
                 {% if aluno[0] in presentes_ids %}checked{% endif %}
             >
-
-            <div>
-                <div class="nome">{{ aluno[1] }}</div>
-                <div class="info">
-                    FAIXA: {{ aluno[2] or 'NÃO INFORMADA' }} |
-                    GRAUS: {{ aluno[3] or '0' }} |
-                    SEDE: {{ aluno[4] or 'NÃO INFORMADA' }}
+        
+            {% if aluno[6] %}
+                <img
+                    class="foto-aluno"
+                    src="{{ aluno[6] }}"
+                    alt="{{ aluno[1] }}"
+                >
+            {% else %}
+                <img
+                    class="foto-aluno"
+                    src="{{ url_for('static', filename='default.png') }}"
+                >
+            {% endif %}
+        
+            <div class="dados">
+        
+                <div class="nome">
+                    {{ "%04d"|format(aluno[7]) }}
+                    —
+                    {{ aluno[1] }}
                 </div>
+        
+                <div class="info">
+                    {{ aluno[2] or "SEM FAIXA" }}
+                    •
+                    {{ aluno[3] or "0" }} GRAUS
+                </div>
+        
             </div>
+        
         </div>
         {% endfor %}
 
